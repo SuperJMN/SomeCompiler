@@ -24,6 +24,11 @@ public class Compiler
 
     private void CheckDeclarations(IEnumerable<FunctionDeclaration> declarations)
     {
+        if (declarations.All(x => x.Name != "main"))
+        {
+            errors.Add(new Error(ErrorKind.MainNotDeclared, "Main functions is not declared"));
+        }
+        
         declarations
             .GroupBy(x => x.Name)
             .Where(x => x.Count() > 1)
@@ -44,7 +49,8 @@ public class Compiler
 
 public enum ErrorKind
 {
-    FunctionAlreadyDeclared
+    FunctionAlreadyDeclared,
+    MainNotDeclared
 }
 
 public class Error

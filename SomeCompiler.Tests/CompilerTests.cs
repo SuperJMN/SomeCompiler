@@ -28,6 +28,18 @@ public class CompilerTests
             .Contain(e => e.Kind == ErrorKind.FunctionAlreadyDeclared);
     }
     
+    [Fact]
+    public void Main_function_should_be_declared()
+    {
+        var result = Compile("void other() { }");
+        result.Should()
+            .BeFailure()
+            .And
+            .Subject.Error
+            .Should()
+            .Contain(e => e.Kind == ErrorKind.MainNotDeclared);
+    }
+    
     private static Result<CompiledProgram, List<Error>> Compile(string source)
     {
         var parser = new SomeParser();
