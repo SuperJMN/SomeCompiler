@@ -1,4 +1,6 @@
-﻿namespace SomeCompiler.Parsing.Model;
+﻿using SomeCompiler.Compilation.Model;
+
+namespace SomeCompiler.Parsing.Model;
 
 public class Statements : List<Statement>
 {
@@ -10,5 +12,5 @@ public class Statements : List<Statement>
     {
     }
 
-    public override string ToString() => string.Join("\n", this);
+    public override string ToString() => this.JoinWithLines();
 }

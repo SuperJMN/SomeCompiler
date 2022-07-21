@@ -2,10 +2,12 @@
 
 public class CompiledProgram
 {
-    public IEnumerable<FunctionDeclaration> Declarations { get; }
+    public IEnumerable<BoundFunction> Functions { get; }
 
-    public CompiledProgram(IEnumerable<FunctionDeclaration> declarations)
+    public CompiledProgram(IEnumerable<BoundFunction> functions)
     {
-        Declarations = declarations;
+        Functions = functions;
     }
+
+    public override string ToString() => Functions.JoinWithLines();
 }

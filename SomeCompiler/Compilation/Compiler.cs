@@ -13,13 +13,24 @@ public class Compiler
         errors = new();
         var declarations = GetFunctionDeclarations(source.Functions);
         CheckDeclarations(declarations);
+        var functions = source.Functions.Select(Bind);
 
         if (errors.Any())
         {
             return Result.Failure<CompiledProgram, List<Error>>(errors);
         }
         
-        return Result.Success<CompiledProgram, List<Error>>(new CompiledProgram(declarations));
+        return Result.Success<CompiledProgram, List<Error>>(new CompiledProgram(functions));
+    }
+
+    private BoundFunction Bind(Function function)
+    {
+        return new BoundFunction(function.ReturnType, function.Identifier, Bind(function.Block));
+    }
+
+    private BoundBlock Bind(Block block)
+    {
+        return new BoundBlock();
     }
 
     private void CheckDeclarations(IEnumerable<FunctionDeclaration> declarations)

@@ -13,7 +13,10 @@ public class CompilerTests
     [Fact]
     public void Empty_program()
     {
-        Compile("void main() { }");
+        Compile("void main() { }")
+            .Should().BeSuccess()
+            .And.Subject.Value.ToString().RemoveWhitespace()
+            .Should().Be("void main() { }".RemoveWhitespace());
     }
     
     [Fact]
