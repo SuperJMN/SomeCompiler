@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using SomeCompiler;
 using SomeCompiler.Parsing;
 
 Console.WriteLine("Hello, World!");

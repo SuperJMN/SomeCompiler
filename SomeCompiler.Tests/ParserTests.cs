@@ -8,10 +8,10 @@ public class ParserTests
     [Fact]
     public void Empty_main()
     {
-        var source = $@"void main() {{ }}";
+        var source = @"void main() { }";
         AssertParse(source);
     }
-    
+
     [Theory]
     [InlineData(42)]
     [InlineData(1)]

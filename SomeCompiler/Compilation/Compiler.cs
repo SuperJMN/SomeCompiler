@@ -10,52 +10,39 @@ public class Compiler
 
     public Result<CompiledProgram, List<Error>> Compile(Program source)
     {
-        errors = new();
+        errors = new List<Error>();
         var declarations = GetFunctionDeclarations(source.Functions);
         CheckDeclarations(declarations);
         var functions = source.Functions.Select(Bind);
 
-        if (errors.Any())
-        {
-            return Result.Failure<CompiledProgram, List<Error>>(errors);
-        }
-        
+        if (errors.Any()) return Result.Failure<CompiledProgram, List<Error>>(errors);
+
         return Result.Success<CompiledProgram, List<Error>>(new CompiledProgram(functions));
     }
 
-    private BoundFunction Bind(Function function)
-    {
-        return new BoundFunction(function.ReturnType, function.Identifier, Bind(function.Block));
-    }
+    private BoundFunction Bind(Function function) =>
+        new BoundFunction(function.ReturnType, function.Identifier, Bind(function.Block));
 
-    private BoundBlock Bind(Block block)
-    {
-        return new BoundBlock();
-    }
+    private BoundBlock Bind(Block block) => new BoundBlock();
 
     private void CheckDeclarations(IEnumerable<FunctionDeclaration> declarations)
     {
         if (declarations.All(x => x.Name != "main"))
-        {
             errors.Add(new Error(ErrorKind.MainNotDeclared, "Main functions is not declared"));
-        }
-        
+
         declarations
             .GroupBy(x => x.Name)
             .Where(x => x.Count() > 1)
             .ToList()
-            .ForEach(d => errors.Add(new Error(ErrorKind.FunctionAlreadyDeclared ,$"Function '{d.Key}' has been declared more than once")));
+            .ForEach(d => errors.Add(new Error(ErrorKind.FunctionAlreadyDeclared,
+                $"Function '{d.Key}' has been declared more than once")));
     }
 
-    private List<FunctionDeclaration> GetFunctionDeclarations(Functions sourceFunctions)
-    {
-        return sourceFunctions.Select(GetFunctionDeclaration).ToList();
-    }
+    private List<FunctionDeclaration> GetFunctionDeclarations(Functions sourceFunctions) =>
+        sourceFunctions.Select(GetFunctionDeclaration).ToList();
 
-    private FunctionDeclaration GetFunctionDeclaration(Function function)
-    {
-        return new FunctionDeclaration(function.Identifier);
-    }
+    private FunctionDeclaration GetFunctionDeclaration(Function function) =>
+        new FunctionDeclaration(function.Identifier);
 }
 
 public enum ErrorKind
@@ -66,22 +53,22 @@ public enum ErrorKind
 
 public class Error
 {
-    public ErrorKind Kind { get; }
-    public string Message { get; }
-
     public Error(ErrorKind kind, string message)
     {
         Kind = kind;
         Message = message;
     }
+
+    public ErrorKind Kind { get; }
+    public string Message { get; }
 }
 
 public class FunctionDeclaration
 {
-    public string Name { get; }
-
     public FunctionDeclaration(string name)
     {
         Name = name;
     }
+
+    public string Name { get; }
 }

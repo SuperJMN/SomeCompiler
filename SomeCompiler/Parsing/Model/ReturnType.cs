@@ -2,12 +2,12 @@
 
 public class ReturnType
 {
-    public string Type { get; }
-
     public ReturnType(string type)
     {
         Type = type;
     }
+
+    public string Type { get; }
 
     public override string ToString() => $"{Type}";
 }

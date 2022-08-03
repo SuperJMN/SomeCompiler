@@ -15,5 +15,5 @@ public class BoundFunction
     public string Name { get; }
     public BoundBlock Block { get; }
 
-    public override string ToString() => new object[]{ $"{ReturnType} {Name}()", Block }.JoinWithLines();
+    public override string ToString() => new object[] { $"{ReturnType} {Name}()", Block }.JoinWithLines();
 }

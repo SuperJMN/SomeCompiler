@@ -2,12 +2,12 @@
 
 public class ArgumentType
 {
-    public string Type { get; }
-
     public ArgumentType(string type)
     {
         Type = type;
     }
+
+    public string Type { get; }
 
     public override string ToString() => Type;
 }

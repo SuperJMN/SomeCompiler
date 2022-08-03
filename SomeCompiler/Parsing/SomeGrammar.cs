@@ -10,9 +10,9 @@ public class SomeGrammar : NativeGrammar
     protected override IEnumerable<Regex> IgnorePatterns =>
         new[] { new Regex(@"\s+") };
 
-    public ArgumentType ArgumentType([L("int")] string keyword) => new ArgumentType(keyword);
-    
-    public ReturnType ReturnType([L("void")] string keyword) => new ReturnType(keyword);
+    public ArgumentType ArgumentType([L("int")] string keyword) => new(keyword);
+
+    public ReturnType ReturnType([L("void")] string keyword) => new(keyword);
 
     public int Unit([R("number", @"\d+")] string value) => int.Parse(value);
 
@@ -58,10 +58,12 @@ public class SomeGrammar : NativeGrammar
     public Functions Functions(Function function, Functions functions) => new(new[] { function }.Concat(functions));
     public Functions Functions(Function function) => new(new[] { function });
 
-    public Function Function(ReturnType returnType, string identifier, [L("(")] string open, [L(")")] string close, Block block) =>
+    public Function Function(ReturnType returnType, string identifier, [L("(")] string open, [L(")")] string close,
+        Block block) =>
         new(returnType, identifier, new ArgumentList(), block);
 
-    public Function Function(ReturnType returnType, string identifier, [L("(")] string open, ArgumentList argumentList, [L(")")] string close,
+    public Function Function(ReturnType returnType, string identifier, [L("(")] string open, ArgumentList argumentList,
+        [L(")")] string close,
         Block block) => new(returnType, identifier, argumentList, block);
 
     public Argument Argument(ArgumentType argumentType, string identifier) => new(argumentType, identifier);
