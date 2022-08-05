@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentAssertions;
 using FluentAssertions.CSharpFunctionalExtensions;
+using Microsoft.CSharp.RuntimeBinder;
 using SomeCompiler.Compilation;
 using SomeCompiler.Compilation.Model;
 using SomeCompiler.Parsing;
@@ -55,12 +56,6 @@ public class CompilerTests
 
     private static Result<CompiledProgram, List<Error>> Compile(string source)
     {
-        var parser = new SomeParser();
-        var sut = new Compiler();
-
-        var parseResult = parser.Parse(source);
-
-        Assert.True(parseResult.IsSuccess, parseResult.ErrorMessage);
-        return sut.Compile(parseResult.Result);
+        return new CompilerFrontend().Compile(source);
     }
 }

@@ -3,5 +3,6 @@
 public enum ErrorKind
 {
     FunctionAlreadyDeclared,
-    MainNotDeclared
+    MainNotDeclared,
+    SyntaxError
 }

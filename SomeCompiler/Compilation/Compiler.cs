@@ -46,7 +46,7 @@ public class Compiler
     private void CheckDeclarations(IList<FunctionDeclaration> declarations)
     {
         if (declarations.All(x => x.Name != "main"))
-            errors.Add(new Error(ErrorKind.MainNotDeclared, "Main functions is not declared"));
+            errors.Add(new Error(ErrorKind.MainNotDeclared, "'main' function is not declared"));
 
         declarations
             .GroupBy(x => x.Name)

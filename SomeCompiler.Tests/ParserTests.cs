@@ -1,3 +1,5 @@
+using FluentAssertions;
+using FluentAssertions.CSharpFunctionalExtensions;
 using SomeCompiler.Parsing;
 using Xunit;
 
@@ -56,7 +58,7 @@ public class ParserTests
         var sut = new SomeParser();
         var result = sut.Parse(source);
 
-        Assert.True(result.IsSuccess, result.ErrorMessage);
-        Assert.Equal(source.RemoveWhitespace(), result.Result.ToString().RemoveWhitespace());
+        result.Should().BeSuccess()
+            .And.Subject.Value.ToString().RemoveWhitespace().Should().Be(source.RemoveWhitespace());
     }
 }
