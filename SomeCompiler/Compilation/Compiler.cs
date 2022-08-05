@@ -20,8 +20,7 @@ public class Compiler
         return Result.Success<CompiledProgram, List<Error>>(new CompiledProgram(functions));
     }
 
-    private BoundFunction Bind(Function function) =>
-        new BoundFunction(function.ReturnType, function.Identifier, Bind(function.Block));
+    private BoundFunction Bind(Function function) => new(function.ReturnType, function.Identifier, Bind(function.Block));
 
     private BoundBlock Bind(Block block)
     {
@@ -33,7 +32,7 @@ public class Compiler
     {
         if (statement is ReturnStatement rs)
         {
-            return  (BoundStatement)new BoundReturnStatement(Bind(rs.Expression));
+            return new BoundReturnStatement(Bind(rs.Expression));
         }
 
         throw new NotSupportedException();
@@ -44,7 +43,7 @@ public class Compiler
         return new BoundConstantExpression(expression.Value);
     }
 
-    private void CheckDeclarations(IEnumerable<FunctionDeclaration> declarations)
+    private void CheckDeclarations(IList<FunctionDeclaration> declarations)
     {
         if (declarations.All(x => x.Name != "main"))
             errors.Add(new Error(ErrorKind.MainNotDeclared, "Main functions is not declared"));
@@ -60,6 +59,5 @@ public class Compiler
     private List<FunctionDeclaration> GetFunctionDeclarations(Functions sourceFunctions) =>
         sourceFunctions.Select(GetFunctionDeclaration).ToList();
 
-    private FunctionDeclaration GetFunctionDeclaration(Function function) =>
-        new FunctionDeclaration(function.Identifier);
+    private static FunctionDeclaration GetFunctionDeclaration(Function function) => new(function.Identifier);
 }
