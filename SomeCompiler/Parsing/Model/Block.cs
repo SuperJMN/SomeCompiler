@@ -1,13 +1,13 @@
-﻿namespace SomeCompiler.Parsing.Model;
+﻿using SomeCompiler.Compilation.Model;
 
-public class Block
+namespace SomeCompiler.Parsing.Model;
+
+public class Block : List<Statement>
 {
-    public Block(Statements statements)
+    public Block(Statements statements) : base(statements)
     {
-        Statements = statements;
     }
 
-    public Statements Statements { get; }
+    public override string ToString() => new object[] { "{", this.JoinWithLines(), "}" }.JoinWithLines();
 
-    public override string ToString() => $"{{\n{Statements}\n}}";
 }

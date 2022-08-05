@@ -24,7 +24,7 @@ public class Compiler
 
     private BoundBlock Bind(Block block)
     {
-        var boundReturnStatements = block.Statements.Select(Bind);
+        var boundReturnStatements = block.Select(Bind);
         return new BoundBlock(boundReturnStatements.ToList());
     }
 
