@@ -2,12 +2,12 @@
 
 public class Expression
 {
-    private readonly int additive;
+    public int Value { get; }
 
     public Expression(int additive)
     {
-        this.additive = additive;
+        this.Value = additive;
     }
 
-    public override string ToString() => additive.ToString();
+    public override string ToString() => Value.ToString();
 }

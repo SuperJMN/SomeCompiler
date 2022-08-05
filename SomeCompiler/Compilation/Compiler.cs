@@ -23,7 +23,26 @@ public class Compiler
     private BoundFunction Bind(Function function) =>
         new BoundFunction(function.ReturnType, function.Identifier, Bind(function.Block));
 
-    private BoundBlock Bind(Block block) => new BoundBlock();
+    private BoundBlock Bind(Block block)
+    {
+        var boundReturnStatements = block.Statements.Select(Bind);
+        return new BoundBlock(boundReturnStatements.ToList());
+    }
+
+    private BoundStatement Bind(Statement statement)
+    {
+        if (statement is ReturnStatement rs)
+        {
+            return  (BoundStatement)new BoundReturnStatement(Bind(rs.Expression));
+        }
+
+        throw new NotSupportedException();
+    }
+
+    private BoundExpression Bind(Expression expression)
+    {
+        return new BoundConstantExpression(expression.Value);
+    }
 
     private void CheckDeclarations(IEnumerable<FunctionDeclaration> declarations)
     {
@@ -43,32 +62,4 @@ public class Compiler
 
     private FunctionDeclaration GetFunctionDeclaration(Function function) =>
         new FunctionDeclaration(function.Identifier);
-}
-
-public enum ErrorKind
-{
-    FunctionAlreadyDeclared,
-    MainNotDeclared
-}
-
-public class Error
-{
-    public Error(ErrorKind kind, string message)
-    {
-        Kind = kind;
-        Message = message;
-    }
-
-    public ErrorKind Kind { get; }
-    public string Message { get; }
-}
-
-public class FunctionDeclaration
-{
-    public FunctionDeclaration(string name)
-    {
-        Name = name;
-    }
-
-    public string Name { get; }
 }

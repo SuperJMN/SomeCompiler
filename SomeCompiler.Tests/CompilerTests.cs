@@ -16,7 +16,7 @@ public class CompilerTests
         AssertSuccess("void main() { }");
     }
 
-    [Fact(Skip = "Next to make green")]
+    [Fact]
     public void Return_numeric_constant()
     {
         AssertSuccess("void main() { return 13; }");
