@@ -6,11 +6,11 @@ namespace SomeCompiler.Tests;
 
 public class IntermediateCodeGeneratorTests
 {
-    [Fact(Skip = "Next test to make green")]
+    [Fact]
     public void Empty()
     {
         var input = "void main() { }";
-        var output = "Call Main;Halt;Label Main;Return;";
+        var output = "Call Main;Halt;Label Main;Return";
 
         var result = new CompilerFrontend().Generate(input);
         result
