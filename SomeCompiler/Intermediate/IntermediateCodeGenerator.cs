@@ -9,20 +9,36 @@ public class IntermediateCodeGenerator
 {
     public Result<IntermediateCodeProgram, List<Error>> Generate(CompiledProgram compiledProgram)
     {
+        var block = compiledProgram.Functions.First().Block;
+
+        object? value = null;
+        foreach (var statement in block)
+        {
+            if (statement is BoundReturnStatement rs)
+            {
+                value = (rs.Expression as BoundConstantExpression)?.Value;
+            }
+        }
+        
         IEnumerable<IntermediateCode> instructions = new []
         {
             Call("Main"),
             Halt(),
             Label("Main"),
-            Return(),
+            value is null ? Return() : Return(value),
         };
         
         return Result.Success<IntermediateCodeProgram, List<Error>>(new IntermediateCodeProgram(instructions));
     }
 
+    private IntermediateCode Return(object constant)
+    {
+        return new ReturnCode(constant);
+    }
+
     private IntermediateCode Return()
     {
-        return new ReturnCode();
+        return new ReturnCode(Maybe<object>.None);
     }
 
     private IntermediateCode Label(string name)

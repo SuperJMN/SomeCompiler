@@ -11,6 +11,12 @@ public class IntermediateCodeGeneratorTests
     {
         AssertCode("void main() { }", "Call Main;Halt;Label Main;Return");
     }
+    
+    [Fact]
+    public void Return_integer_constant()
+    {
+        AssertCode("void main() { return 1; }", "Call Main;Halt;Label Main;Return 1");
+    }
 
     private static void AssertCode(string input, string output)
     {
