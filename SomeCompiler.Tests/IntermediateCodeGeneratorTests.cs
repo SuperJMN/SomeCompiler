@@ -9,9 +9,11 @@ public class IntermediateCodeGeneratorTests
     [Fact]
     public void Empty()
     {
-        var input = "void main() { }";
-        var output = "Call Main;Halt;Label Main;Return";
+        AssertCode("void main() { }", "Call Main;Halt;Label Main;Return");
+    }
 
+    private static void AssertCode(string input, string output)
+    {
         var result = new CompilerFrontend().Generate(input);
         result
             .Should().BeSuccess()

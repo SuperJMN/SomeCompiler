@@ -7,7 +7,7 @@ namespace SomeCompiler.Intermediate;
 
 public class IntermediateCodeGenerator
 {
-    public Result<IntermediateCodeProgram, List<Error>> Generate(CompiledProgram result)
+    public Result<IntermediateCodeProgram, List<Error>> Generate(CompiledProgram compiledProgram)
     {
         IEnumerable<IntermediateCode> instructions = new []
         {
@@ -39,51 +39,4 @@ public class IntermediateCodeGenerator
     {
         return new CallCode(label);
     }
-}
-
-internal class CallCode : IntermediateCode
-{
-    public string LabelName { get; }
-
-    public CallCode(string labelName)
-    {
-        LabelName = labelName;
-    }
-
-    public override string ToString() => $"Call {LabelName}";
-}
-
-internal class HaltCode : IntermediateCode
-{
-    public override string ToString() => "Halt";
-}
-
-internal class LabelCode : IntermediateCode
-{
-    public string Name { get; }
-
-    public LabelCode(string name)
-    {
-        Name = name;
-    }
-
-    public override string ToString() => $"Label {Name}";
-}
-
-internal class ReturnCode : IntermediateCode
-{
-    public override string ToString() => "Return";
-}
-
-public class IntermediateCodeProgram : List<IntermediateCode>
-{
-    public IntermediateCodeProgram(IEnumerable<IntermediateCode> instructions) : base(instructions)
-    {
-    }
-
-    public override string ToString() => this.Join(";");
-}
-
-public abstract class IntermediateCode
-{
 }
