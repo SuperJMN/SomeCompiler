@@ -35,6 +35,11 @@ public class Compiler
             return new BoundReturnStatement(Bind(rs.Expression));
         }
 
+        if (statement is AssignmentStatement assignment)
+        {
+            return new BoundAssignmentStatement(assignment.LeftValue, Bind(assignment.Expression));
+        }
+
         throw new NotSupportedException();
     }
 

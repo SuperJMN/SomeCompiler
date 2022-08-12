@@ -22,6 +22,12 @@ public class CompilerTests
     {
         AssertSuccess("void main() { return 13; }");
     }
+    
+    [Fact]
+    public void Assignment()
+    {
+        AssertSuccess("void main() { a = 13; }");
+    }
 
     [Fact]
     public void Duplicate_declaration()
