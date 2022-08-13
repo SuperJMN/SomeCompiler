@@ -22,13 +22,27 @@ public class IntermediateCodeGenerator
         
         IEnumerable<IntermediateCode> instructions = new []
         {
-            Call("Main"),
+            Call("main"),
             Halt(),
-            Label("Main"),
-            value is null ? Return() : Return(value),
-        };
+            
+        }.Concat(GenerateFunction(compiledProgram.Functions.First(x => x.Name == "main")));
         
         return Result.Success<IntermediateCodeProgram, List<Error>>(new IntermediateCodeProgram(instructions));
+    }
+
+    private IEnumerable<IntermediateCode> GenerateFunction(BoundFunction function)
+    {        
+        object? value = null;
+        foreach (var statement in function.Block)
+        {
+            if (statement is BoundReturnStatement rs)
+            {
+                value = (rs.Expression as BoundConstantExpression)?.Value;
+            }
+        }
+
+        yield return Label(function.Name);
+        yield return value is null ? Return() : Return(value);
     }
 
     private IntermediateCode Return(object constant)

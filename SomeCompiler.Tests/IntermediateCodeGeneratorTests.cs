@@ -9,13 +9,13 @@ public class IntermediateCodeGeneratorTests
     [Fact]
     public void Empty()
     {
-        AssertCode("void main() { }", "Call Main;Halt;Label Main;Return");
+        AssertCode("void main() { }", "Call main;Halt;Label main;Return");
     }
     
     [Fact]
     public void Return_integer_constant()
     {
-        AssertCode("void main() { return 1; }", "Call Main;Halt;Label Main;Return 1");
+        AssertCode("void main() { return 1; }", "Call main;Halt;Label main;Return 1");
     }
 
     private static void AssertCode(string input, string output)
