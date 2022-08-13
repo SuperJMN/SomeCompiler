@@ -36,17 +36,15 @@ public class SomeGrammar : NativeGrammar
 
     public Expression Expression(int additive) => new(additive);
 
-    public Statement Statement([L("return")] string keyword, Expression expression,
-        [L(";")] string semicolon) => new ReturnStatement(expression);
+    public Statement Statement([L("return")] string keyword, Expression expression) => new ReturnStatement(expression);
 
-    public Statement Statement(LeftValue leftValue, [L("=")] string equals, Expression expression,
-        [L(";")] string semicolon) =>
+    public Statement Statement(LeftValue leftValue, [L("=")] string equals, Expression expression) =>
         new AssignmentStatement(leftValue, expression);
 
-    public Statement Statement(ArgumentType argumentType, string identifier, [L(";")] string semicolon) =>
+    public Statement Statement(ArgumentType argumentType, string identifier) =>
         new DeclarationStatement(argumentType, identifier);
 
-    public Statements Statements(Statement statement) => new(new[] { statement });
+    public Statements Statements(Statement statement, [L(";")] string semicolon) => new(new[] { statement });
 
     public Statements Statements(Statements statements, Statement statement) =>
         new(new[] { statement }.Concat(statements));
