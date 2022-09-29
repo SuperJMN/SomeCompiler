@@ -1,4 +1,4 @@
-namespace SomeCompiler.Intermediate.Model;
+namespace SomeCompiler.Generation.Intermediate.Model;
 
 public static class DictionaryMixin
 {

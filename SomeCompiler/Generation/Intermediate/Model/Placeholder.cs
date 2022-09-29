@@ -1,6 +1,6 @@
 using CodeGeneration.Model.Classes;
 
-namespace SomeCompiler.Intermediate.Model;
+namespace SomeCompiler.Generation.Intermediate.Model;
 
 public class Placeholder : Reference
 {

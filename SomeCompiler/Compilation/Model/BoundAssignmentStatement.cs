@@ -2,7 +2,7 @@
 
 namespace SomeCompiler.Compilation.Model;
 
-internal class BoundAssignmentStatement : BoundStatement
+public class BoundAssignmentStatement : BoundStatement
 {
     public LeftValue LeftValue { get; }
     public BoundExpression RightValue { get; }
