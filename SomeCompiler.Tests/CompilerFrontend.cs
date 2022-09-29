@@ -2,6 +2,7 @@
 using SomeCompiler.Compilation;
 using SomeCompiler.Compilation.Model;
 using SomeCompiler.Intermediate;
+using SomeCompiler.Intermediate.Model;
 using SomeCompiler.Parsing;
 
 namespace SomeCompiler.Tests;

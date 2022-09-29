@@ -1,6 +1,6 @@
 ﻿using SomeCompiler.Parsing.Model;
 
-namespace SomeCompiler.Compilation;
+namespace SomeCompiler.Compilation.Model;
 
 internal class BoundAssignmentStatement : BoundStatement
 {

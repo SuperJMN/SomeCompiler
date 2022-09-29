@@ -1,72 +1,54 @@
-﻿using System.Linq.Expressions;
 using CSharpFunctionalExtensions;
 using SomeCompiler.Compilation;
 using SomeCompiler.Compilation.Model;
+using SomeCompiler.Intermediate.Model;
 
 namespace SomeCompiler.Intermediate;
 
 public class IntermediateCodeGenerator
 {
-    public Result<IntermediateCodeProgram, List<Error>> Generate(CompiledProgram compiledProgram)
+    public Fragment Generate(AssignmentExpression assignment)
     {
-        var block = compiledProgram.Functions.First().Block;
+        var reference = new NamedReference(assignment.Identifier.Identifier);
+        var expressionFragment = Generate(assignment.Expression);
 
-        object? value = null;
-        foreach (var statement in block)
+        var code = new Code(reference, expressionFragment.Reference, null, Operator.Equal);
+        return new Fragment(reference, expressionFragment.Codes.Concat(new[] {code}));
+    }
+
+    private Fragment Generate(ConstantExpression cex)
+    {
+        return new Fragment(x => new Code(x, new ConstantReference(cex.Constant), null, Operator.Equal));
+    }
+
+    private Fragment Generate(BinaryExpression bex)
+    {
+        var left = Generate(bex.Left);
+        var right = Generate(bex.Right);
+
+        return new Fragment(reference => new Code(reference, left.Reference, right.Reference, bex.Operator))
+            .Prepend(right)
+            .Prepend(left);
+    }
+
+    private Fragment Generate(IdentifierExpression bex)
+    {
+        return new Fragment(reference => new Code(reference, new NamedReference(bex.Identifier), null, Operator.Equal));
+    }
+
+    private Fragment Generate(Expression expression)
+    {
+        return expression switch
         {
-            if (statement is BoundReturnStatement rs)
-            {
-                value = (rs.Expression as BoundConstantExpression)?.Value;
-            }
-        }
-        
-        IEnumerable<IntermediateCode> instructions = new []
-        {
-            Call("main"),
-            Halt(),
-            
-        }.Concat(GenerateFunction(compiledProgram.Functions.First(x => x.Name == "main")));
-        
-        return Result.Success<IntermediateCodeProgram, List<Error>>(new IntermediateCodeProgram(instructions));
+            BinaryExpression bex => Generate(bex),
+            ConstantExpression cex => Generate(cex),
+            IdentifierExpression iex => Generate(iex),
+            _ => throw new NotSupportedException()
+        };
     }
 
-    private IEnumerable<IntermediateCode> GenerateFunction(BoundFunction function)
-    {        
-        object? value = null;
-        foreach (var statement in function.Block)
-        {
-            if (statement is BoundReturnStatement rs)
-            {
-                value = (rs.Expression as BoundConstantExpression)?.Value;
-            }
-        }
-
-        yield return Label(function.Name);
-        yield return value is null ? Return() : Return(value);
-    }
-
-    private IntermediateCode Return(object constant)
+    public Result<IntermediateCodeProgram,List<Error>> Generate(CompiledProgram assignment)
     {
-        return new ReturnCode(constant);
-    }
-
-    private IntermediateCode Return()
-    {
-        return new ReturnCode(Maybe<object>.None);
-    }
-
-    private IntermediateCode Label(string name)
-    {
-        return new LabelCode(name);
-    }
-
-    private IntermediateCode Halt()
-    {
-        return new HaltCode();
-    }
-
-    private IntermediateCode Call(string label)
-    {
-        return new CallCode(label);
+        throw new NotImplementedException();
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace SomeCompiler.Compilation.Model;
+﻿namespace SomeCompiler;
 
 public static class Mixin
 {
