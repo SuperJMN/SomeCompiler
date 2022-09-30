@@ -1,34 +1,14 @@
 using CodeGeneration.Model.Classes;
+using SomeCompiler.Generation.Intermediate.Model.Codes;
 
 namespace SomeCompiler.Generation.Intermediate.Model;
 
 public static class CodeFormatter
 {
-    public static IEnumerable<string> ToCodeFormatContent(IEnumerable<Code> codes)
+    public static IEnumerable<string> ToCodeFormatContent(ICollection<Code> codes)
     {
-        var map = new Dictionary<Placeholder, string>();
-
-        return codes.Select(code => Format(code, map));
-    }
-
-    private static string Format(Code code, IDictionary<Placeholder, string> map)
-    {
-        if (code.Right is null && code.Left is null && code.Target is null)
-        {
-            return $"{code.Operator}";
-        }
-
-        if (code.Right is null && code.Left is null)
-        {
-            return $"{code.Operator} {GetReferenceName(code.Target, map)}";
-        }
-
-        if (code.Right is null)
-        {
-            return $"{GetReferenceName(code.Target, map)} {code.Operator} {GetReferenceName(code.Left, map)} {GetReferenceName(code.Right, map)}";
-        }
-
-        return $"{GetReferenceName(code.Target, map)} = {GetReferenceName(code.Left, map)} {code.Operator} {GetReferenceName(code.Right, map)}";
+        var map = codes.SelectMany(x => x.GetReferences()).Select((x, i) => (x, i)).ToDictionary(tuple => tuple.x, x => "T" + (x.i + 1));
+        return codes.Select(code => code.ToString(map));
     }
 
     private static string GetReferenceName(Reference? reference, IDictionary<Placeholder, string> map)
