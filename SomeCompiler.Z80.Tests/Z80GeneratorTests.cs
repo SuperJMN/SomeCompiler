@@ -9,7 +9,7 @@ namespace SomeCompiler.Z80.Tests
         [Fact]
         public void Test1()
         {
-            var input = "void main() { a = 1 + 2; }";
+            var input = "void main() { a = 1; }";
             var expected = 
                 @"CALL    MAIN 
                 HALT     

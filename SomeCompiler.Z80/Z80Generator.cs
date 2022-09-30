@@ -7,12 +7,14 @@ public class Z80Generator
 {
     public string Generate(IntermediateCodeProgram program)
     {
+        var refToMemAddressMap = program.Select((code, i) => (code, i)).ToDictionary(t => t.code, t => t.i * 2 + 0x30);
+
         StringBuilder strBuilder=new();
         foreach (var code in program)
         {
             if (code.Operator == Operator.Call)
             {
-                strBuilder.AppendLine($"CALL {code.Target}");
+                strBuilder.AppendLine($"CALL {((LabelReference)code.Target).Label}");
             }
 
             if (code.Operator == Operator.Halt)
