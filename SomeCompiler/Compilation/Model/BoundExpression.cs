@@ -1,5 +1,5 @@
-﻿namespace SomeCompiler.Compilation;
+﻿namespace SomeCompiler.Compilation.Model;
 
-internal class BoundExpression
+public class BoundExpression
 {
 }

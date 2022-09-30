@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using CSharpFunctionalExtensions;
 using EasyParse.Native;
 using EasyParse.Native.Annotations;
 using SomeCompiler.Parsing.Model;
@@ -37,6 +38,7 @@ public class SomeGrammar : NativeGrammar
     public Expression Expression(int additive) => new(additive);
 
     public Statement Statement([L("return")] string keyword, Expression expression) => new ReturnStatement(expression);
+    public Statement Statement([L("return")] string keyword) => new ReturnStatement();
 
     public Statement Statement(LeftValue leftValue, [L("=")] string equals, Expression expression) =>
         new AssignmentStatement(leftValue, expression);

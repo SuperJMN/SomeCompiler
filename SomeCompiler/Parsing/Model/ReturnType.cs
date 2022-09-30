@@ -1,4 +1,4 @@
-﻿namespace SomeCompiler.Parsing;
+﻿namespace SomeCompiler.Parsing.Model;
 
 public class ReturnType
 {

@@ -9,13 +9,13 @@ public class IntermediateCodeGeneratorTests
     [Fact]
     public void Empty()
     {
-        AssertCode("void main() { }", "Call main;Halt;Label main;Return");
+        AssertCode("void main() { }", "call main;halt;label main;return;");
     }
     
     [Fact]
     public void Return_integer_constant()
     {
-        AssertCode("void main() { return 1; }", "Call main;Halt;Label main;Return 1");
+        AssertCode("void main() { return 1; }", "call main;halt;label main;T1=1;return T1;");
     }
 
     private static void AssertCode(string input, string output)
@@ -24,6 +24,6 @@ public class IntermediateCodeGeneratorTests
         result
             .Should().BeSuccess()
             .And.Subject.Value.ToString().RemoveWhitespace()
-            .Should().Be(output.RemoveWhitespace());
+            .Should().BeEquivalentTo(output.RemoveWhitespace());
     }
 }

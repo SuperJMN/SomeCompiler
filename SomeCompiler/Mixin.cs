@@ -1,4 +1,4 @@
-﻿namespace SomeCompiler.Compilation.Model;
+﻿namespace SomeCompiler;
 
 public static class Mixin
 {
@@ -8,6 +8,6 @@ public static class Mixin
 
     public static string Join<T>(this IEnumerable<T> items, string separator)
     {
-        return string.Join(separator, items.Select(x => x.ToString()));
+        return string.Join(separator, items.Select(x => x?.ToString()));
     }
 }

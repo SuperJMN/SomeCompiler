@@ -7,7 +7,14 @@ internal class ReturnStatement : Statement
         Expression = expression;
     }
 
-    public Expression Expression { get; }
+    public ReturnStatement()
+    {
+    }
 
-    public override string ToString() => $"return {Expression};";
+    public Expression? Expression { get; }
+
+    public override string ToString()
+    {
+        return $"return {Expression};";
+    }
 }

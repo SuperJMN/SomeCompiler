@@ -1,4 +1,5 @@
 ﻿using SomeCompiler.Parsing;
+using SomeCompiler.Parsing.Model;
 
 namespace SomeCompiler.Compilation.Model;
 

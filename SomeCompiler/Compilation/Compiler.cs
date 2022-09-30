@@ -32,7 +32,7 @@ public class Compiler
     {
         if (statement is ReturnStatement rs)
         {
-            return new BoundReturnStatement(Bind(rs.Expression));
+            return new BoundReturnStatement(rs.Expression is not null ? Bind(rs.Expression) : null);
         }
 
         if (statement is AssignmentStatement assignment)
