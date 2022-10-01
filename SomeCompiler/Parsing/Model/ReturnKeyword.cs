@@ -1,3 +1,3 @@
 ﻿namespace SomeCompiler.Parsing.Model;
 
-public record Expression;
+public record ReturnKeyword;

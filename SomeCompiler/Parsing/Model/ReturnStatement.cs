@@ -1,20 +1,18 @@
-﻿namespace SomeCompiler.Parsing.Model;
+﻿using CSharpFunctionalExtensions;
 
-internal class ReturnStatement : Statement
+namespace SomeCompiler.Parsing.Model;
+
+public record ReturnStatement : Statement
 {
-    public ReturnStatement(Expression expression)
+    public ReturnStatement(Maybe<Expression> expression)
     {
         Expression = expression;
     }
 
-    public ReturnStatement()
-    {
-    }
-
-    public Expression? Expression { get; }
+    public Maybe<Expression> Expression { get; }
 
     public override string ToString()
     {
-        return $"return {Expression};";
+        return $"return {Expression.Match(x => x.ToString(), () => "")};";
     }
 }

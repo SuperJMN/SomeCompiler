@@ -1,13 +1,9 @@
 ﻿namespace SomeCompiler.Parsing.Model;
 
-public class ReturnType
+public record ReturnType(string Type)
 {
-    public ReturnType(string type)
+    public override string ToString()
     {
-        Type = type;
+        return Type;
     }
-
-    public string Type { get; }
-
-    public override string ToString() => $"{Type}";
 }

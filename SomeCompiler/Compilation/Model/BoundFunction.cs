@@ -1,20 +1,20 @@
-﻿using SomeCompiler.Parsing;
+﻿using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Parsing.Model;
 
 namespace SomeCompiler.Compilation.Model;
 
 public class BoundFunction
 {
-    public BoundFunction(ReturnType returnType, string name, BoundBlock block)
+    public BoundFunction(ReturnType returnType, string name, BoundCompoundStatement compoundStatement)
     {
         ReturnType = returnType;
         Name = name;
-        Block = block;
+        CompoundStatement = compoundStatement;
     }
 
     public ReturnType ReturnType { get; }
     public string Name { get; }
-    public BoundBlock Block { get; }
+    public BoundCompoundStatement CompoundStatement { get; }
 
-    public override string ToString() => new object[] { $"{ReturnType} {Name}()", Block }.JoinWithLines();
+    public override string ToString() => new object[] { $"{ReturnType} {Name}()", CompoundStatement }.JoinWithLines();
 }

@@ -10,5 +10,8 @@ public class ArgumentList : List<Argument>
     {
     }
 
-    public override string ToString() => string.Join(", ", this);
+    public override string ToString()
+    {
+        return this.JoinWithCommas();
+    }
 }

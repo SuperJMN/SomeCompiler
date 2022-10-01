@@ -1,13 +1,9 @@
 ﻿namespace SomeCompiler.Parsing.Model;
 
-public class Program
+public record Program(Functions Functions)
 {
-    public Program(Functions functions)
+    public override string ToString()
     {
-        Functions = functions;
+        return Functions.ToString();
     }
-
-    public Functions Functions { get; }
-
-    public override string ToString() => Functions.ToString();
 }
