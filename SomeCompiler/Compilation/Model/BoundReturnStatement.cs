@@ -1,13 +1,8 @@
-﻿namespace SomeCompiler.Compilation.Model;
+﻿using CSharpFunctionalExtensions;
 
-internal class BoundReturnStatement : BoundStatement
+namespace SomeCompiler.Compilation.Model;
+
+public record BoundReturnStatement(Maybe<BoundExpression> Expression) : BoundStatement
 {
-    public BoundExpression? Expression { get; }
-
-    public BoundReturnStatement(BoundExpression? expression)
-    {
-        Expression = expression;
-    }
-
     public override string ToString() => $"return {Expression};";
 }

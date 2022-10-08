@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using SomeCompiler.Compilation.Model;
+using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Parsing.Model;
 
 namespace SomeCompiler.Compilation;
@@ -20,32 +21,49 @@ public class Compiler
         return Result.Success<CompiledProgram, List<Error>>(new CompiledProgram(functions));
     }
 
-    private BoundFunction Bind(Function function) => new(function.ReturnType, function.Identifier, Bind(function.Block));
+    private BoundFunction Bind(Function function) => new(function.ReturnType, function.Identifier, Bind(function.CompoundStatement));
 
-    private BoundBlock Bind(Block block)
+    private BoundCompoundStatement Bind(CompoundStatement compoundStatement)
     {
-        var boundReturnStatements = block.Select(Bind);
-        return new BoundBlock(boundReturnStatements.ToList());
+        var boundReturnStatements = compoundStatement.Statements.Select(Bind);
+        return new BoundCompoundStatement(boundReturnStatements.ToList());
     }
 
     private BoundStatement Bind(Statement statement)
     {
         if (statement is ReturnStatement rs)
         {
-            return new BoundReturnStatement(rs.Expression is not null ? Bind(rs.Expression) : null);
+            return new BoundReturnStatement(rs.Expression.Match(x => Bind(x), () => new Maybe<BoundExpression>()));
         }
 
-        if (statement is AssignmentStatement assignment)
+        if (statement is ExpressionStatement expressionStatement)
         {
-            return new BoundAssignmentStatement(assignment.LeftValue, Bind(assignment.Expression));
+            return new BoundExpressionStatement(Bind(expressionStatement.Expression));
         }
 
         throw new NotSupportedException();
     }
 
+    private BoundExpression Bind(ConstantExpression constantExpression)
+    {
+        return new BoundConstantExpression(constantExpression.Constant);
+    }
+
+    private BoundExpression Bind(AssignmentExpression assignmentExpression)
+    {
+        return new BoundAssignmentExpression(assignmentExpression.LeftValue, Bind(assignmentExpression.Expression));
+    }
+
     private BoundExpression Bind(Expression expression)
     {
-        return new BoundConstantExpression(expression.Value);
+        return expression switch
+        {
+            AssignmentExpression assignmentExpression => Bind(assignmentExpression),
+            ConstantExpression constantExpression => Bind(constantExpression),
+            IdentifierExpression identifierExpression => throw new NotImplementedException(),
+            NegateExpression negateExpression => throw new NotImplementedException(),
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
     private void CheckDeclarations(IList<FunctionDeclaration> declarations)

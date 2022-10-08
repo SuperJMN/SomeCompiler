@@ -1,19 +1,9 @@
 ﻿namespace SomeCompiler.Parsing.Model;
 
-public class Function
+public record Function(ReturnType ReturnType, string Identifier, ArgumentList ArgumentList, CompoundStatement CompoundStatement)
 {
-    public Function(ReturnType returnType, string identifier, ArgumentList argumentList, Block block)
+    public override string ToString()
     {
-        ReturnType = returnType;
-        Identifier = identifier;
-        ArgumentList = argumentList;
-        Block = block;
+        return $"{ReturnType} {Identifier}({ArgumentList}) {CompoundStatement}";
     }
-
-    public ReturnType ReturnType { get; }
-    public string Identifier { get; }
-    public ArgumentList ArgumentList { get; }
-    public Block Block { get; }
-
-    public override string ToString() => $"{ReturnType} {Identifier}({ArgumentList}) {Block}";
 }

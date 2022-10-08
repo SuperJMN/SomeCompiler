@@ -1,13 +1,6 @@
 ﻿namespace SomeCompiler.Compilation.Model;
 
-internal class BoundConstantExpression : BoundExpression
+public record BoundConstantExpression(object Value) : BoundExpression
 {
-    public object Value { get; }
-
-    public BoundConstantExpression(object value)
-    {
-        Value = value;
-    }
-
     public override string? ToString() => Value.ToString();
 }

@@ -1,16 +1,17 @@
-﻿using SomeCompiler.Compilation.Model;
-
-namespace SomeCompiler.Parsing.Model;
+﻿namespace SomeCompiler.Parsing.Model;
 
 public class Statements : List<Statement>
 {
-    public Statements(IEnumerable<Statement> items) : base(items.ToList())
+    public Statements(IEnumerable<Statement> statements) : base(statements)
     {
     }
 
-    public Statements()
+    public Statements(params Statement[] statements) : base(statements)
     {
     }
 
-    public override string ToString() => this.JoinWithLines();
+    public override string ToString()
+    {
+        return this.JoinWithLines();
+    }
 }

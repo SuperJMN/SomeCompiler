@@ -2,9 +2,16 @@
 
 public class Functions : List<Function>
 {
-    public Functions(IEnumerable<Function> items) : base(items.ToList())
+    public Functions(IEnumerable<Function> statements) : base(statements)
     {
     }
 
-    public override string ToString() => string.Join(Environment.NewLine, this);
+    public Functions(params Function[] statements) : base(statements)
+    {
+    }
+
+    public override string ToString()
+    {
+        return this.JoinWithLines();
+    }
 }

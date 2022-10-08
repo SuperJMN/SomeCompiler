@@ -1,13 +1,9 @@
 ﻿namespace SomeCompiler.Parsing.Model;
 
-public class LeftValue
+public record LeftValue(string Identifier)
 {
-    public LeftValue(string identifier)
+    public override string ToString()
     {
-        Identifier = identifier;
+        return Identifier;
     }
-
-    public string Identifier { get; }
-
-    public override string ToString() => Identifier;
 }

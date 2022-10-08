@@ -1,5 +1,3 @@
 ﻿namespace SomeCompiler.Parsing.Model;
 
-public abstract class Statement
-{
-}
+public record Statement;

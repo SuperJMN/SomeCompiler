@@ -1,13 +1,9 @@
 ﻿namespace SomeCompiler.Parsing.Model;
 
-public class ArgumentType
+public record ArgumentType(string Type)
 {
-    public ArgumentType(string type)
+    public override string ToString()
     {
-        Type = type;
+        return $"{Type}";
     }
-
-    public string Type { get; }
-
-    public override string ToString() => Type;
 }

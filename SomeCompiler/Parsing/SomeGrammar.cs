@@ -8,70 +8,43 @@ namespace SomeCompiler.Parsing;
 
 public class SomeGrammar : NativeGrammar
 {
-    protected override IEnumerable<Regex> IgnorePatterns =>
-        new[] { new Regex(@"\s+") };
+    protected override IEnumerable<Regex> IgnorePatterns => new[] { new Regex(@"\s+") };
 
-    public ArgumentType ArgumentType([L("int")] string keyword) => new(keyword);
-
-    public ReturnType ReturnType([L("void")] string keyword) => new(keyword);
-
-    public int Unit([R("number", @"\d+")] string value) => int.Parse(value);
-
+    public int Number([R("number", @"\d+")] string value) => int.Parse(value);
     public string Identifier([R("identifier", @"\w+")] string value) => value;
-
-    public int Unit([L("-")] string minus, int unit) => -unit;
-
-    public int Unit([L("(")] string open, int additive, [L(")")] string close) => additive;
-
-    public int Multiplicative(int unit) => unit;
-
-    public int Multiplicative(int multiplicative, [L("*", "/")] string op, int unit) =>
-        op == "*" ? multiplicative * unit : multiplicative / unit;
-
-    public int Additive(int multiplicative) => multiplicative;
-
-    public int Additive(int additive, [L("+", "-")] string op, int multiplicative) =>
-        op == "+" ? additive + multiplicative : additive - multiplicative;
-
+    public ReturnType ReturnType([L("void")] string keyword) => new(keyword);
+    public ArgumentType ArgumentType([L("int")] string keyword) => new(keyword);
     public LeftValue LeftValue(string identifier) => new(identifier);
+    public ReturnKeyword ReturnKeyword([L("return")] string keyword) => new ReturnKeyword();
 
-    public Expression Expression(int additive) => new(additive);
+    public Statements Statements(Statement statement) => new(statement);
+    public Statements Statements(Statement statement, Statements statements) => new(new[]{ statement }.Concat(statements));
+    
+    public Expression Expression(int number) => new ConstantExpression(number);
+    public Expression Expression(string identifier) => new IdentifierExpression(identifier);
+    public Expression Expression(LeftValue leftValue, [L("=")] string equals, Expression expression) => new AssignmentExpression(leftValue, expression);
+    public Expression Expression([L("-")] string minus, Expression expression) => new NegateExpression(expression);
 
-    public Statement Statement([L("return")] string keyword, Expression expression) => new ReturnStatement(expression);
-    public Statement Statement([L("return")] string keyword) => new ReturnStatement();
+    public CompoundStatement CompoundStatement([L("{")] string openBrace, Statements statements, [L("}")] string closeBrace) => new CompoundStatement(statements);
+    public CompoundStatement CompoundStatement([L("{")] string openBrace, [L("}")] string closeBrace) => new CompoundStatement(new Statements());
 
-    public Statement Statement(LeftValue leftValue, [L("=")] string equals, Expression expression) =>
-        new AssignmentStatement(leftValue, expression);
+    public Statement Statement(ArgumentType argumentType, string identifier, [L(";")] string semicolon) => new DeclarationStatement(argumentType, identifier);
+    public Statement Statement(Expression expression, [L(";")] string semicolon) => new ExpressionStatement(expression);
+    public Statement Statement(ReturnKeyword returnKeyword, [L(";")] string semicolon) => new ReturnStatement(Maybe<Expression>.None);
+    public Statement Statement(ReturnKeyword returnKeyword, Expression expression, [L(";")] string semicolon) => new ReturnStatement(expression);
 
-    public Statement Statement(ArgumentType argumentType, string identifier) =>
-        new DeclarationStatement(argumentType, identifier);
+    public Function Function(ReturnType returnType, string identifier, [L("(")] string lparen, [L(")")] string rparen, CompoundStatement compoundStatement) => new Function(returnType, identifier, new ArgumentList(), compoundStatement);
+    public Function Function(ReturnType returnType, string identifier, [L("(")] string lparen, ArgumentList argumentList, [L(")")] string rparen, CompoundStatement compoundStatement) => new Function(returnType, identifier, argumentList, compoundStatement);
 
-    public Statements Statements(Statement statement, [L(";")] string semicolon) => new(new[] { statement });
-
-    public Statements Statements(Statements statements, Statement statement) =>
-        new(new[] { statement }.Concat(statements));
-
-
-    public Block Block([L("{")] string open, Statements statements, [L("}")] string close) => new(statements);
-    public Block Block([L("{")] string open, [L("}")] string close) => new(new Statements());
-
-    public Functions Functions(Function function, Functions functions) => new(new[] { function }.Concat(functions));
-    public Functions Functions(Function function) => new(new[] { function });
-
-    public Function Function(ReturnType returnType, string identifier, [L("(")] string open, [L(")")] string close,
-        Block block) =>
-        new(returnType, identifier, new ArgumentList(), block);
-
-    public Function Function(ReturnType returnType, string identifier, [L("(")] string open, ArgumentList argumentList,
-        [L(")")] string close,
-        Block block) => new(returnType, identifier, argumentList, block);
+    public Functions Functions(Function function) => new(function);
+    public Functions Functions(Function function, Functions functions) => new(new[]{ function }.Concat(functions));
 
     public Argument Argument(ArgumentType argumentType, string identifier) => new(argumentType, identifier);
-    public ArgumentList ArgumentList(Argument argument) => new(new[] { argument });
 
-    public ArgumentList ArgumentList(Argument argument, [L(",")] string comma, ArgumentList argumentList) =>
-        new(new[] { argument }.Concat(argumentList));
+    public ArgumentList ArgumentList(Argument argument) => new(new[] { argument });
+    public ArgumentList ArgumentList(Argument argument, [L(",")] string comma, ArgumentList argumentList) => new(new[] { argument }.Concat(argumentList));
 
     [Start]
-    public Program Program(Functions functions) => new(functions);
+    public Program Program(Functions functions) => new Program(functions);
 }
+

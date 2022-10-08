@@ -1,6 +1,6 @@
 namespace SomeCompiler.Compilation.Model;
 
-public class BoundIdentifierExpression : BoundExpression
+public record class BoundIdentifierExpression : BoundExpression
 {
     public BoundIdentifierExpression(string identifier)
     {

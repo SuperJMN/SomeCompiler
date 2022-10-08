@@ -1,15 +1,9 @@
 ﻿namespace SomeCompiler.Parsing.Model;
 
-internal class DeclarationStatement : Statement
+public record DeclarationStatement(ArgumentType ArgumentType, string Identifier) : Statement
 {
-    public DeclarationStatement(ArgumentType argumentType, string identifier)
+    public override string ToString()
     {
-        ArgumentType = argumentType;
-        Identifier = identifier;
+        return $"{ArgumentType} {Identifier};";
     }
-
-    public ArgumentType ArgumentType { get; }
-    public string Identifier { get; }
-
-    public override string ToString() => $"{ArgumentType} {Identifier};";
 }

@@ -7,13 +7,13 @@ namespace SomeCompiler.Generation.Intermediate;
 
 public class IntermediateCodeGenerator
 {
-    public IEnumerable<Code> Generate(BoundAssignmentStatement assignment)
+    public Fragment Generate(BoundAssignmentExpression assignment)
     {
-        var reference = new NamedReference(assignment.LeftValue.Identifier);
-        var expressionFragment = Generate(assignment.RightValue);
+        var reference = new NamedReference(assignment.Left.Identifier);
+        var expressionFragment = Generate(assignment.Right);
 
         var code = new Code(reference, expressionFragment.Reference, null, Operator.Equal);
-        return expressionFragment.Codes.Concat(new[] {code});
+        return new Fragment(reference, expressionFragment.Codes.Concat(new[] {code}));
     }
 
     public Result<IntermediateCodeProgram, List<Error>> Generate(CompiledProgram compiledProgram)
@@ -31,12 +31,12 @@ public class IntermediateCodeGenerator
 
     private IEnumerable<Code> Generate(BoundReturnStatement boundReturnStatement)
     {
-        if (boundReturnStatement.Expression is null)
+        if (boundReturnStatement.Expression.HasNoValue)
         {
             return new[] {Code.Return()};
         }
 
-        var gen = Generate(boundReturnStatement.Expression);
+        var gen = Generate(boundReturnStatement.Expression.Value);
         return gen.Codes.Concat(new[] {Code.Return(gen.Reference)});
     }
 
@@ -74,15 +74,15 @@ public class IntermediateCodeGenerator
     private IEnumerable<Code> Generate(BoundFunction function)
     {
         var codes1 = new[] {Code.Label(function.Name)};
-        var codes2 = Generate(function.Block);
+        var codes2 = Generate(function.CompoundStatement);
         var codes3 = ArraySegment<Code>.Empty;
 
         return codes1.Concat(codes2).Concat(codes3);
     }
 
-    private IEnumerable<Code> Generate(BoundBlock block)
+    private IEnumerable<Code> Generate(BoundCompoundStatement compoundStatement)
     {
-        var generated = block.SelectMany(Generate).ToList();
+        var generated = compoundStatement.Statements.SelectMany(Generate).ToList();
 
         AddReturnCodeIfMissing(generated);
 
@@ -101,9 +101,21 @@ public class IntermediateCodeGenerator
     {
         return statement switch
         {
-            BoundAssignmentStatement boundAssignmentStatement => Generate(boundAssignmentStatement),
+            BoundExpressionStatement expressionStatement => Generate(expressionStatement).Codes,
             BoundReturnStatement boundReturnStatement => Generate(boundReturnStatement),
             _ => throw new ArgumentOutOfRangeException(nameof(statement))
+        };
+    }
+
+    private Fragment Generate(BoundExpressionStatement boundExpressionStatement)
+    {
+        return boundExpressionStatement.Expression switch
+        {
+            BoundAssignmentExpression boundAssignmentExpression => Generate(boundAssignmentExpression),
+            BoundBinaryExpression boundBinaryExpression => Generate(boundBinaryExpression),
+            BoundConstantExpression boundConstantExpression => Generate(boundConstantExpression),
+            BoundIdentifierExpression boundIdentifierExpression => Generate(boundIdentifierExpression),
+            _ => throw new ArgumentOutOfRangeException()
         };
     }
 }
