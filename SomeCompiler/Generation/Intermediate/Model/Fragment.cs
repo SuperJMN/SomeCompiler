@@ -1,4 +1,5 @@
 using CodeGeneration.Model.Classes;
+using SomeCompiler.Generation.Intermediate.Model.Codes;
 
 namespace SomeCompiler.Generation.Intermediate.Model;
 

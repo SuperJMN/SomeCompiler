@@ -2,6 +2,7 @@ using CSharpFunctionalExtensions;
 using SomeCompiler.Compilation;
 using SomeCompiler.Compilation.Model;
 using SomeCompiler.Generation.Intermediate.Model;
+using SomeCompiler.Generation.Intermediate.Model.Codes;
 
 namespace SomeCompiler.Generation.Intermediate;
 
@@ -12,7 +13,7 @@ public class IntermediateCodeGenerator
         var reference = new NamedReference(assignment.Left.Identifier);
         var expressionFragment = Generate(assignment.Right);
 
-        var code = new Code(reference, expressionFragment.Reference, null, Operator.Equal);
+        Code code = new Assign(reference, expressionFragment.Reference);
         return new Fragment(reference, expressionFragment.Codes.Concat(new[] {code}));
     }
 
@@ -42,7 +43,7 @@ public class IntermediateCodeGenerator
 
     private Fragment Generate(BoundConstantExpression cex)
     {
-        return new Fragment(x => new Code(x, new ConstantReference((int) cex.Value), null, Operator.Equal));
+        return new Fragment(x => new AssignConstant(x, (int)cex.Value));
     }
 
     private Fragment Generate(BoundBinaryExpression bex)
@@ -50,14 +51,14 @@ public class IntermediateCodeGenerator
         var left = Generate(bex.Left);
         var right = Generate(bex.Right);
 
-        return new Fragment(reference => new Code(reference, left.Reference, right.Reference, bex.Operator.ToOperator()))
+        return new Fragment(reference => new Add(reference, left.Reference, right.Reference))
             .Prepend(right)
             .Prepend(left);
     }
 
     private Fragment Generate(BoundIdentifierExpression bex)
     {
-        return new Fragment(reference => new Code(reference, new NamedReference(bex.Identifier), null, Operator.Equal));
+        return new Fragment(reference => new Assign(reference, new NamedReference(bex.Identifier)));
     }
 
     private Fragment Generate(BoundExpression expression)
@@ -89,12 +90,14 @@ public class IntermediateCodeGenerator
         return generated;
     }
 
-    private static void AddReturnCodeIfMissing(List<Code> generated)
+    private static void AddReturnCodeIfMissing(ICollection<Code> generated)
     {
-        if (generated.LastOrDefault()?.Operator != Operator.Return)
+        if (generated.LastOrDefault() is Return || generated.LastOrDefault() is EmptyReturn)
         {
-            generated.Add(Code.Return());
+            return;
         }
+
+        generated.Add(new EmptyReturn());
     }
 
     private IEnumerable<Code> Generate(BoundStatement statement)
