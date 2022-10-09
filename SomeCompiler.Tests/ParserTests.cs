@@ -40,6 +40,13 @@ public class ParserTests
     }
 
     [Fact]
+    public void Multiple_lines()
+    {
+        var source = @"void main() { int a; int b; b = 13; a = 1; }";
+        AssertParse(source);
+    }
+
+    [Fact]
     public void More_than_one_function()
     {
         var source = @"void main() { int a; } void another() { }";
