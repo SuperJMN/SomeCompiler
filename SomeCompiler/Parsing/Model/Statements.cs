@@ -1,17 +1,14 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public class Statements : List<Statement>
+public class Statements : List<Statement>, INode
 {
-    public Statements(IEnumerable<Statement> statements) : base(statements)
+    public Statements(Statements statements) : base(statements)
     {
     }
 
-    public Statements(params Statement[] statements) : base(statements)
+    public Statements()
     {
     }
 
-    public override string ToString()
-    {
-        return this.JoinWithLines();
-    }
+    public IEnumerable<INode> Children => this;
 }

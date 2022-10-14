@@ -1,9 +1,6 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record Program(Functions Functions)
+public record Program(Functions Functions) : INode
 {
-    public override string ToString()
-    {
-        return Functions.ToString();
-    }
+    public IEnumerable<INode> Children => Functions.Children;
 }

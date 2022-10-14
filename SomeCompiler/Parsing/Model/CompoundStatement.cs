@@ -1,9 +1,14 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record CompoundStatement(Statements Statements) : Statement
+public class CompoundStatement : List<Statement>, INode
 {
-    public override string ToString()
+    public CompoundStatement(IEnumerable<Statement> compoundStatement) : base(compoundStatement)
     {
-        return $"{{{Environment.NewLine}{Statements.JoinWithLines()}{Environment.NewLine}}}";
     }
+
+    public CompoundStatement()
+    {
+    }
+
+    public IEnumerable<INode> Children => this.Select(x => x);
 }

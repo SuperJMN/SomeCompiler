@@ -1,3 +1,6 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record Statement;
+public abstract record Statement : INode
+{
+    public abstract IEnumerable<INode> Children { get; }
+}

@@ -1,9 +1,6 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record ExpressionStatement(Expression Expression) : Statement
+internal record ExpressionStatement(Expression Expression) : Statement
 {
-    public override string ToString()
-    {
-        return Expression.ToString();
-    }
+    public override IEnumerable<INode> Children => Expression.Children;
 }
