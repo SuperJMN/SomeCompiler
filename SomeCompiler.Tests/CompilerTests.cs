@@ -28,6 +28,12 @@ public class CompilerTests
     }
 
     [Fact]
+    public void Addition()
+    {
+        AssertSuccess("void main() { return 1+2; }");
+    }
+
+    [Fact]
     public void Duplicate_declaration()
     {
         AssertError("void main() { } void main() { }", ErrorKind.FunctionAlreadyDeclared);

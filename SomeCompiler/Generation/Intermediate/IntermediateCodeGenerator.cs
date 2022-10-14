@@ -75,15 +75,15 @@ public class IntermediateCodeGenerator
     private IEnumerable<Code> Generate(BoundFunction function)
     {
         var codes1 = new[] {Code.Label(function.Name)};
-        var codes2 = Generate(function.CompoundStatement);
+        var codes2 = Generate(function.Block);
         var codes3 = ArraySegment<Code>.Empty;
 
         return codes1.Concat(codes2).Concat(codes3);
     }
 
-    private IEnumerable<Code> Generate(BoundCompoundStatement compoundStatement)
+    private IEnumerable<Code> Generate(BoundBlock block)
     {
-        var generated = compoundStatement.Statements.SelectMany(Generate).ToList();
+        var generated = block.Statements.SelectMany(Generate).ToList();
 
         AddReturnCodeIfMissing(generated);
 

@@ -37,23 +37,25 @@ public class SomeGrammar : FluentGrammar
         .Match(LeftValue, "=", Expression).To<LeftValue, Expression, Expression>((a, b) => new AssignmentExpression(a, b));
 
     private NonTerminal CompoundStatement => () => Rule()
-        .Match(Symbols.EmptyBlock).To((string _) => new CompoundStatement())
-        .Match("{", Statements, "}").To((Statements ss) => new CompoundStatement(ss));
+        .Match(Symbols.EmptyBlock).To((string _) => new Block())
+        .Match("{", Statements, "}").To((Statements ss) => new Block(ss));
 
     private NonTerminal Statements => () => Rule()
         .Match(Statement).To((Statement s) => new Statements { s })
         .Match(Statements, Statement).To((Statements ss, Statement s) => new Statements(ss) { s });
+        
 
     private NonTerminal Functions => () => Rule()
         .Match(Function).To((Function s) => new Functions() { s })
         .Match(Functions, Function).To((Functions ff, Function f) => new Functions(ff) { f });
 
     private NonTerminal Statement => () => Rule()
-        .Match(Expression, ";").To((Expression e) => new ExpressionStatement(e));
+        .Match(Expression, ";").To((Expression e) => new ExpressionStatement(e))
+        .Match("return", Expression, ";").To((Expression e) => (Statement)new ReturnStatement(e));
 
     private NonTerminal Function => () => Rule()
-        .Match("void", Symbols.Identifier, "(", ParameterList, ")", CompoundStatement).To((string i, ArgumentList args, CompoundStatement c) => new Function(i, args, c))
-        .Match("void", Symbols.Identifier, "(", ")", CompoundStatement).To((string i, CompoundStatement c) => new Function(i, new ArgumentList(), c))
+        .Match("void", Symbols.Identifier, "(", ParameterList, ")", CompoundStatement).To((string i, ArgumentList args, Block c) => new Function(i, args, c))
+        .Match("void", Symbols.Identifier, "(", ")", CompoundStatement).To((string i, Block c) => new Function(i, new ArgumentList(), c))
     ;
 
     private NonTerminal Program => () => Rule()
