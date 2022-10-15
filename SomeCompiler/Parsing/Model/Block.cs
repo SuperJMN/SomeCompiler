@@ -11,4 +11,9 @@ public class Block : List<Statement>, INode
     }
 
     public IEnumerable<INode> Children => this.Select(x => x);
+
+    public override string ToString()
+    {
+        return "{" + this.JoinWithLines() + "}";
+    }
 }

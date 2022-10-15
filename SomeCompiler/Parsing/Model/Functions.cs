@@ -11,4 +11,9 @@ public class Functions : List<Function>, INode
     }
 
     public IEnumerable<INode> Children => this;
+
+    public override string ToString()
+    {
+        return this.JoinWithLines();
+    }
 }

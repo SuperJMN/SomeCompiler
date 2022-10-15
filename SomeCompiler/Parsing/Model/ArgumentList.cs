@@ -9,4 +9,9 @@ public class ArgumentList : List<Argument>
     public ArgumentList()
     {
     }
+
+    public override string ToString()
+    {
+        return this.JoinWithCommas();
+    }
 }
