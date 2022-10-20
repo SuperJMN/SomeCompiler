@@ -31,7 +31,7 @@ public class VirtualMachineTests
     public async Task Assignment()
     {
         var status = await Run("void main() { a = 123; }");
-        status.Memory["A"].Should().BeEquivalentTo(new DataMemoryEntry(123));
+        status.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(123));
     }
 
     private static IObservable<VirtualMachineState> Run(string code)

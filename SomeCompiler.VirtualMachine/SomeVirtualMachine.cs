@@ -5,6 +5,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CodeGeneration.Model.Classes;
 using CSharpFunctionalExtensions;
+using EasyParse.ParserGenerator.Collections;
+using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
 
@@ -30,12 +32,7 @@ public class SomeVirtualMachine
 
     public void Load(IntermediateCodeProgram program)
     {
-        var valueTuples = program
-            .SelectMany(x => x.GetReferences())
-            .ToImmutableHashSet()
-            .Select((r, i) => (Reference: r, i)).ToList();
-
-        variables = valueTuples.ToDictionary(t => t.Reference, t => 50 + t.i);
+        variables = program.IndexedReferences().ToList().ToDictionary(t => t.Reference, t => 50 + t.Index);
 
         var contents = ToMemory(program);
 
@@ -96,6 +93,8 @@ public class SomeVirtualMachine
             case Add add:
                 break;
             case Assign assign:
+                memory[variables[assign.Target]] = memory[variables[assign.Source]];
+                ExecutionPointer++;
                 break;
             case AssignConstant assignConstant:
                 memory[variables[assignConstant.Target]] = new DataMemoryEntry(assignConstant.Source);
@@ -114,6 +113,8 @@ public class SomeVirtualMachine
             case Divide divide:
                 break;
             case EmptyReturn emptyReturn:
+                var previousInstruction2 = stack.Pop();
+                ExecutionPointer = memory.ToList().IndexOf(previousInstruction2);
                 break;
             case Halt halt:
                 Halt();

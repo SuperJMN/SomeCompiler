@@ -1,4 +1,5 @@
 using System.Text;
+using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
 
@@ -8,7 +9,7 @@ public class Z80Generator
 {
     public string Generate(IntermediateCodeProgram program)
     {
-        var map = program.SelectMany(x => x.GetReferences()).Select((reference, i) => (reference, i)).ToDictionary(t => t.reference, t => t.i * 2 + 0x30);
+        var map = program.IndexedReferences().ToDictionary(t => t.Reference, t => t.Index * 2 + 0x30);
 
         StringBuilder strBuilder=new();
         foreach (var code in program)
