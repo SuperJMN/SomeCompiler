@@ -17,6 +17,10 @@ public class SomeVirtualMachine
     private readonly Stack<MemoryEntry> stack = new();
     private Dictionary<Reference, int> variables = new();
 
+    public Dictionary<string, int> References => 
+        (from r in variables let rf = r.Key as NamedReference where rf != null select new { Name = rf.Value, Index = r.Value })
+        .ToDictionary(x => x.Name, x => x.Index);
+
     public IReadOnlyList<MemoryEntry> StackContents => stack.ToImmutableList();
     public IReadOnlyList<MemoryEntry> Memory => memory.ToImmutableList();
 
@@ -26,7 +30,13 @@ public class SomeVirtualMachine
 
     public void Load(IntermediateCodeProgram program)
     {
-        variables = program.SelectMany(x => x.GetReferences()).Select((reference, i) => (reference, i)).ToDictionary(t => t.reference, t => 50 + t.i);
+        var valueTuples = program
+            .SelectMany(x => x.GetReferences())
+            .ToImmutableHashSet()
+            .Select((r, i) => (Reference: r, i)).ToList();
+
+        variables = valueTuples.ToDictionary(t => t.Reference, t => 50 + t.i);
+
         var contents = ToMemory(program);
 
         Array.ConstrainedCopy(contents.ToArray(), 0, memory, 0, contents.Count);
@@ -48,7 +58,7 @@ public class SomeVirtualMachine
         return instructions.ToList();
     }
 
-    public IObservable<Unit> Run(IScheduler? scheduler = null)
+    public IObservable<Unit> RunUntilHalted(IScheduler? scheduler = null)
     {
         scheduler ??= Scheduler.Default;
 

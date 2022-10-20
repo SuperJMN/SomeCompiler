@@ -27,15 +27,22 @@ public class VirtualMachineTests
         status.StackContents.Should().BeEquivalentTo(new DataMemoryEntry(123));
     }
 
-    private static async Task<VirtualMachineState> Run(string code)
+    [Fact]
+    public async Task Assignment()
+    {
+        var status = await Run("void main() { a = 123; }");
+        status.Memory["A"].Should().BeEquivalentTo(new DataMemoryEntry(123));
+    }
+
+    private static IObservable<VirtualMachineState> Run(string code)
     {
         var gen = new CompilerFrontend();
         var generated = gen.Emit(code);
         var vm = new SomeVirtualMachine();
         vm.Load(generated.Value);
-        await vm.Run();
-        
-        return new VirtualMachineState(vm.ExecutionPointer, vm.StackContents, vm.Memory);
+        return vm.RunUntilHalted()
+            .Timeout(TimeSpan.FromSeconds(0.5))
+            .Select(_ => new VirtualMachineState(vm.ExecutionPointer, vm.StackContents, vm.Memory, vm.References));
     }
 
     [Fact]
@@ -48,7 +55,7 @@ public class VirtualMachineTests
 
         var sut = new SomeVirtualMachine();
         sut.Load(code);
-        await sut.Run();
+        await sut.RunUntilHalted();
         sut.IsHalted.Should().BeTrue();
     }
 
@@ -57,7 +64,7 @@ public class VirtualMachineTests
         var sut = new SomeVirtualMachine();
         sut.Load(intermediateCodeProgram);
 
-        await sut.Run();
+        await sut.RunUntilHalted();
 
         var mem = sut.GetVariable(variable);
         mem
