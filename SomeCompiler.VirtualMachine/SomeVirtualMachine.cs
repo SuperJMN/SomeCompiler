@@ -1,38 +1,48 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections;
+using System.Collections.Immutable;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reflection.PortableExecutable;
 using CodeGeneration.Model.Classes;
 using CSharpFunctionalExtensions;
-using EasyParse.ParserGenerator.Collections;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
+using SomeCompiler.VirtualMachine.Commands;
 
 namespace SomeCompiler.VirtualMachine;
 
-public class SomeVirtualMachine
+public class SomeVirtualMachine : IMachine
 {
     private readonly BehaviorSubject<bool> halted = new(false);
     private readonly MemoryEntry[] memory = new MemoryEntry[100];
     private readonly Stack<MemoryEntry> stack = new();
     private Dictionary<Reference, int> variables = new();
 
-    public Dictionary<string, int> References => 
-        (from r in variables let rf = r.Key as NamedReference where rf != null select new { Name = rf.Value, Index = r.Value })
+    public Dictionary<string, int> References =>
+        (from r in Variables let rf = r.Key as NamedReference where rf != null select new { Name = rf.Value, Index = r.Value })
         .ToDictionary(x => x.Name, x => x.Index);
 
-    public IReadOnlyList<MemoryEntry> StackContents => stack.ToImmutableList();
-    public IReadOnlyList<MemoryEntry> Memory => memory.ToImmutableList();
+    public IReadOnlyList<MemoryEntry> StackContents => Stack.ToImmutableList();
+    public IList<MemoryEntry> Memory => memory;
 
-    public long ExecutionPointer { get; private set; }
+    public int ExecutionPointer { get; set; }
 
     public bool IsHalted => halted.Value;
 
+    public Stack<MemoryEntry> Stack => stack;
+
+    public Dictionary<Reference, int> Variables
+    {
+        get => variables;
+        private set => variables = value;
+    }
+
     public void Load(IntermediateCodeProgram program)
     {
-        variables = program.IndexedReferences().ToList().ToDictionary(t => t.Reference, t => 50 + t.Index);
+        Variables = program.IndexedReferences().ToList().ToDictionary(t => t.Reference, t => 50 + t.Index);
 
         var contents = ToMemory(program);
 
@@ -42,13 +52,13 @@ public class SomeVirtualMachine
 
     public MemoryEntry GetVariable(string name)
     {
-        var namedReference = variables.Keys.OfType<NamedReference>().First(x => x.Value == name);
-        return memory[variables[namedReference]];
+        var namedReference = Variables.Keys.OfType<NamedReference>().First(x => x.Value == name);
+        return memory[Variables[namedReference]];
     }
 
     public IList<InstructionMemoryEntry> ToMemory(IList<Code> program)
     {
-        var prepend = new[] { Maybe.From((Label) null) };
+        var prepend = new[] { Maybe.From((Label)null) };
 
         var labels = prepend.Concat(program.Select(x => Maybe<Label>.From(x as Label)));
         var instructions = labels.Zip(program, (l, i) => new InstructionMemoryEntry(i, l)).Where(x => x.Code is not Label);
@@ -83,59 +93,30 @@ public class SomeVirtualMachine
             throw new InvalidOperationException($"{memoryEntry} is not an instruction");
         }
 
-        ExecuteInstruction(ime.Code);
+        var command = ToCommand(ime);
+        command.Execute();
     }
 
-    private void ExecuteInstruction(Code memoryEntry)
+    private Command ToCommand(InstructionMemoryEntry instructionMemoryEntry)
     {
-        switch (memoryEntry)
+        return instructionMemoryEntry.Code switch
         {
-            case Add add:
-                break;
-            case Assign assign:
-                memory[variables[assign.Target]] = memory[variables[assign.Source]];
-                ExecutionPointer++;
-                break;
-            case AssignConstant assignConstant:
-                memory[variables[assignConstant.Target]] = new DataMemoryEntry(assignConstant.Source);
-                ExecutionPointer++;
-                break;
-            case Call call:
-                var instructionMemoryEntries = from ins in memory.OfType<InstructionMemoryEntry>()
-                    from l in ins.Label.ToList()
-                    where l.Name == call.Name
-                    select ins;
-
-                stack.Push(memory[ExecutionPointer + 1]);
-                ExecutionPointer = memory.ToList().IndexOf(instructionMemoryEntries.First());
-
-                break;
-            case Divide divide:
-                break;
-            case EmptyReturn emptyReturn:
-                var previousInstruction2 = stack.Pop();
-                ExecutionPointer = memory.ToList().IndexOf(previousInstruction2);
-                break;
-            case Halt halt:
-                Halt();
-                break;
-            case Label label:
-                break;
-            case Multiply multiply:
-                break;
-            case Return ret:
-                var previousInstruction = stack.Pop();
-                stack.Push(memory[variables[ret.Reference]]);
-                ExecutionPointer = memory.ToList().IndexOf(previousInstruction);
-                break;
-            case Subtract subtract:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(memoryEntry), memoryEntry.ToString());
-        }
+            Add add => throw new NotImplementedException(),
+            Assign assign => new AssignReferenceCommand(this, assign.Source, assign.Target),
+            AssignConstant assignConstant => new AssignConstantCommand(this, assignConstant.Source, assignConstant.Target),
+            Call call => new CallCommand(this, call.Name),
+            Divide divide => throw new NotImplementedException(),
+            EmptyReturn emptyReturn => new ReturnCommand(this),
+            Halt halt => new HaltCommand(this),
+            Label label => throw new NotImplementedException(),
+            Multiply multiply => throw new NotImplementedException(),
+            Return @return => new ReturnReferenceCommand(this, @return.Reference),
+            Subtract subtract => throw new NotImplementedException(),
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
-    private void Halt()
+    public void Halt()
     {
         halted.OnNext(true);
     }

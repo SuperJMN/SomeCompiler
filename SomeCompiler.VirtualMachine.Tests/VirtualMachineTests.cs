@@ -1,4 +1,5 @@
-﻿using System.Reactive.Linq;
+﻿using System.Collections.Immutable;
+using System.Reactive.Linq;
 using FluentAssertions;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
@@ -42,7 +43,7 @@ public class VirtualMachineTests
         vm.Load(generated.Value);
         return vm.RunUntilHalted()
             .Timeout(TimeSpan.FromSeconds(0.5))
-            .Select(_ => new VirtualMachineState(vm.ExecutionPointer, vm.StackContents, vm.Memory, vm.References));
+            .Select(_ => new VirtualMachineState(vm.ExecutionPointer, vm.StackContents, vm.Memory.ToImmutableList(), vm.References));
     }
 
     [Fact]
