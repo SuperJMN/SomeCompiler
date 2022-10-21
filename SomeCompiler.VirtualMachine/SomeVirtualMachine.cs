@@ -101,7 +101,7 @@ public class SomeVirtualMachine : IMachine
     {
         return instructionMemoryEntry.Code switch
         {
-            Add add => throw new NotImplementedException(),
+            Add add => new AddCommand(this, add.Left, add.Right, add.Target),
             Assign assign => new AssignReferenceCommand(this, assign.Source, assign.Target),
             AssignConstant assignConstant => new AssignConstantCommand(this, assignConstant.Source, assignConstant.Target),
             Call call => new CallCommand(this, call.Name),

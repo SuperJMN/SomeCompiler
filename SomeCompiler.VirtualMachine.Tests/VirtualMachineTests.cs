@@ -43,6 +43,13 @@ public class VirtualMachineTests
         state.Memory["b"].Should().BeEquivalentTo(new DataMemoryEntry(2));
     }
 
+    [Fact]
+    public async Task Addition()
+    {
+        var state = await Run("void main() { a = 1 + 2; }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(3));
+    }
+
     private static IObservable<VirtualMachineState> Run(string code)
     {
         var gen = new CompilerFrontend();
