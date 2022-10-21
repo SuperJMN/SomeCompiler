@@ -24,15 +24,15 @@ public class VirtualMachineTests
     [Fact]
     public async Task Return_constant_puts_data_in_stack()
     {
-        var status = await Run("void main() { return 123; }");
-        status.StackContents.Should().BeEquivalentTo(new DataMemoryEntry(123));
+        var state = await Run("void main() { return 123; }");
+        state.StackContents.Should().BeEquivalentTo(new DataMemoryEntry(123));
     }
 
     [Fact]
     public async Task Assignment()
     {
-        var status = await Run("void main() { a = 123; }");
-        status.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(123));
+        var state = await Run("void main() { a = 123; }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(123));
     }
 
     private static IObservable<VirtualMachineState> Run(string code)
