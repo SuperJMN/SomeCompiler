@@ -42,14 +42,14 @@ public class ParserTests
     [Fact]
     public void Multiple_lines()
     {
-        var source = @"void main() { int a; int b; b = 13; a = 1; }";
+        var source = @"void main() { b = 13; a = 1; }";
         AssertParse(source);
     }
 
     [Fact]
     public void More_than_one_function()
     {
-        var source = @"void main() { int a; } void another() { }";
+        var source = @"void main() { } void another() { }";
         AssertParse(source);
     }
 
@@ -57,6 +57,13 @@ public class ParserTests
     public void Function_with_arguments()
     {
         var source = @"void main(int a, int b) { }";
+        AssertParse(source);
+    }
+
+    [Fact]
+    public void Empty_return()
+    {
+        var source = @"void main() { return; }";
         AssertParse(source);
     }
 

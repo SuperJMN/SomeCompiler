@@ -1,9 +1,11 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record ConstantExpression(int Constant) : Expression
+internal record ConstantExpression(int Value) : Expression
 {
+    public override IEnumerable<Expression> Children => Enumerable.Empty<Expression>();
+
     public override string ToString()
     {
-        return Constant.ToString();
+        return Value.ToString();
     }
 }

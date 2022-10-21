@@ -1,3 +1,6 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record IdentifierExpression(string Identifier) : Expression;
+internal record IdentifierExpression(string Identifier) : Expression
+{
+    public override IEnumerable<Expression> Children => Enumerable.Empty<Expression>();
+}

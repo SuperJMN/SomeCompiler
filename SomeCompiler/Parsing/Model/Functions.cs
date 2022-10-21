@@ -1,14 +1,16 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public class Functions : List<Function>
+public class Functions : List<Function>, INode
 {
-    public Functions(IEnumerable<Function> statements) : base(statements)
+    public Functions(Functions functions) : base(functions)
     {
     }
 
-    public Functions(params Function[] statements) : base(statements)
+    public Functions()
     {
     }
+
+    public IEnumerable<INode> Children => this;
 
     public override string ToString()
     {

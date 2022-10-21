@@ -1,9 +1,11 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record Function(ReturnType ReturnType, string Identifier, ArgumentList ArgumentList, CompoundStatement CompoundStatement)
+public record Function(string Name, ArgumentList ArgumentList, Block Block) : INode
 {
+    public IEnumerable<INode> Children => Block.Children;
+
     public override string ToString()
     {
-        return $"{ReturnType} {Identifier}({ArgumentList}) {CompoundStatement}";
+        return $"void {Name}({ArgumentList}) {Block}";
     }
 }

@@ -1,50 +1,67 @@
-﻿using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
-using EasyParse.Native;
-using EasyParse.Native.Annotations;
+﻿using EasyParse.Fluent.Symbols;
+using EasyParse.Fluent;
 using SomeCompiler.Parsing.Model;
 
 namespace SomeCompiler.Parsing;
 
-public class SomeGrammar : NativeGrammar
+public class SomeGrammar : FluentGrammar
 {
-    protected override IEnumerable<Regex> IgnorePatterns => new[] { new Regex(@"\s+") };
+    private NonTerminal Parameter => () => Rule()
+        .Match("int", Symbols.Identifier).To<string, Argument>(b => new Argument(new ArgumentType("int"), b));
 
-    public int Number([R("number", @"\d+")] string value) => int.Parse(value);
-    public string Identifier([R("identifier", @"\w+")] string value) => value;
-    public ReturnType ReturnType([L("void")] string keyword) => new(keyword);
-    public ArgumentType ArgumentType([L("int")] string keyword) => new(keyword);
-    public LeftValue LeftValue(string identifier) => new(identifier);
-    public ReturnKeyword ReturnKeyword([L("return")] string keyword) => new ReturnKeyword();
+    private NonTerminal ParameterList => () => Rule()
+        .Match(Parameter).To<Argument, ArgumentList>(a => new ArgumentList { a })
+        .Match(ParameterList, ",", Parameter).To<ArgumentList, Argument, ArgumentList>((aa, a) => new ArgumentList(aa) { a });
 
-    public Statements Statements(Statement statement) => new(statement);
-    public Statements Statements(Statement statement, Statements statements) => new(new[]{ statement }.Concat(statements));
+    private NonTerminal Unit => () => Rule()
+        .Match(Pattern.Int).To((int i) => new Unit(null, new ConstantExpression(i)))
+        .Match("-", Unit).To((Unit u) => new Unit("-", u))
+        .Match(Symbols.Identifier).To((string e) => new Unit(null, new IdentifierExpression(e)))
+        .Match("(", Term, ")").To((Term term) => new Unit(null, term));
+
+    private NonTerminal Factor => () => Rule()
+        .Match(Unit).To((Unit u) => new Factor(null, u))
+        .Match(Factor, "*", Unit).To((Factor f, Unit u) => new Factor("*", f, u))
+        .Match(Factor, "/", Unit).To((Factor f, Unit u) => new Factor("/", f, u));
+
+    private NonTerminal Term => () => Rule()
+        .Match(Factor).To((Factor f) => new Term(null, f))
+        .Match(Term, "+", Factor).To((Term t, Factor f) => new Term("+", t, f))
+        .Match(Term, "-", Factor).To((Term t, Factor f) => new Term("-", t, f));
+
+    private NonTerminal LeftValue => () => Rule()
+        .Match(Symbols.Identifier).To((string x) => new LeftValue(x));
     
-    public Expression Expression(int number) => new ConstantExpression(number);
-    public Expression Expression(string identifier) => new IdentifierExpression(identifier);
-    public Expression Expression(LeftValue leftValue, [L("=")] string equals, Expression expression) => new AssignmentExpression(leftValue, expression);
-    public Expression Expression([L("-")] string minus, Expression expression) => new NegateExpression(expression);
+    private NonTerminal Expression => () => Rule()
+        .Match<Expression>(Term)
+        .Match(LeftValue, "=", Expression).To<LeftValue, Expression, Expression>((a, b) => new AssignmentExpression(a, b));
 
-    public CompoundStatement CompoundStatement([L("{")] string openBrace, Statements statements, [L("}")] string closeBrace) => new CompoundStatement(statements);
-    public CompoundStatement CompoundStatement([L("{")] string openBrace, [L("}")] string closeBrace) => new CompoundStatement(new Statements());
+    private NonTerminal CompoundStatement => () => Rule()
+        .Match(Symbols.EmptyBlock).To((string _) => new Block())
+        .Match("{", Statements, "}").To((Statements ss) => new Block(ss));
 
-    public Statement Statement(ArgumentType argumentType, string identifier, [L(";")] string semicolon) => new DeclarationStatement(argumentType, identifier);
-    public Statement Statement(Expression expression, [L(";")] string semicolon) => new ExpressionStatement(expression);
-    public Statement Statement(ReturnKeyword returnKeyword, [L(";")] string semicolon) => new ReturnStatement(Maybe<Expression>.None);
-    public Statement Statement(ReturnKeyword returnKeyword, Expression expression, [L(";")] string semicolon) => new ReturnStatement(expression);
+    private NonTerminal Statements => () => Rule()
+        .Match(Statement).To((Statement s) => new Statements { s })
+        .Match(Statements, Statement).To((Statements ss, Statement s) => new Statements(ss) { s });
+        
 
-    public Function Function(ReturnType returnType, string identifier, [L("(")] string lparen, [L(")")] string rparen, CompoundStatement compoundStatement) => new Function(returnType, identifier, new ArgumentList(), compoundStatement);
-    public Function Function(ReturnType returnType, string identifier, [L("(")] string lparen, ArgumentList argumentList, [L(")")] string rparen, CompoundStatement compoundStatement) => new Function(returnType, identifier, argumentList, compoundStatement);
+    private NonTerminal Functions => () => Rule()
+        .Match(Function).To((Function s) => new Functions() { s })
+        .Match(Functions, Function).To((Functions ff, Function f) => new Functions(ff) { f });
 
-    public Functions Functions(Function function) => new(function);
-    public Functions Functions(Function function, Functions functions) => new(new[]{ function }.Concat(functions));
+    private NonTerminal Statement => () => Rule()
+        .Match(Expression, ";").To((Expression e) => new ExpressionStatement(e))
+        .Match("return", Expression, ";").To((Expression e) => (Statement)new ReturnStatement(e));
 
-    public Argument Argument(ArgumentType argumentType, string identifier) => new(argumentType, identifier);
+    private NonTerminal Function => () => Rule()
+        .Match("void", Symbols.Identifier, "(", ParameterList, ")", CompoundStatement).To((string i, ArgumentList args, Block c) => new Function(i, args, c))
+        .Match("void", Symbols.Identifier, "(", ")", CompoundStatement).To((string i, Block c) => new Function(i, new ArgumentList(), c))
+    ;
 
-    public ArgumentList ArgumentList(Argument argument) => new(new[] { argument });
-    public ArgumentList ArgumentList(Argument argument, [L(",")] string comma, ArgumentList argumentList) => new(new[] { argument }.Concat(argumentList));
+    private NonTerminal Program => () => Rule()
+        .Match(Functions).To((Functions s) => new Program(s));
 
-    [Start]
-    public Program Program(Functions functions) => new Program(functions);
+    protected override IEnumerable<RegexSymbol> Ignore => new List<RegexSymbol> { Pattern.WhiteSpace };
+
+    protected override IRule Start => Program();
 }
-

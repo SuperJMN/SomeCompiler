@@ -2,7 +2,7 @@ using SomeCompiler.Compilation.Model;
 
 namespace SomeCompiler.Generation.Intermediate;
 
-public record BoundCompoundStatement(IEnumerable<BoundStatement> Statements) : BoundStatement
+public record BoundBlock(IEnumerable<BoundStatement> Statements) : BoundStatement
 {
     public override string ToString()
     {

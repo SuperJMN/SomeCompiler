@@ -1,9 +1,9 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record Argument(ArgumentType ArgumentType, string Identifier)
+public record Argument(ArgumentType ArgumentType, string Name)
 {
     public override string ToString()
     {
-        return $"{ArgumentType} {Identifier}";
+        return $"{ArgumentType} {Name}";
     }
 }

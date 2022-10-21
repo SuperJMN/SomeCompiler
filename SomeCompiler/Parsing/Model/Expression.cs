@@ -1,3 +1,11 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record Expression;
+public abstract record Expression : INode
+{
+    public abstract IEnumerable<INode> Children { get; }
+
+    public override string ToString()
+    {
+        return "Expression not supported";
+    }
+}

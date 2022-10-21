@@ -5,16 +5,16 @@ namespace SomeCompiler.Compilation.Model;
 
 public class BoundFunction
 {
-    public BoundFunction(ReturnType returnType, string name, BoundCompoundStatement compoundStatement)
+    public BoundFunction(ReturnType returnType, string name, BoundBlock block)
     {
         ReturnType = returnType;
         Name = name;
-        CompoundStatement = compoundStatement;
+        Block = block;
     }
 
     public ReturnType ReturnType { get; }
     public string Name { get; }
-    public BoundCompoundStatement CompoundStatement { get; }
+    public BoundBlock Block { get; }
 
-    public override string ToString() => new object[] { $"{ReturnType} {Name}()", CompoundStatement }.JoinWithLines();
+    public override string ToString() => new object[] { $"{ReturnType} {Name}()", Block }.JoinWithLines();
 }

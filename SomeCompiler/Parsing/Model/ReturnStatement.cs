@@ -1,18 +1,13 @@
-﻿using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions;
 
 namespace SomeCompiler.Parsing.Model;
 
-public record ReturnStatement : Statement
+record ReturnStatement(Maybe<Expression> Expression) : Statement
 {
-    public ReturnStatement(Maybe<Expression> expression)
-    {
-        Expression = expression;
-    }
-
-    public Maybe<Expression> Expression { get; }
+    public override IEnumerable<INode> Children => Expression.ToList();
 
     public override string ToString()
     {
-        return $"return {Expression.Match(x => x.ToString(), () => "")};";
+        return "return" + Expression.Match(expression => " " + expression, () => "") + ";";
     }
 }

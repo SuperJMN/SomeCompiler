@@ -1,4 +1,4 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
 public class ArgumentList : List<Argument>
 {

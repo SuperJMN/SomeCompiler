@@ -1,11 +1,9 @@
 namespace SomeCompiler.Compilation.Model;
 
-public record class BoundIdentifierExpression : BoundExpression
+public record BoundIdentifierExpression(string Identifier) : BoundExpression
 {
-    public BoundIdentifierExpression(string identifier)
+    public override string ToString()
     {
-        Identifier = identifier;
+        return Identifier;
     }
-
-    public string Identifier { get; }
 }

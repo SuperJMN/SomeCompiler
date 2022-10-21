@@ -13,4 +13,9 @@ public class BinaryOperator
     }
 
     public string Symbol { get; }
+
+    public override string ToString()
+    {
+        return Symbol;
+    }
 }

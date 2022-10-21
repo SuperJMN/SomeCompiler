@@ -1,9 +1,11 @@
-﻿namespace SomeCompiler.Parsing.Model;
+namespace SomeCompiler.Parsing.Model;
 
-public record AssignmentExpression(LeftValue LeftValue, Expression Expression) : Expression
+internal record AssignmentExpression(LeftValue Left, Expression Right) : Expression
 {
+    public override IEnumerable<Expression> Children => new []{ Right };
+
     public override string ToString()
     {
-        return $"{LeftValue} = {Expression};";
+        return $"{Left} = {Right}";
     }
 }

@@ -8,15 +8,6 @@ namespace SomeCompiler.Generation.Intermediate;
 
 public class IntermediateCodeGenerator
 {
-    public Fragment Generate(BoundAssignmentExpression assignment)
-    {
-        var reference = new NamedReference(assignment.Left.Identifier);
-        var expressionFragment = Generate(assignment.Right);
-
-        Code code = new Assign(reference, expressionFragment.Reference);
-        return new Fragment(reference, expressionFragment.Codes.Concat(new[] {code}));
-    }
-
     public Result<IntermediateCodeProgram, List<Error>> Generate(CompiledProgram compiledProgram)
     {
         var bootstrap = new[]
@@ -30,20 +21,39 @@ public class IntermediateCodeGenerator
         return new IntermediateCodeProgram(bootstrap.Concat(codes));
     }
 
+    private static void AddReturnCodeIfMissing(ICollection<Code> generated)
+    {
+        if (generated.LastOrDefault() is Return || generated.LastOrDefault() is EmptyReturn)
+        {
+            return;
+        }
+
+        generated.Add(new EmptyReturn());
+    }
+
+    private Fragment Generate(BoundAssignmentExpression assignment)
+    {
+        var reference = new NamedReference(assignment.Left.Identifier);
+        var expressionFragment = Generate(assignment.Right);
+
+        Code code = new Assign(reference, expressionFragment.Reference);
+        return new Fragment(reference, expressionFragment.Codes.Concat(new[] { code }));
+    }
+
     private IEnumerable<Code> Generate(BoundReturnStatement boundReturnStatement)
     {
         if (boundReturnStatement.Expression.HasNoValue)
         {
-            return new[] {Code.Return()};
+            return new[] { Code.Return() };
         }
 
         var gen = Generate(boundReturnStatement.Expression.Value);
-        return gen.Codes.Concat(new[] {Code.Return(gen.Reference)});
+        return gen.Codes.Concat(new[] { Code.Return(gen.Reference) });
     }
 
     private Fragment Generate(BoundConstantExpression cex)
     {
-        return new Fragment(x => new AssignConstant(x, (int)cex.Value));
+        return new Fragment(x => new AssignConstant(x, (int) cex.Value));
     }
 
     private Fragment Generate(BoundBinaryExpression bex)
@@ -74,30 +84,20 @@ public class IntermediateCodeGenerator
 
     private IEnumerable<Code> Generate(BoundFunction function)
     {
-        var codes1 = new[] {Code.Label(function.Name)};
-        var codes2 = Generate(function.CompoundStatement);
+        var codes1 = new[] { Code.Label(function.Name) };
+        var codes2 = Generate(function.Block);
         var codes3 = ArraySegment<Code>.Empty;
 
         return codes1.Concat(codes2).Concat(codes3);
     }
 
-    private IEnumerable<Code> Generate(BoundCompoundStatement compoundStatement)
+    private IEnumerable<Code> Generate(BoundBlock block)
     {
-        var generated = compoundStatement.Statements.SelectMany(Generate).ToList();
+        var generated = block.Statements.SelectMany(Generate).ToList();
 
         AddReturnCodeIfMissing(generated);
 
         return generated;
-    }
-
-    private static void AddReturnCodeIfMissing(ICollection<Code> generated)
-    {
-        if (generated.LastOrDefault() is Return || generated.LastOrDefault() is EmptyReturn)
-        {
-            return;
-        }
-
-        generated.Add(new EmptyReturn());
     }
 
     private IEnumerable<Code> Generate(BoundStatement statement)

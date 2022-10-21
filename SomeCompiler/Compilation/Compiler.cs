@@ -13,60 +13,105 @@ public class Compiler
     {
         errors = new List<Error>();
         var declarations = GetFunctionDeclarations(source.Functions);
-        CheckDeclarations(declarations);
+        ValidateDeclarations(declarations);
         var functions = source.Functions.Select(Bind);
 
-        if (errors.Any()) return Result.Failure<CompiledProgram, List<Error>>(errors);
-
-        return Result.Success<CompiledProgram, List<Error>>(new CompiledProgram(functions));
+        if (errors.Any())
+        {
+            return Result.Failure<CompiledProgram, List<Error>>(errors);
+        }
+        
+        return new CompiledProgram(functions);
     }
 
-    private BoundFunction Bind(Function function) => new(function.ReturnType, function.Identifier, Bind(function.CompoundStatement));
-
-    private BoundCompoundStatement Bind(CompoundStatement compoundStatement)
+    private BoundFunction Bind(Function function)
     {
-        var boundReturnStatements = compoundStatement.Statements.Select(Bind);
-        return new BoundCompoundStatement(boundReturnStatements.ToList());
+        return new BoundFunction(new ReturnType("void"), function.Name, Bind(function.Block));
+    }
+
+    private BoundBlock Bind(Block block)
+    {
+        return new BoundBlock(block.Select(Bind));
     }
 
     private BoundStatement Bind(Statement statement)
     {
-        if (statement is ReturnStatement rs)
+        return statement switch
         {
-            return new BoundReturnStatement(rs.Expression.Match(x => Bind(x), () => new Maybe<BoundExpression>()));
-        }
-
-        if (statement is ExpressionStatement expressionStatement)
-        {
-            return new BoundExpressionStatement(Bind(expressionStatement.Expression));
-        }
-
-        throw new NotSupportedException();
+            ExpressionStatement expr => Bind(expr),
+            ReturnStatement ret => Bind(ret),
+            _ => throw new ArgumentOutOfRangeException(nameof(statement))
+        };
     }
 
-    private BoundExpression Bind(ConstantExpression constantExpression)
+    private BoundStatement Bind(ReturnStatement returnStatement)
     {
-        return new BoundConstantExpression(constantExpression.Constant);
+        return new BoundReturnStatement(returnStatement.Expression.Map(Bind));
     }
 
-    private BoundExpression Bind(AssignmentExpression assignmentExpression)
+    private BoundStatement Bind(ExpressionStatement expressionStatement)
     {
-        return new BoundAssignmentExpression(assignmentExpression.LeftValue, Bind(assignmentExpression.Expression));
+        return new BoundExpressionStatement(Bind(expressionStatement.Expression));
     }
 
     private BoundExpression Bind(Expression expression)
     {
         return expression switch
         {
+            ArithmeticOperation arithmeticOperation => Bind(arithmeticOperation),
             AssignmentExpression assignmentExpression => Bind(assignmentExpression),
-            ConstantExpression constantExpression => Bind(constantExpression),
-            IdentifierExpression identifierExpression => throw new NotImplementedException(),
-            NegateExpression negateExpression => throw new NotImplementedException(),
-            _ => throw new ArgumentOutOfRangeException()
+            ConstantExpression constantExpression => new BoundConstantExpression(constantExpression.Value),
+            IdentifierExpression identifierExpression => new BoundIdentifierExpression(identifierExpression.Identifier),
+            _ => throw new ArgumentOutOfRangeException(nameof(expression))
         };
     }
 
-    private void CheckDeclarations(IList<FunctionDeclaration> declarations)
+    private BoundExpression Bind(ArithmeticOperation arithmeticOperation)
+    {
+        return arithmeticOperation switch
+        {
+            Factor factor => Bind(factor),
+            Term term => Bind(term),
+            Unit unit => Bind(unit)
+        };
+    }
+
+    private BoundExpression Bind(Unit unit)
+    {
+        return Bind(unit.Expressions[0]);
+    }
+
+    private BoundExpression Bind(Factor factor)
+    {
+        if (factor.Expressions.Length == 1)
+        {
+            return Bind(factor.Expressions[0]);
+        }
+
+        throw new Exception();    }
+
+    private BoundExpression Bind(Term term)
+    {
+        if (term.Expressions.Length == 1)
+        {
+            return Bind(term.Expressions[0]);
+        }
+
+        return new BoundBinaryExpression(Bind(term.Expressions[0]), Bind(term.Expressions[1]), BinaryOperator.Add);
+    }
+
+    private BoundExpression Bind(AssignmentExpression assignmentExpression)
+    {
+        return new BoundAssignmentExpression(Bind(assignmentExpression.Left), Bind(assignmentExpression.Right));
+    }
+
+    // Acabo de meter los métodos para LValue y assigment expression. Nada funciona. Ir rellenando hasta que se pueda y luego chutar los tests.
+    private LeftValue Bind(LeftValue leftValue)
+    {
+        return leftValue;
+    }
+
+    private void ValidateDeclarations(IList<FunctionDeclaration> declarations)
     {
         if (declarations.All(x => x.Name != "main"))
             errors.Add(new Error(ErrorKind.MainNotDeclared, "'main' function is not declared"));
@@ -80,7 +125,7 @@ public class Compiler
     }
 
     private List<FunctionDeclaration> GetFunctionDeclarations(Functions sourceFunctions) =>
-        sourceFunctions.Select(GetFunctionDeclaration).ToList();
+    sourceFunctions.Select(GetFunctionDeclaration).ToList();
 
-    private static FunctionDeclaration GetFunctionDeclaration(Function function) => new(function.Identifier);
+    private static FunctionDeclaration GetFunctionDeclaration(Function function) => new(function.Name);
 }
