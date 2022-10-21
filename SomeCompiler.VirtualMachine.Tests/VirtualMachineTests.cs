@@ -35,6 +35,14 @@ public class VirtualMachineTests
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(123));
     }
 
+    [Fact]
+    public async Task Multiple_assignment()
+    {
+        var state = await Run("void main() { a = 1; b = 2; }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(1));
+        state.Memory["b"].Should().BeEquivalentTo(new DataMemoryEntry(2));
+    }
+
     private static IObservable<VirtualMachineState> Run(string code)
     {
         var gen = new CompilerFrontend();
