@@ -14,7 +14,7 @@ namespace SomeCompiler.Z80.Tests
             this.output = output;
         }
 
-        [Fact]
+        [Fact(Skip = "Not reliable. Can't assert.")]
         public void Simple_test()
         {
             var input = "void main() { a = 1; }";

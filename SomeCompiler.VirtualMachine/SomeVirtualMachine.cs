@@ -105,13 +105,12 @@ public class SomeVirtualMachine : IMachine
             Assign assign => new AssignReferenceCommand(this, assign.Source, assign.Target),
             AssignConstant assignConstant => new AssignConstantCommand(this, assignConstant.Source, assignConstant.Target),
             Call call => new CallCommand(this, call.Name),
-            Divide divide => throw new NotImplementedException(),
+            Divide divide => new DivideCommand(this, divide.Left, divide.Right, divide.Target),
             EmptyReturn emptyReturn => new ReturnCommand(this),
             Halt halt => new HaltCommand(this),
-            Label label => throw new NotImplementedException(),
-            Multiply multiply => throw new NotImplementedException(),
+            Multiply multiply => new MultiplyCommand(this, multiply.Left, multiply.Right, multiply.Target),
             Return @return => new ReturnReferenceCommand(this, @return.Reference),
-            Subtract subtract => throw new NotImplementedException(),
+            Subtract subtract => new SubtractCommand(this, subtract.Left, subtract.Right, subtract.Target),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
