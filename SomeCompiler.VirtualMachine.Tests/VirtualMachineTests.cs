@@ -58,6 +58,27 @@ public class VirtualMachineTests
     }
 
     [Fact]
+    public async Task Subtraction()
+    {
+        var state = await Run("void main() { a = 4 - 2; }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(2));
+    }
+
+    [Fact]
+    public async Task Division()
+    {
+        var state = await Run("void main() { a = 6 / 2; }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(3));
+    }
+
+    [Fact]
+    public async Task Multiplication()
+    {
+        var state = await Run("void main() { a = 6 * 2; }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(12));
+    }
+
+    [Fact]
     public async Task Addition_multi_statement_multi_operator()
     {
         var state = await Run("void main() { a = 1 + 2; b = a + 5; }");

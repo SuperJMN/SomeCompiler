@@ -1,3 +1,4 @@
+using CodeGeneration.Model.Classes;
 using CSharpFunctionalExtensions;
 using SomeCompiler.Compilation;
 using SomeCompiler.Compilation.Model;
@@ -60,10 +61,35 @@ public class IntermediateCodeGenerator
     {
         var left = Generate(bex.Left);
         var right = Generate(bex.Right);
-
-        return new Fragment(reference => new Add(reference, left.Reference, right.Reference))
+        
+        return new Fragment(reference => GetOperator(bex.Operator, reference, left, right))
             .Prepend(right)
             .Prepend(left);
+    }
+
+    private static Code GetOperator(BinaryOperator op, Reference reference, Fragment left, Fragment right)
+    {
+        if (op == BinaryOperator.Add)
+        {
+            return new Add(reference, left.Reference, right.Reference);
+        }
+
+        if (op == BinaryOperator.Subtract)
+        {
+            return new Subtract(reference, left.Reference, right.Reference);
+        }
+
+        if (op == BinaryOperator.Multiply)
+        {
+            return new Multiply(reference, left.Reference, right.Reference);
+        }
+
+        if (op == BinaryOperator.Divide)
+        {
+            return new Divide(reference, left.Reference, right.Reference);
+        }
+
+        throw new NotSupportedException();
     }
 
     private Fragment Generate(BoundIdentifierExpression bex)

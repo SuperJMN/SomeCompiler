@@ -88,7 +88,8 @@ public class Compiler
             return Bind(factor.Expressions[0]);
         }
 
-        throw new Exception();    }
+        return new BoundBinaryExpression(Bind(factor.Expressions[0]), Bind(factor.Expressions[1]), GetOperator(factor.Op));
+    }
 
     private BoundExpression Bind(Term term)
     {
@@ -97,7 +98,24 @@ public class Compiler
             return Bind(term.Expressions[0]);
         }
 
-        return new BoundBinaryExpression(Bind(term.Expressions[0]), Bind(term.Expressions[1]), BinaryOperator.Add);
+        return new BoundBinaryExpression(Bind(term.Expressions[0]), Bind(term.Expressions[1]), GetOperator(term.Op));
+    }
+
+    private static BinaryOperator GetOperator(string? term)
+    {
+        if (term is null)
+        {
+            throw new NullReferenceException(term);
+        }
+
+        return term switch
+        {
+            "+" => BinaryOperator.Add,
+            "-" => BinaryOperator.Subtract,
+            "*" => BinaryOperator.Multiply,
+            "/" => BinaryOperator.Divide,
+            _ => throw new NotSupportedException(term)
+        };
     }
 
     private BoundExpression Bind(AssignmentExpression assignmentExpression)
