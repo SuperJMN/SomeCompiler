@@ -50,6 +50,20 @@ public class VirtualMachineTests
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(3));
     }
 
+    [Fact]
+    public async Task Addition_multi_statement_simple_assignment()
+    {
+        var state = await Run("void main() { a = 1 + 2; b = a; }");
+        state.Memory["b"].Should().BeEquivalentTo(new DataMemoryEntry(3));
+    }
+
+    [Fact]
+    public async Task Addition_multi_statement_multi_operator()
+    {
+        var state = await Run("void main() { a = 1 + 2; b = a + 5; }");
+        state.Memory["b"].Should().BeEquivalentTo(new DataMemoryEntry(8));
+    }
+
     private static IObservable<VirtualMachineState> Run(string code)
     {
         var gen = new CompilerFrontend();
