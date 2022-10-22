@@ -1,14 +1,15 @@
 using CodeGeneration.Model.Classes;
-using SomeCompiler.Generation.Intermediate.Model.Codes;
 
 namespace SomeCompiler.Generation.Intermediate.Model;
 
 public static class CodeFormatter
 {
-    public static IEnumerable<string> ToCodeFormatContent(ICollection<Code> codes)
+    public static IEnumerable<string> ToCodeFormatContent(this IntermediateCodeProgram program)
     {
-        var map = codes.SelectMany(x => x.GetReferences()).Select((x, i) => (x, i)).ToDictionary(tuple => tuple.x, x => "T" + (x.i + 1));
-        return codes.Select(code => code.ToString(map));
+        var named = program.NamedReferences().Select(x => ((Reference) x, x.Value));
+        var unnamed = program.UnnamedReferences().Select((x, i) => (x, $"T{i+1}"));
+        var map = named.Concat(unnamed).ToDictionary(x => x.Item1, tuple => tuple.Item2);
+        return program.Select(code => code.ToString(map));
     }
 
     private static string GetReferenceName(Reference? reference, IDictionary<Placeholder, string> map)

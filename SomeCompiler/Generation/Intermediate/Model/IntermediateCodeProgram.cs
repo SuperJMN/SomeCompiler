@@ -10,6 +10,6 @@ public class IntermediateCodeProgram : List<Code>
 
     public override string ToString()
     {
-        return CodeFormatter.ToCodeFormatContent(this).Select(x => x+";").JoinWithLines();
+        return this.ToTextFormatContent().Join(";");
     }
 }
