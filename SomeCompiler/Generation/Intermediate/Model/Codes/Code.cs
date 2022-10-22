@@ -15,8 +15,5 @@ public abstract record Code
     public static Code Label(string name) => new Label(name);
     public static Code Call(string name) => new Call(name);
 
-    public virtual string ToString(Dictionary<Reference, string> map)
-    {
-        return "<undefined>";
-    }
+    public abstract string ToString(Dictionary<Reference, string> map);
 }

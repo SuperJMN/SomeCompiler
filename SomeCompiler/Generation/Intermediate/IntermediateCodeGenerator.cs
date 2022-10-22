@@ -11,10 +11,10 @@ public class IntermediateCodeGenerator
 {
     public Result<IntermediateCodeProgram, List<Error>> Generate(CompiledProgram compiledProgram)
     {
-        var bootstrap = new[]
+        var bootstrap = new Code[]
         {
-            Code.Call("main"),
-            Code.Halt()
+            new Call("main"),
+            new Halt()
         };
 
         var codes = compiledProgram.Functions.Select(Generate).SelectMany(x => x).ToList();
@@ -45,11 +45,11 @@ public class IntermediateCodeGenerator
     {
         if (boundReturnStatement.Expression.HasNoValue)
         {
-            return new[] { Code.Return() };
+            return new[] { new EmptyReturn() };
         }
 
         var gen = Generate(boundReturnStatement.Expression.Value);
-        return gen.Codes.Concat(new[] { Code.Return(gen.Reference) });
+        return gen.Codes.Concat(new[] { new Return(gen.Reference) });
     }
 
     private Fragment Generate(BoundConstantExpression cex)

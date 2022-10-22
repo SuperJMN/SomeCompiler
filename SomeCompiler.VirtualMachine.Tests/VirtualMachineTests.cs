@@ -85,6 +85,34 @@ public class VirtualMachineTests
         state.Memory["b"].Should().BeEquivalentTo(new DataMemoryEntry(8));
     }
 
+    [Fact]
+    public async Task Multiply_with_multiple_operands()
+    {
+        var state = await Run("void main() { a = 2*2*2; }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(8));
+    }
+
+    [Fact]
+    public async Task Divide_with_multiple_operands()
+    {
+        var state = await Run("void main() { a = 12/3/2; }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(2));
+    }
+
+    [Fact]
+    public async Task Full_arithmetic()
+    {
+        var state = await Run("void main() { a = 2*6/3+4-1; }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(7));
+    }
+
+    [Fact]
+    public async Task Parentheses()
+    {
+        var state = await Run("void main() { a = 2*(1+2); }");
+        state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(6));
+    }
+
     private static IObservable<VirtualMachineState> Run(string code)
     {
         var gen = new CompilerFrontend();
