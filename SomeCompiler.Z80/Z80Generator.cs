@@ -1,4 +1,5 @@
 using System.Text;
+using CSharpFunctionalExtensions;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
@@ -7,7 +8,7 @@ namespace SomeCompiler.Z80;
 
 public class Z80Generator
 {
-    public string Generate(IntermediateCodeProgram program)
+    public Result<GeneratedProgram> Generate(IntermediateCodeProgram program)
     {
         var map = program.IndexedReferences().ToDictionary(t => t.Reference, t => t.Index * 2 + 0x30);
 
@@ -21,22 +22,22 @@ public class Z80Generator
                 case Assign assign:
                     break;
                 case AssignConstant assignConstant:
-                    strBuilder.AppendLine($"LD hl, {map[assignConstant.Target]:X}h");
-                    strBuilder.AppendLine($"LD (hl), {assignConstant.Source}");
+                    strBuilder.AppendLine($"\tLD hl, {map[assignConstant.Target]}");
+                    strBuilder.AppendLine($"\tLD (hl), {assignConstant.Source}");
                     break;
                 case Call call:
-                    strBuilder.AppendLine($"CALL {call.Name}");
+                    strBuilder.AppendLine($"\tCALL {call.Name}");
                     break;
                 case Divide divide:
                     break;
                 case EmptyReturn emptyReturn:
-                    strBuilder.AppendLine("RET");
+                    strBuilder.AppendLine("\tRET");
                     break;
                 case Halt halt:
-                    strBuilder.AppendLine("HALT");
+                    strBuilder.AppendLine("\tHALT");
                     break;
                 case Label label:
-                    strBuilder.AppendLine($"{label.Name}:");
+                    strBuilder.Append($"{label.Name}");
                     break;
                 case Multiply multiply:
                     break;
@@ -45,38 +46,8 @@ public class Z80Generator
                 case Subtract subtract:
                     break;
             }
-
-            //if (code.Operator == Operator.Call)
-            //{
-            //    strBuilder.AppendLine($"CALL {((LabelReference)code.Target).Label}");
-            //}
-
-            //if (code.Operator == Operator.Halt)
-            //{
-            //    strBuilder.AppendLine("HALT");
-            //}
-
-            //if (code.Operator == Operator.Label)
-            //{
-            //    strBuilder.AppendLine($"LABEL {code.Target}");
-            //}
-
-            //if (code.Operator == Operator.Equal)
-            //{
-            //    strBuilder.AppendLine($"LD {code.Target}, {code.Left}");
-            //}
-
-            //if (code.Operator == Operator.Add)
-            //{
-            //    strBuilder.AppendLine($"ADD {code.Target}, {code.Left}");
-            //}
-
-            //if (code.Operator == Operator.Return)
-            //{
-            //    strBuilder.AppendLine("RET");
-            //}
         }
 
-        return strBuilder.ToString();
+        return new GeneratedProgram(strBuilder.ToString(), new Dictionary<string, int>());
     }
 }
