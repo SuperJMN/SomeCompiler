@@ -1,0 +1,8 @@
+[submodule "6502DotNet"]
+	path = 6502DotNet
+	url = https://github.com/SuperJMN/6502.Net.git
+	branch = cmdline-decouple
+[submodule "Z80DotNet"]
+	path = Z80DotNet
+	url = https://github.com/SuperJMN/Z80dotNet.git
+	branch = upgrade
