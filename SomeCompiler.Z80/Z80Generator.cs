@@ -1,4 +1,5 @@
 using System.Text;
+using CodeGeneration.Model.Classes;
 using CSharpFunctionalExtensions;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
@@ -10,7 +11,9 @@ public class Z80Generator
 {
     public Result<GeneratedProgram> Generate(IntermediateCodeProgram program)
     {
-        var map = program.IndexedReferences().ToDictionary(t => t.Reference, t => t.Index * 2 + 0x30);
+        var getNames = GetNames(program);
+        var addresses = GetMemAddresses(program);
+        var table = getNames.Join(addresses, t => t.Item1, y => y.Key, (a, b) => new{ a.Item1, a.Item2, b.Value }).ToDictionary(x => x.Item1, x => new MetaData(x.Item2, x.Value));
 
         StringBuilder strBuilder=new();
         foreach (var code in program)
@@ -27,18 +30,18 @@ public class Z80Generator
                     // ADD     a,b 
                     // LD      (24h),a
                     
-                    strBuilder.AppendLine($"\tLD hl, ({map[add.Left]})\t; LOAD {add.Left} from memory");
+                    strBuilder.AppendLine($"\tLD hl, ({addresses[add.Left]})\t; LOAD {add.Left} from memory");
                     strBuilder.AppendLine($"\tLD a, l");
-                    strBuilder.AppendLine($"\tLD hl, ({map[add.Right]})\t; LOAD {add.Left} from memory");
+                    strBuilder.AppendLine($"\tLD hl, ({addresses[add.Right]})\t; LOAD {add.Left} from memory");
                     strBuilder.AppendLine($"\tLD b, l");
                     strBuilder.AppendLine($"\tADD a, b");
-                    strBuilder.AppendLine($"\tLD ({map[add.Target]}), a \t; STORE into {add.Target}");
+                    strBuilder.AppendLine($"\tLD ({addresses[add.Target]}), a \t; STORE into {add.Target}");
 
                     break;
                 case Assign assign:
                     break;
                 case AssignConstant assignConstant:
-                    strBuilder.AppendLine($"\tLD hl, {map[assignConstant.Target]}");
+                    strBuilder.AppendLine($"\tLD hl, {addresses[assignConstant.Target]}");
                     strBuilder.AppendLine($"\tLD (hl), {assignConstant.Source}");
                     break;
                 case Call call:
@@ -65,5 +68,17 @@ public class Z80Generator
         }
 
         return new GeneratedProgram(strBuilder.ToString(), new Dictionary<string, int>());
+    }
+
+    private static Dictionary<Reference, int> GetMemAddresses(IntermediateCodeProgram program)
+    {
+        return program.IndexedReferences().ToDictionary(t => t.Reference, t => t.Index * 2 + 0x30);
+    }
+
+    private IEnumerable<(Reference, string)> GetNames(IntermediateCodeProgram program)
+    {
+        var named = program.NamedReferences().Select(x => ((Reference) x, x.Value));
+        var unnamed = program.UnnamedReferences().Select((x, i) => (x, $"T{i+1}"));
+        return named.Concat(unnamed);
     }
 }
