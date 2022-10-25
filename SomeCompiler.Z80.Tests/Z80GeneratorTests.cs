@@ -17,7 +17,7 @@ namespace SomeCompiler.Z80.Tests
                 .And.Subject.Value.Memory[48].Should().Be(123);
         }
 
-        [Fact(Skip = "Not implemented yet")]
+        [Fact]
         public void Addition()
         {
             var input = "void main() { a = 1 + 2; }";
@@ -26,7 +26,7 @@ namespace SomeCompiler.Z80.Tests
 
             result
                 .Should().BeSuccess()
-                .And.Subject.Value.Memory[48].Should().Be(3);
+                .And.Subject.Value.Memory[52].Should().Be(3);
         }
     }
 }

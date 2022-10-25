@@ -40,4 +40,9 @@ public class NamedReference : Reference
     {
         return Value.GetHashCode();
     }
+
+    public override string ToString()
+    {
+        return Value;
+    }
 }

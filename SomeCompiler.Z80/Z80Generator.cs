@@ -18,6 +18,22 @@ public class Z80Generator
             switch (code)
             {
                 case Add add:
+
+                    // Example
+                    // LD      hl,(20h) 
+                    // LD      a,l 
+                    // LD      hl,(22h) 
+                    // LD      b,l 
+                    // ADD     a,b 
+                    // LD      (24h),a
+                    
+                    strBuilder.AppendLine($"\tLD hl, ({map[add.Left]})\t; LOAD {add.Left} from memory");
+                    strBuilder.AppendLine($"\tLD a, l");
+                    strBuilder.AppendLine($"\tLD hl, ({map[add.Right]})\t; LOAD {add.Left} from memory");
+                    strBuilder.AppendLine($"\tLD b, l");
+                    strBuilder.AppendLine($"\tADD a, b");
+                    strBuilder.AppendLine($"\tLD ({map[add.Target]}), a \t; STORE into {add.Target}");
+
                     break;
                 case Assign assign:
                     break;
