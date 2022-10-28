@@ -34,6 +34,6 @@ public class CompilerFrontend
     public Result<IntermediateCodeProgram, List<Error>> Generate(string source)
     {
         var compile = Compile(source);
-        return compile.Bind(x => generator.Generate(x));
+        return compile.Bind(program => generator.Generate(program));
     }
 }
