@@ -1,73 +1,34 @@
-using System.Text;
 using CodeGeneration.Model.Classes;
 using CSharpFunctionalExtensions;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
+using SomeCompiler.Z80.Core;
 
 namespace SomeCompiler.Z80;
 
 public class Z80Generator
 {
+    public IList<LabeledInstruction> AsLabeled(IList<Code> program)
+    {
+        var prepend = new[] { Maybe.From((Label) null) };
+
+        var labels = prepend.Concat(program.Select(x => Maybe<Label>.From(x as Label)));
+        var instructions = labels.Zip(program, (l, i) => new LabeledInstruction(l, i)).Where(x => x.Code is not Label);
+        return instructions.ToList();
+    }
+
     public Result<GeneratedProgram> Generate(IntermediateCodeProgram program)
     {
         var getNames = GetNames(program);
         var addresses = GetMemAddresses(program);
         var table = getNames.Join(addresses, t => t.Item1, y => y.Key, (a, b) => new{ a.Item1, a.Item2, b.Value }).ToDictionary(x => x.Item1, x => new MetaData(x.Item2, x.Value));
+        var codes = AsLabeled(program);
 
-        StringBuilder strBuilder=new();
-        foreach (var code in program)
-        {
-            switch (code)
-            {
-                case Add add:
+        var generator = new Z80LabeledAssemblyGenerator(new Z80IntermediateToOpCodeEmitter(new Z80OpCodeEmitter(table)));
 
-                    // Example
-                    // LD      hl,(20h) 
-                    // LD      a,l 
-                    // LD      hl,(22h) 
-                    // LD      b,l 
-                    // ADD     a,b 
-                    // LD      (24h),a
-                    
-                    strBuilder.AppendLine($"\tLD hl, ({addresses[add.Left]})\t; LOAD {add.Left} from memory");
-                    strBuilder.AppendLine($"\tLD a, l");
-                    strBuilder.AppendLine($"\tLD hl, ({addresses[add.Right]})\t; LOAD {add.Left} from memory");
-                    strBuilder.AppendLine($"\tLD b, l");
-                    strBuilder.AppendLine($"\tADD a, b");
-                    strBuilder.AppendLine($"\tLD ({addresses[add.Target]}), a \t; STORE into {add.Target}");
-
-                    break;
-                case Assign assign:
-                    break;
-                case AssignConstant assignConstant:
-                    strBuilder.AppendLine($"\tLD hl, {addresses[assignConstant.Target]}");
-                    strBuilder.AppendLine($"\tLD (hl), {assignConstant.Source}");
-                    break;
-                case Call call:
-                    strBuilder.AppendLine($"\tCALL {call.Name}");
-                    break;
-                case Divide divide:
-                    break;
-                case EmptyReturn emptyReturn:
-                    strBuilder.AppendLine("\tRET");
-                    break;
-                case Halt halt:
-                    strBuilder.AppendLine("\tHALT");
-                    break;
-                case Label label:
-                    strBuilder.Append($"{label.Name}");
-                    break;
-                case Multiply multiply:
-                    break;
-                case Return r:
-                    break;
-                case Subtract subtract:
-                    break;
-            }
-        }
-
-        return new GeneratedProgram(strBuilder.ToString(), new Dictionary<string, int>());
+        var asm = string.Join(Environment.NewLine, codes.Select(c => generator.Generate(c)));
+        return new GeneratedProgram(asm);
     }
 
     private static Dictionary<Reference, int> GetMemAddresses(IntermediateCodeProgram program)

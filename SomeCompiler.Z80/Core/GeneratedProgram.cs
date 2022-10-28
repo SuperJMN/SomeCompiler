@@ -1,10 +1,10 @@
-namespace SomeCompiler.Z80;
+namespace SomeCompiler.Z80.Core;
 
 public class GeneratedProgram
 {
     public string Assembly { get; }
 
-    public GeneratedProgram(string assembly, Dictionary<string, int> map)
+    public GeneratedProgram(string assembly)
     {
         Assembly = assembly;
     }

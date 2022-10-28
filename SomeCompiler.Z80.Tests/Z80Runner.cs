@@ -2,6 +2,7 @@ using CSharpFunctionalExtensions;
 using Konamiman.Z80dotNet;
 using Sixty502DotNet;
 using SomeCompiler.Generation.Intermediate.Model;
+using SomeCompiler.Z80.Core;
 
 namespace SomeCompiler.Z80.Tests;
 
