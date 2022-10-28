@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
 
 namespace SomeCompiler.Z80.Core;
@@ -12,12 +13,12 @@ public class Z80LabeledAssemblyGenerator
         this.z80IntermediateToOpCodeEmitter = z80IntermediateToOpCodeEmitter;
     }
 
-    public string Generate(LabeledInstruction labeledInstruction)
+    public string Generate(LabeledCode labeledCode)
     {
-        var intrs = Generate(labeledInstruction.Code);
-        var labelStr = labeledInstruction.Label.Match(x => x.Name, () => "");
-        var instrs = string.Join(Environment.NewLine, intrs);
-        return labelStr + instrs;
+        var asmLines = Generate(labeledCode.Code);
+        var label = labeledCode.Label.Match(x => x.Name, () => "");
+        var asmCode = string.Join(Environment.NewLine, asmLines);
+        return label + asmCode;
     }
 
     private IEnumerable<string> Generate(Code code)

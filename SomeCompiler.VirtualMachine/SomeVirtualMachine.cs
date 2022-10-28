@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reflection.PortableExecutable;
 using CodeGeneration.Model.Classes;
-using CSharpFunctionalExtensions;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
@@ -58,11 +55,10 @@ public class SomeVirtualMachine : IMachine
 
     public IList<InstructionMemoryEntry> ToMemory(IList<Code> program)
     {
-        var prepend = new[] { Maybe.From((Label)null) };
-
-        var labels = prepend.Concat(program.Select(x => Maybe<Label>.From(x as Label)));
-        var instructions = labels.Zip(program, (l, i) => new InstructionMemoryEntry(i, l)).Where(x => x.Code is not Label);
-        return instructions.ToList();
+        return program
+            .AsLabeled()
+            .Select(lc => new InstructionMemoryEntry(lc.Code, lc.Label))
+            .ToList();
     }
 
     public IObservable<Unit> RunUntilHalted(IScheduler? scheduler = null)
