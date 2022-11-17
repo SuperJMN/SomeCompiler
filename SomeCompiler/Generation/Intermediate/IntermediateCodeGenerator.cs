@@ -110,11 +110,10 @@ public class IntermediateCodeGenerator
 
     private IEnumerable<Code> Generate(BoundFunction function)
     {
-        var codes1 = new[] { Code.Label(function.Name) };
-        var codes2 = Generate(function.Block);
-        var codes3 = ArraySegment<Code>.Empty;
+        var label = new[] { (Code) new Label(function.Name) };
+        var block = Generate(function.Block);
 
-        return codes1.Concat(codes2).Concat(codes3);
+        return label.Concat(block);
     }
 
     private IEnumerable<Code> Generate(BoundBlock block)

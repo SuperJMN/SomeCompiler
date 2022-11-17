@@ -1,82 +1,35 @@
-using System.Text;
+using CodeGeneration.Model.Classes;
+using CSharpFunctionalExtensions;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
-using SomeCompiler.Generation.Intermediate.Model.Codes;
+using SomeCompiler.Z80.Core;
 
 namespace SomeCompiler.Z80;
 
 public class Z80Generator
 {
-    public string Generate(IntermediateCodeProgram program)
+    public Result<GeneratedProgram> Generate(IntermediateCodeProgram program)
     {
-        var map = program.IndexedReferences().ToDictionary(t => t.Reference, t => t.Index * 2 + 0x30);
+        var getNames = GetNames(program);
+        var addresses = GetMemAddresses(program);
+        var table = getNames.Join(addresses, t => t.Item1, y => y.Key, (a, b) => new{ a.Item1, a.Item2, b.Value }).ToDictionary(x => x.Item1, x => new MetaData(x.Item2, x.Value));
+        var codes = program.AsLabeled();
 
-        StringBuilder strBuilder=new();
-        foreach (var code in program)
-        {
-            switch (code)
-            {
-                case Add add:
-                    break;
-                case Assign assign:
-                    break;
-                case AssignConstant assignConstant:
-                    strBuilder.AppendLine($"LD hl, {map[assignConstant.Target]:X}h");
-                    strBuilder.AppendLine($"LD (hl), {assignConstant.Source}");
-                    break;
-                case Call call:
-                    strBuilder.AppendLine($"CALL {call.Name}");
-                    break;
-                case Divide divide:
-                    break;
-                case EmptyReturn emptyReturn:
-                    strBuilder.AppendLine("RET");
-                    break;
-                case Halt halt:
-                    strBuilder.AppendLine("HALT");
-                    break;
-                case Label label:
-                    strBuilder.AppendLine($"{label.Name}:");
-                    break;
-                case Multiply multiply:
-                    break;
-                case Return r:
-                    break;
-                case Subtract subtract:
-                    break;
-            }
+        var generator = new Z80LabeledAssemblyGenerator(new Z80IntermediateToOpCodeEmitter(new Z80OpCodeEmitter(table)));
 
-            //if (code.Operator == Operator.Call)
-            //{
-            //    strBuilder.AppendLine($"CALL {((LabelReference)code.Target).Label}");
-            //}
+        var asm = string.Join(Environment.NewLine, codes.Select(c => generator.Generate(c)));
+        return new GeneratedProgram(asm);
+    }
 
-            //if (code.Operator == Operator.Halt)
-            //{
-            //    strBuilder.AppendLine("HALT");
-            //}
+    private static Dictionary<Reference, int> GetMemAddresses(IntermediateCodeProgram program)
+    {
+        return program.IndexedReferences().ToDictionary(t => t.Reference, t => t.Index * 2 + 0x30);
+    }
 
-            //if (code.Operator == Operator.Label)
-            //{
-            //    strBuilder.AppendLine($"LABEL {code.Target}");
-            //}
-
-            //if (code.Operator == Operator.Equal)
-            //{
-            //    strBuilder.AppendLine($"LD {code.Target}, {code.Left}");
-            //}
-
-            //if (code.Operator == Operator.Add)
-            //{
-            //    strBuilder.AppendLine($"ADD {code.Target}, {code.Left}");
-            //}
-
-            //if (code.Operator == Operator.Return)
-            //{
-            //    strBuilder.AppendLine("RET");
-            //}
-        }
-
-        return strBuilder.ToString();
+    private IEnumerable<(Reference, string)> GetNames(IntermediateCodeProgram program)
+    {
+        var named = program.NamedReferences().Select(x => ((Reference) x, x.Value));
+        var unnamed = program.UnnamedReferences().Select((x, i) => (x, $"T{i+1}"));
+        return named.Concat(unnamed);
     }
 }

@@ -13,9 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Z80", "SomeCom
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Z80.Tests", "SomeCompiler.Z80.Tests\SomeCompiler.Z80.Tests.csproj", "{3CAD5A77-E96B-47EC-AB58-25A1625738D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SomeCompiler.VirtualMachine", "SomeCompiler.VirtualMachine\SomeCompiler.VirtualMachine.csproj", "{81D11D71-02F9-48CD-9AAB-DC03B678A045}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.VirtualMachine", "SomeCompiler.VirtualMachine\SomeCompiler.VirtualMachine.csproj", "{81D11D71-02F9-48CD-9AAB-DC03B678A045}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SomeCompiler.VirtualMachine.Tests", "SomeCompiler.VirtualMachine.Tests\SomeCompiler.VirtualMachine.Tests.csproj", "{09B19199-7A6D-4483-810F-41084EB24284}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.VirtualMachine.Tests", "SomeCompiler.VirtualMachine.Tests\SomeCompiler.VirtualMachine.Tests.csproj", "{09B19199-7A6D-4483-810F-41084EB24284}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Zilog Z80", "Zilog Z80", "{EA4FEC43-5486-43F7-A209-70B5786592A8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sixty502DotNet", "6502DotNet\Sixty502DotNet\Sixty502DotNet.csproj", "{2D5336D0-4E02-4593-BD47-AF0AEEC64558}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Main", "Z80DotNet\Main\Main.csproj", "{DF64CDE6-590E-4879-8E0D-DABEBFE10332}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,9 +57,23 @@ Global
 		{09B19199-7A6D-4483-810F-41084EB24284}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09B19199-7A6D-4483-810F-41084EB24284}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09B19199-7A6D-4483-810F-41084EB24284}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D5336D0-4E02-4593-BD47-AF0AEEC64558}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D5336D0-4E02-4593-BD47-AF0AEEC64558}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D5336D0-4E02-4593-BD47-AF0AEEC64558}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D5336D0-4E02-4593-BD47-AF0AEEC64558}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF64CDE6-590E-4879-8E0D-DABEBFE10332}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF64CDE6-590E-4879-8E0D-DABEBFE10332}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF64CDE6-590E-4879-8E0D-DABEBFE10332}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF64CDE6-590E-4879-8E0D-DABEBFE10332}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{532F7AD6-E51F-44E2-BC01-12CE3C7225AB} = {EA4FEC43-5486-43F7-A209-70B5786592A8}
+		{3CAD5A77-E96B-47EC-AB58-25A1625738D4} = {EA4FEC43-5486-43F7-A209-70B5786592A8}
+		{2D5336D0-4E02-4593-BD47-AF0AEEC64558} = {EA4FEC43-5486-43F7-A209-70B5786592A8}
+		{DF64CDE6-590E-4879-8E0D-DABEBFE10332} = {EA4FEC43-5486-43F7-A209-70B5786592A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D913E0AD-76F5-46F9-9F9A-378CC38F61EF}

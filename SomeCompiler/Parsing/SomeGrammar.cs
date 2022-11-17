@@ -44,7 +44,6 @@ public class SomeGrammar : FluentGrammar
         .Match(Statement).To((Statement s) => new Statements { s })
         .Match(Statements, Statement).To((Statements ss, Statement s) => new Statements(ss) { s });
         
-
     private NonTerminal Functions => () => Rule()
         .Match(Function).To((Function s) => new Functions() { s })
         .Match(Functions, Function).To((Functions ff, Function f) => new Functions(ff) { f });
@@ -54,8 +53,8 @@ public class SomeGrammar : FluentGrammar
         .Match("return", Expression, ";").To((Expression e) => (Statement)new ReturnStatement(e));
 
     private NonTerminal Function => () => Rule()
-        .Match("void", Symbols.Identifier, "(", ParameterList, ")", CompoundStatement).To((string i, ArgumentList args, Block c) => new Function(i, args, c))
-        .Match("void", Symbols.Identifier, "(", ")", CompoundStatement).To((string i, Block c) => new Function(i, new ArgumentList(), c))
+        .Match("int", Symbols.Identifier, "(", ParameterList, ")", CompoundStatement).To((string i, ArgumentList args, Block c) => new Function(i, args, c))
+        .Match("int", Symbols.Identifier, "(", ")", CompoundStatement).To((string i, Block c) => new Function(i, new ArgumentList(), c))
     ;
 
     private NonTerminal Program => () => Rule()

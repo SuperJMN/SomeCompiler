@@ -1,4 +1,3 @@
-using CSharpFunctionalExtensions;
 using FluentAssertions;
 using FluentAssertions.CSharpFunctionalExtensions;
 using Xunit.Abstractions;
@@ -13,30 +12,29 @@ namespace SomeCompiler.Z80.Tests
         {
             this.output = output;
         }
-
-        [Fact(Skip = "Not reliable. Can't assert.")]
+        
+        [Fact]
         public void Simple_test()
         {
-            var input = "void main() { a = 1; }";
-            var expected =
-@"CALL main
-HALT
-main:
-LD hl, 30h
-LD (hl), 1
-RET";
+            var input = "int main() { return 123; }";
 
-            var compile = new CompilerFrontend();
-            var result = compile
-                .Emit(input)
-                .Map(x => new Z80Generator().Generate(x));
+            var result = new Z80Runner(output).Run(input);
 
-            result.Tap(e => output.WriteLine(e));
+            result
+                .Should().BeSuccess()
+                .And.Subject.Value.Registers.L.Should().Be(123);
+        }
 
-            result.Should().BeSuccess()
-                .And.Subject.Value.RemoveWhitespace()
-                .Should()
-                .BeEquivalentTo(expected.RemoveWhitespace());
+        [Fact]
+        public void Addition()
+        {
+            var input = "int main() { return 1 + 2; }";
+
+            var result = new Z80Runner(output).Run(input);
+
+            result
+                .Should().BeSuccess()
+                .And.Subject.Value.Registers.L.Should().Be(3);
         }
     }
 }
