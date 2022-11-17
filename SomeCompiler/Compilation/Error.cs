@@ -10,4 +10,6 @@ public class Error
 
     public ErrorKind Kind { get; }
     public string Message { get; }
+
+    public override string ToString() => $"{nameof(Kind)}: {Kind}, {nameof(Message)}: {Message}";
 }

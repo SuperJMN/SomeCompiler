@@ -72,4 +72,13 @@ public class Z80IntermediateToOpCodeEmitter
             opCodeEmitter.Set(Register.Hl, assign.Target)
         };
     }
+
+    public IEnumerable<string> Return(Return ret)
+    {
+        return new[]
+        {
+            opCodeEmitter.Set(ret.Reference, Register.Hl),
+            opCodeEmitter.Return(),
+        };
+    }
 }

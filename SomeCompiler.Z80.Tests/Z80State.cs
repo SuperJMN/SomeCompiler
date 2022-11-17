@@ -12,4 +12,5 @@ public class Z80State
     }
 
     public IMemory Memory => processor.Memory;
+    public IZ80Registers Registers => processor.Registers;
 }

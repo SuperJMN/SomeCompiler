@@ -11,6 +11,12 @@ public class Z80OpCodeEmitter
         this.table = table;
     }
 
+    /// <summary>
+    /// Loads from memory reference by <param name="from" /> into register <param name="to" />
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <returns></returns>
     public string Set(Reference from, Register to)
     {
         return Tab + $"LD {to}, ({table[from].Address})\t; {to} = {table[from].Name}";
