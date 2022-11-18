@@ -4,26 +4,26 @@ namespace SomeCompiler.Z80.Core;
 
 public class Z80AssemblyGenerator
 {
-    private readonly Z80IntermediateToOpCodeEmitter z80IntermediateToOpCodeEmitter;
+    private readonly IntermediateEmitter intermediateEmitter;
 
-    public Z80AssemblyGenerator(Z80IntermediateToOpCodeEmitter z80IntermediateToOpCodeEmitter)
+    public Z80AssemblyGenerator(IntermediateEmitter intermediateEmitter)
     {
-        this.z80IntermediateToOpCodeEmitter = z80IntermediateToOpCodeEmitter;
+        this.intermediateEmitter = intermediateEmitter;
     }
 
     public IEnumerable<string> Generate(Code code)
     {
         return code switch
         {
-            Add add => z80IntermediateToOpCodeEmitter.Addition(add),
-            Assign assign => z80IntermediateToOpCodeEmitter.Assign(assign),
-            AssignConstant assignConstant => z80IntermediateToOpCodeEmitter.AssignConstant(assignConstant),
-            Call call => z80IntermediateToOpCodeEmitter.Call(call),
-            Divide divide => z80IntermediateToOpCodeEmitter.Divide(divide),
-            EmptyReturn emptyReturn => z80IntermediateToOpCodeEmitter.EmptyReturn(),
-            Halt halt => z80IntermediateToOpCodeEmitter.Halt(),
-            Multiply multiply => throw new NotImplementedException(),
-            Return ret => z80IntermediateToOpCodeEmitter.Return(ret),
+            Add add => intermediateEmitter.Addition(add),
+            Assign assign => intermediateEmitter.Assign(assign),
+            AssignConstant assignConstant => intermediateEmitter.AssignConstant(assignConstant),
+            Call call => intermediateEmitter.Call(call),
+            Divide divide => intermediateEmitter.Divide(divide),
+            EmptyReturn emptyReturn => intermediateEmitter.EmptyReturn(),
+            Halt halt => intermediateEmitter.Halt(),
+            Multiply multiply => intermediateEmitter.Multiply(multiply),
+            Return ret => intermediateEmitter.Return(ret),
             Subtract subtract => throw new NotImplementedException(),
             Label label => new[] { $"{label.Name}:"},
             _ => throw new ArgumentOutOfRangeException(nameof(code))

@@ -13,7 +13,7 @@ public class Z80Generator
         var getNames = GetNames(program);
         var addresses = GetMemAddresses(program);
         var table = getNames.Join(addresses, t => t.Item1, y => y.Key, (a, b) => new{ a.Item1, a.Item2, b.Value }).ToDictionary(x => x.Item1, x => new MetaData(x.Item2, x.Value));
-        var generator = new Z80AssemblyGenerator(new Z80IntermediateToOpCodeEmitter(new Z80OpCodeEmitter(table)));
+        var generator = new Z80AssemblyGenerator(new IntermediateEmitter(new OpCodeEmitter(table)));
 
         var asm = program
             .Select(c => generator.Generate(c).JoinWithLines())
