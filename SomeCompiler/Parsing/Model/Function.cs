@@ -6,6 +6,6 @@ public record Function(string Name, ArgumentList ArgumentList, Block Block) : IN
 
     public override string ToString()
     {
-        return $"void {Name}({ArgumentList}) {Block}";
+        return $"int {Name}({ArgumentList}) {Block}";
     }
 }

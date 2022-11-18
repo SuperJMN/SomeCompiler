@@ -2,11 +2,12 @@ using SomeCompiler.Generation.Intermediate.Model.Codes;
 
 namespace SomeCompiler.Z80.Core;
 
-public class Z80IntermediateToOpCodeEmitter
+public class IntermediateEmitter
 {
-    private readonly Z80OpCodeEmitter opCodeEmitter;
+    private readonly OpCodeEmitter opCodeEmitter;
+    private static bool multiplyAlgorithmAdded = false;
 
-    public Z80IntermediateToOpCodeEmitter(Z80OpCodeEmitter opCodeEmitter)
+    public IntermediateEmitter(OpCodeEmitter opCodeEmitter)
     {
         this.opCodeEmitter = opCodeEmitter;
     }
@@ -15,8 +16,8 @@ public class Z80IntermediateToOpCodeEmitter
     {
         var str = new[]
         {
-            opCodeEmitter.Set(assignConstant.Source, Register.Hl),
-            opCodeEmitter.Set(Register.Hl, assignConstant.Target)
+            opCodeEmitter.Set(assignConstant.Source, Register.HL),
+            opCodeEmitter.Set(Register.HL, assignConstant.Target)
         };
 
         return str;
@@ -26,9 +27,9 @@ public class Z80IntermediateToOpCodeEmitter
     {
         return new[]
         {
-            opCodeEmitter.Set(add.Left, Register.Hl),
+            opCodeEmitter.Set(add.Left, Register.HL),
             opCodeEmitter.Set(Register.L, Register.A),
-            opCodeEmitter.Set(add.Right, Register.Hl),
+            opCodeEmitter.Set(add.Right, Register.HL),
             opCodeEmitter.Set(Register.L, Register.B),
             opCodeEmitter.Increment(Register.A, Register.B),
             opCodeEmitter.Set(Register.A, add.Target)
@@ -68,8 +69,8 @@ public class Z80IntermediateToOpCodeEmitter
     {
         return new[]
         {
-            opCodeEmitter.Set(assign.Source, Register.Hl),
-            opCodeEmitter.Set(Register.Hl, assign.Target)
+            opCodeEmitter.Set(assign.Source, Register.HL),
+            opCodeEmitter.Set(Register.HL, assign.Target)
         };
     }
 
@@ -77,8 +78,19 @@ public class Z80IntermediateToOpCodeEmitter
     {
         return new[]
         {
-            opCodeEmitter.Set(ret.Reference, Register.Hl),
+            opCodeEmitter.Set(ret.Reference, Register.HL),
             opCodeEmitter.Return(),
+        };
+    }
+
+    public IEnumerable<string> Multiply(Multiply multiply)
+    {
+        return new[]
+        {
+            opCodeEmitter.Set(multiply.Left, Register.BC),
+            opCodeEmitter.Set(multiply.Right, Register.DE),
+            opCodeEmitter.Call("MUL16"),
+            opCodeEmitter.Set(Register.HL, multiply.Target),
         };
     }
 }

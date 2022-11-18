@@ -26,7 +26,7 @@ public class Compiler
 
     private BoundFunction Bind(Function function)
     {
-        return new BoundFunction(new ReturnType("void"), function.Name, Bind(function.Block));
+        return new BoundFunction(new ReturnType("int"), function.Name, Bind(function.Block));
     }
 
     private BoundBlock Bind(Block block)

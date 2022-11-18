@@ -12,37 +12,37 @@ public class CompilerTests
     [Fact]
     public void Empty_program()
     {
-        AssertSuccess("void main() { }");
+        AssertSuccess("int main() { }");
     }
 
     [Fact]
     public void Return_numeric_constant()
     {
-        AssertSuccess("void main() { return 13; }");
+        AssertSuccess("int main() { return 13; }");
     }
     
     [Fact]
     public void Assignment()
     {
-        AssertSuccess("void main() { a = 13; }");
+        AssertSuccess("int main() { a = 13; }");
     }
 
     [Fact]
     public void Addition()
     {
-        AssertSuccess("void main() { return 1+2; }");
+        AssertSuccess("int main() { return 1+2; }");
     }
 
     [Fact]
     public void Duplicate_declaration()
     {
-        AssertError("void main() { } void main() { }", ErrorKind.FunctionAlreadyDeclared);
+        AssertError("int main() { } int main() { }", ErrorKind.FunctionAlreadyDeclared);
     }
 
     [Fact]
     public void Main_function_should_be_declared()
     {
-        AssertError("void other() { }", ErrorKind.MainNotDeclared);
+        AssertError("int other() { }", ErrorKind.MainNotDeclared);
     }
 
     private static void AssertSuccess(string code)

@@ -30,10 +30,11 @@ public class Z80Runner
         return result;
     }
 
-    private Result<byte[]> Assemble(GeneratedProgram program)
+    private Result<AssemblyData> Assemble(GeneratedProgram program)
     {
         logger.WriteLine(program.Assembly);
-        return new Z80Assembler().Assemble(program.Assembly);
+        var assemble = new Z80Assembler().Assemble(program.Assembly);
+        return assemble;
     }
 
     private Result<GeneratedProgram> Generate(IntermediateCodeProgram x)
@@ -41,10 +42,10 @@ public class Z80Runner
         return new Z80Generator().Generate(x);
     }
 
-    private Z80State Run(byte[] bytes)
+    private Z80State Run(AssemblyData assemblyData)
     {
         var processor = new Z80Processor();
-        processor.Memory.SetContents(0, bytes);
+        processor.Memory.SetContents(0, assemblyData.ProgramBinary);
         processor.Start();
         return new Z80State(processor);
     }

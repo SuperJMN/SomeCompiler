@@ -2,11 +2,11 @@ using CodeGeneration.Model.Classes;
 
 namespace SomeCompiler.Z80.Core;
 
-public class Z80OpCodeEmitter
+public class OpCodeEmitter
 {
     private readonly Dictionary<Reference, MetaData> table;
 
-    public Z80OpCodeEmitter(Dictionary<Reference, MetaData> table)
+    public OpCodeEmitter(Dictionary<Reference, MetaData> table)
     {
         this.table = table;
     }
