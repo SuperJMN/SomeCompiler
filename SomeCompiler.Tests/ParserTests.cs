@@ -10,7 +10,7 @@ public class ParserTests
     [Fact]
     public void Empty_main()
     {
-        var source = @"void main() { }";
+        var source = @"int main() { }";
         AssertParse(source);
     }
 
@@ -21,49 +21,49 @@ public class ParserTests
     [InlineData(-1)]
     public void Return_integer_constant(int constant)
     {
-        var source = $@"void main() {{ return {constant}; }}";
+        var source = $@"int main() {{ return {constant}; }}";
         AssertParse(source);
     }
 
     [Fact]
     public void Assignment()
     {
-        var source = @"void main() { a = 12; }";
+        var source = @"int main() { a = 12; }";
         AssertParse(source);
     }
 
     [Fact(Skip = "Grammar doesn't support it yet")]
     public void Declaration()
     {
-        var source = @"void main() { int a; }";
+        var source = @"int main() { int a; }";
         AssertParse(source);
     }
 
     [Fact]
     public void Multiple_lines()
     {
-        var source = @"void main() { b = 13; a = 1; }";
+        var source = @"int main() { b = 13; a = 1; }";
         AssertParse(source);
     }
 
     [Fact]
     public void More_than_one_function()
     {
-        var source = @"void main() { } void another() { }";
+        var source = @"int main() { } int another() { }";
         AssertParse(source);
     }
 
     [Fact]
     public void Function_with_arguments()
     {
-        var source = @"void main(int a, int b) { }";
+        var source = @"int main(int a, int b) { }";
         AssertParse(source);
     }
 
     [Fact(Skip = "Grammar doesn't support it yet")]
     public void Empty_return()
     {
-        var source = @"void main() { return; }";
+        var source = @"int main() { return; }";
         AssertParse(source);
     }
 

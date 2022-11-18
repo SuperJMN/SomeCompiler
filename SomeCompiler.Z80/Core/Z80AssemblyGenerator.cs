@@ -1,27 +1,17 @@
-using CSharpFunctionalExtensions;
-using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
 
 namespace SomeCompiler.Z80.Core;
 
-public class Z80LabeledAssemblyGenerator
+public class Z80AssemblyGenerator
 {
     private readonly Z80IntermediateToOpCodeEmitter z80IntermediateToOpCodeEmitter;
 
-    public Z80LabeledAssemblyGenerator(Z80IntermediateToOpCodeEmitter z80IntermediateToOpCodeEmitter)
+    public Z80AssemblyGenerator(Z80IntermediateToOpCodeEmitter z80IntermediateToOpCodeEmitter)
     {
         this.z80IntermediateToOpCodeEmitter = z80IntermediateToOpCodeEmitter;
     }
 
-    public string Generate(LabeledCode labeledCode)
-    {
-        var asmLines = Generate(labeledCode.Code);
-        var label = labeledCode.Label.Match(x => x.Name + ":", () => "");
-        var asmCode = string.Join(Environment.NewLine, asmLines);
-        return label + Environment.NewLine + asmCode;
-    }
-
-    private IEnumerable<string> Generate(Code code)
+    public IEnumerable<string> Generate(Code code)
     {
         return code switch
         {
@@ -35,6 +25,7 @@ public class Z80LabeledAssemblyGenerator
             Multiply multiply => throw new NotImplementedException(),
             Return ret => z80IntermediateToOpCodeEmitter.Return(ret),
             Subtract subtract => throw new NotImplementedException(),
+            Label label => new[] { $"{label.Name}:"},
             _ => throw new ArgumentOutOfRangeException(nameof(code))
         };
     }

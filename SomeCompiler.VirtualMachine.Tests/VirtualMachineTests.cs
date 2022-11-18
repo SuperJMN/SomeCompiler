@@ -24,21 +24,21 @@ public class VirtualMachineTests
     [Fact]
     public async Task Return_constant_puts_data_in_stack()
     {
-        var state = await Run("void main() { return 123; }");
+        var state = await Run("int main() { return 123; }");
         state.StackContents.Should().BeEquivalentTo(new DataMemoryEntry(123));
     }
 
     [Fact]
     public async Task Assignment()
     {
-        var state = await Run("void main() { a = 123; }");
+        var state = await Run("int main() { a = 123; }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(123));
     }
 
     [Fact]
     public async Task Multiple_assignment()
     {
-        var state = await Run("void main() { a = 1; b = 2; }");
+        var state = await Run("int main() { a = 1; b = 2; }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(1));
         state.Memory["b"].Should().BeEquivalentTo(new DataMemoryEntry(2));
     }
@@ -46,70 +46,70 @@ public class VirtualMachineTests
     [Fact]
     public async Task Addition()
     {
-        var state = await Run("void main() { a = 1 + 2; }");
+        var state = await Run("int main() { a = 1 + 2; }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(3));
     }
 
     [Fact]
     public async Task Addition_multi_statement_simple_assignment()
     {
-        var state = await Run("void main() { a = 1 + 2; b = a; }");
+        var state = await Run("int main() { a = 1 + 2; b = a; }");
         state.Memory["b"].Should().BeEquivalentTo(new DataMemoryEntry(3));
     }
 
     [Fact]
     public async Task Subtraction()
     {
-        var state = await Run("void main() { a = 4 - 2; }");
+        var state = await Run("int main() { a = 4 - 2; }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(2));
     }
 
     [Fact]
     public async Task Division()
     {
-        var state = await Run("void main() { a = 6 / 2; }");
+        var state = await Run("int main() { a = 6 / 2; }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(3));
     }
 
     [Fact]
     public async Task Multiplication()
     {
-        var state = await Run("void main() { a = 6 * 2; }");
+        var state = await Run("int main() { a = 6 * 2; }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(12));
     }
 
     [Fact]
     public async Task Addition_multi_statement_multi_operator()
     {
-        var state = await Run("void main() { a = 1 + 2; b = a + 5; }");
+        var state = await Run("int main() { a = 1 + 2; b = a + 5; }");
         state.Memory["b"].Should().BeEquivalentTo(new DataMemoryEntry(8));
     }
 
     [Fact]
     public async Task Multiply_with_multiple_operands()
     {
-        var state = await Run("void main() { a = 2*2*2; }");
+        var state = await Run("int main() { a = 2*2*2; }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(8));
     }
 
     [Fact]
     public async Task Divide_with_multiple_operands()
     {
-        var state = await Run("void main() { a = 12/3/2; }");
+        var state = await Run("int main() { a = 12/3/2; }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(2));
     }
 
     [Fact]
     public async Task Full_arithmetic()
     {
-        var state = await Run("void main() { a = 2*6/3+4-1; }");
+        var state = await Run("int main() { a = 2*6/3+4-1; }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(7));
     }
 
     [Fact]
     public async Task Parentheses()
     {
-        var state = await Run("void main() { a = 2*(1+2); }");
+        var state = await Run("int main() { a = 2*(1+2); }");
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(6));
     }
 
