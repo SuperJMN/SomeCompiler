@@ -1,6 +1,6 @@
 # Welcome!
 
-This is "SomeCompiler" a little C-like compiler created for "The Joy of Learning®".
+This is "SomeCompiler", a little C-like compiler created for "The Joy of Learning®".
 
 I'm making this in my free time to learn about compilers and some old-school topics. It's supposed to make me happier, but more often that not, it's making me get bald faster 🤣
 
