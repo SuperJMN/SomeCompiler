@@ -90,34 +90,7 @@ public class IntermediateEmitter
             opCodeEmitter.Set(multiply.Left, Register.BC),
             opCodeEmitter.Set(multiply.Right, Register.DE),
             opCodeEmitter.Call("MUL16"),
-            opCodeEmitter.Return(),
-        }.Concat(MultiplyAlgorithm());
-    }
-
-    private static IEnumerable<string> MultiplyAlgorithm()
-    {
-        if (multiplyAlgorithmAdded)
-        {
-            yield break;
-        }
-
-        multiplyAlgorithmAdded = true;
-        
-        yield return @"MUL16:
-        LD      A,C             ; MULTIPLIER LOW PLACED IN A
-        LD      C,B             ; MULTIPLIER HIGH PLACED IN C
-        LD      B,$16           ; COUNTER (16 BITS)
-        LD      HL,0            ;
-MULT:
-        SRL     C               ; RIGHT SHIFT MULTIPLIER HIGH
-        RRA                     ; ROTATE RIGHT MULTIPLIER LOW
-        JR      NC,NOADD        ; TEST CARRY
-        ADD     HL,DE           ; ADD MULTIPLICAND TO RESULT
-NOADD:
-        EX      DE,HL
-        ADD     HL,HL           ; SHIFT MULTIPLICAND LEFT
-        EX      DE,HL           ;
-        DJNZ    MULT            ;
-        RET";
+            opCodeEmitter.Set(Register.HL, multiply.Target),
+        };
     }
 }

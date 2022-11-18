@@ -48,5 +48,17 @@ namespace SomeCompiler.Z80.Tests
                 .Should().BeSuccess()
                 .And.Subject.Value.Registers.L.Should().Be(6);
         }
+        
+        [Fact]
+        public void Multiplication_twice()
+        {
+            var input = "int main() { return 2 * 3 * 4; }";
+
+            var result = new Z80Runner(output).Run(input);
+
+            result
+                .Should().BeSuccess()
+                .And.Subject.Value.Registers.L.Should().Be(24);
+        }
     }
 }
