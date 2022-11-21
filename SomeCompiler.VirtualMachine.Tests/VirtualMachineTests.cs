@@ -115,7 +115,7 @@ public class VirtualMachineTests
 
     private static IObservable<VirtualMachineState> Run(string code)
     {
-        var gen = new CompilerFrontend();
+        var gen = new Compiler();
         var generated = gen.Emit(code);
         var vm = new SomeVirtualMachine();
         vm.Load(generated.Value);

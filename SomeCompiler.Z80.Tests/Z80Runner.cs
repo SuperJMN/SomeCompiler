@@ -18,7 +18,7 @@ public class Z80Runner
     
     public Result<Z80State> Run(string input)
     {
-        var compile = new CompilerFrontend();
+        var compile = new Compiler();
 
         var result = compile
             .Emit(input)

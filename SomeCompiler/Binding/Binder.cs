@@ -5,7 +5,7 @@ using SomeCompiler.Parsing.Model;
 
 namespace SomeCompiler.Compilation;
 
-public class Compiler
+public class Binder
 {
     private List<Error> errors = new();
 

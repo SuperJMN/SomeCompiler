@@ -7,16 +7,16 @@ using SomeCompiler.Parsing;
 
 namespace SomeCompiler;
 
-public class CompilerFrontend
+public class Compiler
 {
     private readonly SomeParser parser;
-    private readonly Compiler compiler;
+    private readonly Binder binder;
     private readonly IntermediateCodeGenerator generator;
 
-    public CompilerFrontend()
+    public Compiler()
     {
         parser = new SomeParser();
-        compiler = new Compiler();
+        binder = new Binder();
         generator = new IntermediateCodeGenerator();
     }
 
@@ -26,7 +26,7 @@ public class CompilerFrontend
 
         var mapError = parseResult
             .MapError(x => x.Select(s => new Error(ErrorKind.SyntaxError, s)).ToList())
-            .Bind(x => compiler.Compile(x));
+            .Bind(x => binder.Compile(x));
         
         return mapError;
     }
