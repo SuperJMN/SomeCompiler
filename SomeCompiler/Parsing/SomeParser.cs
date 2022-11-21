@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using EasyParse.Parsing;
+﻿using EasyParse.Parsing;
 using SomeCompiler.Parsing.Model;
 
 namespace SomeCompiler.Parsing;

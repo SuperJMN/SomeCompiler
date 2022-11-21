@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace SomeCompiler.Binding.Model;
+﻿namespace SomeCompiler.Binding.Model;
 
 public record BoundReturnStatement(Maybe<BoundExpression> Expression) : BoundStatement
 {

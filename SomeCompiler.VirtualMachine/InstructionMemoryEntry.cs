@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using SomeCompiler.Generation.Intermediate.Model.Codes;
+﻿using SomeCompiler.Generation.Intermediate.Model.Codes;
 
 namespace SomeCompiler.VirtualMachine;
 

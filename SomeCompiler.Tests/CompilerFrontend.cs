@@ -1,11 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using SomeCompiler.Binding;
-using SomeCompiler.Binding.Model;
-using SomeCompiler.Generation.Intermediate;
-using SomeCompiler.Generation.Intermediate.Model;
-using SomeCompiler.Parsing;
-
-namespace SomeCompiler.Tests;
+﻿namespace SomeCompiler.Tests;
 
 public class CompilerFrontend
 {

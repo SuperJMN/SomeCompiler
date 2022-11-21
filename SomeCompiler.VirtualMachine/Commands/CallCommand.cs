@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace SomeCompiler.VirtualMachine.Commands;
+﻿namespace SomeCompiler.VirtualMachine.Commands;
 
 internal class CallCommand : Command
 {

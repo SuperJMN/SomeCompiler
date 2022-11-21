@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using SomeCompiler.Binding;
+﻿using SomeCompiler.Binding;
 using SomeCompiler.Binding.Model;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;

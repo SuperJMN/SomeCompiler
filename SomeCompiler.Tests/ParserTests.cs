@@ -1,8 +1,3 @@
-using FluentAssertions;
-using FluentAssertions.CSharpFunctionalExtensions;
-using SomeCompiler.Parsing;
-using Xunit;
-
 namespace SomeCompiler.Tests;
 
 public class ParserTests

@@ -1,5 +1,4 @@
 ﻿using CodeGeneration.Model.Classes;
-using CSharpFunctionalExtensions;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
 
@@ -37,14 +36,5 @@ public static class IntermediateProgramExtensions
         var unnamed = program.UnnamedReferences().Select((x, i) => (x, $"T{i+1}"));
         var map = named.Concat(unnamed).ToDictionary(x => x.Item1, tuple => tuple.Item2);
         return program.Select(code => code.ToString(map));
-    }
-
-    public static IList<LabeledCode> AsLabeled(this IList<Code> program)
-    {
-        var prepend = new[] { Maybe.From((Label) null) };
-
-        var labels = prepend.Concat(program.Select(x => Maybe<Label>.From(x as Label)));
-        var instructions = labels.Zip(program, (l, c) => new LabeledCode(l, c)).Where(x => x.Code is not Label);
-        return instructions.ToList();
     }
 }

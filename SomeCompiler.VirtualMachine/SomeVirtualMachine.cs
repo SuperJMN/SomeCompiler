@@ -53,7 +53,7 @@ public class SomeVirtualMachine : IMachine
         return memory[Variables[namedReference]];
     }
 
-    public IList<InstructionMemoryEntry> ToMemory(IList<Code> program)
+    private static IList<InstructionMemoryEntry> ToMemory(IList<Code> program)
     {
         return program
             .AsLabeled()

@@ -5,7 +5,6 @@ namespace SomeCompiler.Z80.Core;
 public class IntermediateEmitter
 {
     private readonly OpCodeEmitter opCodeEmitter;
-    private static bool multiplyAlgorithmAdded = false;
 
     public IntermediateEmitter(OpCodeEmitter opCodeEmitter)
     {

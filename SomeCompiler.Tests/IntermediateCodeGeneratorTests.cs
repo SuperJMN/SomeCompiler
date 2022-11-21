@@ -1,8 +1,4 @@
-﻿using FluentAssertions;
-using FluentAssertions.CSharpFunctionalExtensions;
-using Xunit;
-
-namespace SomeCompiler.Tests;
+﻿namespace SomeCompiler.Tests;
 
 public class IntermediateCodeGeneratorTests
 {
