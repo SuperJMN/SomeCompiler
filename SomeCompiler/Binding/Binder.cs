@@ -1,9 +1,9 @@
 ﻿using CSharpFunctionalExtensions;
-using SomeCompiler.Compilation.Model;
+using SomeCompiler.Binding.Model;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Parsing.Model;
 
-namespace SomeCompiler.Compilation;
+namespace SomeCompiler.Binding;
 
 public class Binder
 {

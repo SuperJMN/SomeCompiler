@@ -1,7 +1,8 @@
 ﻿using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Parsing.Model;
+using Zafiro.Core.Mixins;
 
-namespace SomeCompiler.Compilation.Model;
+namespace SomeCompiler.Binding.Model;
 
 public class BoundFunction
 {

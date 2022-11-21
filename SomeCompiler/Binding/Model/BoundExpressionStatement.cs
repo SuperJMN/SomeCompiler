@@ -1,4 +1,4 @@
-﻿namespace SomeCompiler.Compilation.Model;
+﻿namespace SomeCompiler.Binding.Model;
 
 internal record BoundExpressionStatement(BoundExpression Expression) : BoundStatement
 {

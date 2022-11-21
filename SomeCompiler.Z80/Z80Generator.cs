@@ -3,6 +3,7 @@ using CSharpFunctionalExtensions;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Z80.Core;
+using Zafiro.Core.Mixins;
 
 namespace SomeCompiler.Z80;
 

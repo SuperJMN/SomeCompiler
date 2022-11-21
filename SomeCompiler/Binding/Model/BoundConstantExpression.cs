@@ -1,4 +1,4 @@
-﻿namespace SomeCompiler.Compilation.Model;
+﻿namespace SomeCompiler.Binding.Model;
 
 public record BoundConstantExpression(object Value) : BoundExpression
 {

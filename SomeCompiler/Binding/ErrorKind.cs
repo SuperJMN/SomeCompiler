@@ -1,4 +1,4 @@
-﻿namespace SomeCompiler.Compilation;
+﻿namespace SomeCompiler.Binding;
 
 public enum ErrorKind
 {

@@ -1,4 +1,4 @@
-using SomeCompiler.Compilation.Model;
+using SomeCompiler.Binding.Model;
 
 namespace SomeCompiler.Generation.Intermediate.Model;
 

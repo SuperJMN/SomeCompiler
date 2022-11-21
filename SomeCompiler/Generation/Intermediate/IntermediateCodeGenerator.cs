@@ -1,7 +1,7 @@
 using CodeGeneration.Model.Classes;
 using CSharpFunctionalExtensions;
-using SomeCompiler.Compilation;
-using SomeCompiler.Compilation.Model;
+using SomeCompiler.Binding;
+using SomeCompiler.Binding.Model;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
 

@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentAssertions;
 using FluentAssertions.CSharpFunctionalExtensions;
-using SomeCompiler.Compilation;
-using SomeCompiler.Compilation.Model;
+using SomeCompiler.Binding;
+using SomeCompiler.Binding.Model;
 using Xunit;
 
 namespace SomeCompiler.Tests;

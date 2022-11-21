@@ -1,4 +1,6 @@
-﻿namespace SomeCompiler.Compilation.Model;
+﻿using Zafiro.Core.Mixins;
+
+namespace SomeCompiler.Binding.Model;
 
 public class CompiledProgram
 {

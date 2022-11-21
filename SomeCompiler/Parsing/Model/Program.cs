@@ -1,3 +1,5 @@
+using Zafiro.Core.Mixins;
+
 namespace SomeCompiler.Parsing.Model;
 
 public record Program(Functions Functions) : INode

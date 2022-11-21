@@ -4,6 +4,7 @@ using Sixty502DotNet;
 using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Z80.Core;
 using Xunit.Abstractions;
+using Zafiro.Core.Mixins;
 
 namespace SomeCompiler.Z80.Tests;
 
