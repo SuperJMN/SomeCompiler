@@ -1,6 +1,6 @@
 ﻿using SomeCompiler.Binding.Model;
-using SomeCompiler.Generation.Intermediate;
-using SomeCompiler.Parsing.Model;
+using SomeCompiler.Parser.Model;
+using BinaryOperator = SomeCompiler.Binding.Model.BinaryOperator;
 
 namespace SomeCompiler.Binding;
 
@@ -57,7 +57,7 @@ public class Binder
     {
         return expression switch
         {
-            ArithmeticOperation arithmeticOperation => Bind(arithmeticOperation),
+            BinaryExpression arithmeticOperation => Bind(arithmeticOperation),
             AssignmentExpression assignmentExpression => Bind(assignmentExpression),
             ConstantExpression constantExpression => new BoundConstantExpression(constantExpression.Value),
             IdentifierExpression identifierExpression => new BoundIdentifierExpression(identifierExpression.Identifier),
@@ -65,64 +65,31 @@ public class Binder
         };
     }
 
-    private BoundExpression Bind(ArithmeticOperation arithmeticOperation)
+    private BoundExpression Bind(BinaryExpression arithmeticBinaryOperation)
     {
-        return arithmeticOperation switch
+        var left = Bind(arithmeticBinaryOperation.Left);
+        var right = Bind(arithmeticBinaryOperation.Right);
+        switch (arithmeticBinaryOperation)
         {
-            Factor factor => Bind(factor),
-            Term term => Bind(term),
-            Unit unit => Bind(unit)
-        };
-    }
-
-    private BoundExpression Bind(Unit unit)
-    {
-        return Bind(unit.Expressions[0]);
-    }
-
-    private BoundExpression Bind(Factor factor)
-    {
-        if (factor.Expressions.Length == 1)
-        {
-            return Bind(factor.Expressions[0]);
+            case AddExpression:
+                return new BoundAddExpression(left, right);
+            case DivideExpression:
+                return new BoundDivideExpression(left, right);
+            case MultiplyExpression:
+                return new BoundMultiplyExpression(left, right);
+            case SubtractExpression:
+                return new BoundSubtractExpression(left, right);
+            default:
+                throw new ArgumentOutOfRangeException(nameof(arithmeticBinaryOperation));
         }
-
-        return new BoundBinaryExpression(Bind(factor.Expressions[0]), Bind(factor.Expressions[1]), GetOperator(factor.Op));
     }
-
-    private BoundExpression Bind(Term term)
-    {
-        if (term.Expressions.Length == 1)
-        {
-            return Bind(term.Expressions[0]);
-        }
-
-        return new BoundBinaryExpression(Bind(term.Expressions[0]), Bind(term.Expressions[1]), GetOperator(term.Op));
-    }
-
-    private static BinaryOperator GetOperator(string? term)
-    {
-        if (term is null)
-        {
-            throw new NullReferenceException(term);
-        }
-
-        return term switch
-        {
-            "+" => BinaryOperator.Add,
-            "-" => BinaryOperator.Subtract,
-            "*" => BinaryOperator.Multiply,
-            "/" => BinaryOperator.Divide,
-            _ => throw new NotSupportedException(term)
-        };
-    }
-
+    
     private BoundExpression Bind(AssignmentExpression assignmentExpression)
     {
         return new BoundAssignmentExpression(Bind(assignmentExpression.Left), Bind(assignmentExpression.Right));
     }
 
-    // Acabo de meter los métodos para LValue y assigment expression. Nada funciona. Ir rellenando hasta que se pueda y luego chutar los tests.
+    // Acabo de meter los métodos para LValue y assignment expression. Nada funciona. Ir rellenando hasta que se pueda y luego chutar los tests.
     private LeftValue Bind(LeftValue leftValue)
     {
         return leftValue;
@@ -146,3 +113,4 @@ public class Binder
 
     private static FunctionDeclaration GetFunctionDeclaration(Function function) => new(function.Name);
 }
+

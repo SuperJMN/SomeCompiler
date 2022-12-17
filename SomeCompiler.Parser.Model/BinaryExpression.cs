@@ -1,15 +1,15 @@
 using SomeCompiler.Core;
 
-namespace SomeCompiler.Binding.Model;
+namespace SomeCompiler.Parser.Model;
 
-public abstract record BoundBinaryExpression(BoundExpression Left, BoundExpression Right) : BoundExpression, IHasPrecedence
+public abstract record BinaryExpression(Expression Left, Expression Right) : Expression, IHasPrecedence
 {
     public override string ToString()
     {
         return $"{FormatSubexpresion(Left)} {Symbol} {FormatSubexpresion(Right)}";
     }
 
-    private string FormatSubexpresion(BoundExpression expr)
+    private string FormatSubexpresion(Expression expr)
     {
         if (expr is IHasPrecedence pred)
         {

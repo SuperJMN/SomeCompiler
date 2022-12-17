@@ -1,4 +1,6 @@
-﻿namespace SomeCompiler.Tests;
+﻿using SomeCompiler.Parser.Antlr4;
+
+namespace SomeCompiler.Tests;
 
 public class CompilerFrontend
 {

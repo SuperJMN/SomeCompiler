@@ -8,8 +8,13 @@
 
     <ItemGroup>
         <PackageReference Include="CodingHelmet.EasyParse" Version="1.3.2" />
-        <PackageReference Include="CSharpFunctionalExtensions" Version="2.35.1" />
-        <PackageReference Include="Zafiro.Core" Version="3.2.11" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
+        <PackageReference Include="Zafiro.Core" Version="3.2.13" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SomeCompiler.Parser.Antlr4\SomeCompiler.Parser.Antlr4.csproj" />
+      <ProjectReference Include="..\SomeCompiler.Parser.Model\SomeCompiler.Parser.Model.csproj" />
     </ItemGroup>
 
 </Project>

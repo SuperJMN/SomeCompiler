@@ -1,5 +1,4 @@
-﻿using SomeCompiler.Generation.Intermediate;
-using SomeCompiler.Parsing.Model;
+﻿using SomeCompiler.Parser.Model;
 using Zafiro.Core.Mixins;
 
 namespace SomeCompiler.Binding.Model;

@@ -6,6 +6,8 @@
         <Nullable>enable</Nullable>
 
         <IsPackable>false</IsPackable>
+
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,10 +24,11 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Zafiro.Core" Version="3.2.11" />
+        <PackageReference Include="Zafiro.Core" Version="3.2.13" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\SomeCompiler.Parser.Antlr4\SomeCompiler.Parser.Antlr4.csproj" />
         <ProjectReference Include="..\SomeCompiler.VirtualMachine.Tests\SomeCompiler.VirtualMachine.Tests.csproj" />
         <ProjectReference Include="..\SomeCompiler\SomeCompiler.csproj" />
     </ItemGroup>

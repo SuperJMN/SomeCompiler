@@ -1,6 +1,6 @@
 namespace SomeCompiler.Binding.Model;
 
-public class BinaryOperator
+public class BinaryOperator : IComparable<BinaryOperator>
 {
     public static BinaryOperator Add = new("+");
     public static BinaryOperator Multiply = new("*");
@@ -17,5 +17,27 @@ public class BinaryOperator
     public override string ToString()
     {
         return Symbol;
+    }
+
+    public int Precedence { get; set; }
+
+    public int CompareTo(BinaryOperator? other)
+    {
+        if (other == null)
+        {
+            throw new ArgumentNullException(nameof(other));
+        }
+
+        if (Precedence < other.Precedence)
+        {
+            return -1;
+        }
+
+        if (Precedence > other.Precedence)
+        {
+            return 1;
+        }
+
+        return 0;
     }
 }

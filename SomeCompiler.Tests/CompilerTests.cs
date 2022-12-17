@@ -27,6 +27,12 @@ public class CompilerTests
     }
 
     [Fact]
+    public void Division()
+    {
+        AssertSuccess("int main() { return 4/2; }");
+    }
+
+    [Fact]
     public void Duplicate_declaration()
     {
         AssertError("int main() { } int main() { }", ErrorKind.FunctionAlreadyDeclared);

@@ -5,7 +5,6 @@ global using SomeCompiler.Binding;
 global using SomeCompiler.Binding.Model;
 global using SomeCompiler.Generation.Intermediate;
 global using SomeCompiler.Generation.Intermediate.Model;
-global using SomeCompiler.Parsing;
 global using FluentAssertions;
 global using FluentAssertions.CSharpFunctionalExtensions;
 global using Xunit;
