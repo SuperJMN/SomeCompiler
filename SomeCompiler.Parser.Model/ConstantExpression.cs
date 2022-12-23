@@ -1,6 +1,6 @@
 namespace SomeCompiler.Parser.Model;
 
-internal record ConstantExpression(int Value) : Expression
+public record ConstantExpression(int Value) : Expression
 {
     public override IEnumerable<Expression> Children => Enumerable.Empty<Expression>();
 

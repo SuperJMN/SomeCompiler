@@ -1,6 +1,6 @@
 namespace SomeCompiler.Parser.Model;
 
-public record Argument(ArgumentType ArgumentType, string Name)
+public record Parameter(ArgumentType ArgumentType, string Name)
 {
     public override string ToString()
     {

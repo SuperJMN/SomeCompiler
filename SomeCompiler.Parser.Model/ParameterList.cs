@@ -2,13 +2,13 @@ using Zafiro.Core.Mixins;
 
 namespace SomeCompiler.Parser.Model;
 
-public class ArgumentList : List<Argument>
+public class ParameterList : List<Parameter>
 {
-    public ArgumentList(IEnumerable<Argument> arguments) : base(arguments)
+    public ParameterList(IEnumerable<Parameter> arguments) : base(arguments)
     {
     }
 
-    public ArgumentList()
+    public ParameterList()
     {
     }
 
