@@ -60,7 +60,7 @@ public class Parser
         return statementContext.children[0] switch
         {
             CParser.ExpressionStatementContext expr => ParseExpressionStatement(expr),
-            CParser.JumpStatementContext jmpStmt => new ReturnStatement(ParseExpression(jmpStmt.GetChild(1).Descendants<IParseTree>().Last())),
+            CParser.JumpStatementContext jmpStmt => new ReturnStatement(ParseExpression(jmpStmt.GetChild(1))),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -78,8 +78,8 @@ public class Parser
 
     private static Expression ParseAssignmentExpression(CParser.AssignmentExpressionContext ase)
     {
-        var leftValue = ParseLValue(ase.GetChild(0).Descendants<ITerminalNode>().Last());
-        var expression = ParseExpression(ase.GetChild(2).Descendants<IParseTree>().Last());
+        var leftValue = ParseLValue(ase.GetChild(0));
+        var expression = ParseExpression(ase.GetChild(2));
 
         return new AssignmentExpression(leftValue, expression);
     }
@@ -91,7 +91,9 @@ public class Parser
 
     private static Expression ParseExpression(IParseTree expression)
     {
-        return expression switch
+        var finalExpr = expression.Descendants<IParseTree>().Last();
+
+        return finalExpr switch
         {
             TerminalNodeImpl terminalNodeImpl => int.TryParse(terminalNodeImpl.GetText(), out var n) ? new ConstantExpression(n) : new IdentifierExpression(terminalNodeImpl.GetText()),
             CParser.PrimaryExpressionContext primaryExpressionContext => throw new NotImplementedException(),

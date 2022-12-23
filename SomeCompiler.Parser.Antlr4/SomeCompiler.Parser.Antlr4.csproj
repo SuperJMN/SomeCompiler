@@ -8,8 +8,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="2.29.0" />
-		<PackageReference Include="Zafiro.Core" Version="3.2.12" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.37.0" />
+		<PackageReference Include="Zafiro.Core" Version="3.2.13" />
 	</ItemGroup>
 
 	<ItemGroup>
