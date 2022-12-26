@@ -1,16 +1,15 @@
-﻿using System.ComponentModel;
-using Antlr4.Runtime;
+﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
 using SomeCompiler.Parser.Model;
 
 namespace SomeCompiler.Parser.Antlr4;
 
-public class Parser
+public class SomeParser
 {
-    private ExpressionConverter converter;
+    private readonly ExpressionConverter converter = new ExpressionConverter();
 
-    public Result<Program> Parse(string input)
+    public Result<Program, List<string>> Parse(string input)
     {
         var lexer = new CLexer(CharStreams.fromString(input));
         var parser = new CParser(new CommonTokenStream(lexer));
@@ -18,12 +17,11 @@ public class Parser
         var p = parser.translationUnit();
         var b = new ToStringVisitor();
         var toString = p.Accept(b);
-        converter = new ExpressionConverter();
         return Parse(p);
         
     }
 
-    private Result<Program> Parse(CParser.TranslationUnitContext input)
+    private Result<Program, List<string>> Parse(CParser.TranslationUnitContext input)
     {
         var funcs = input.Descendants<CParser.FunctionDefinitionContext>().Select(ParseFunction);
         

@@ -1,6 +1,5 @@
 ﻿using SomeCompiler.Binding.Model;
-using SomeCompiler.Generation.Intermediate;
-using SomeCompiler.Parsing.Model;
+using SomeCompiler.Parser.Model;
 
 namespace SomeCompiler.Binding;
 
@@ -67,37 +66,9 @@ public class Binder
 
     private BoundExpression Bind(ArithmeticOperation arithmeticOperation)
     {
-        return arithmeticOperation switch
-        {
-            Factor factor => Bind(factor),
-            Term term => Bind(term),
-            Unit unit => Bind(unit)
-        };
-    }
-
-    private BoundExpression Bind(Unit unit)
-    {
-        return Bind(unit.Expressions[0]);
-    }
-
-    private BoundExpression Bind(Factor factor)
-    {
-        if (factor.Expressions.Length == 1)
-        {
-            return Bind(factor.Expressions[0]);
-        }
-
-        return new BoundBinaryExpression(Bind(factor.Expressions[0]), Bind(factor.Expressions[1]), GetOperator(factor.Op));
-    }
-
-    private BoundExpression Bind(Term term)
-    {
-        if (term.Expressions.Length == 1)
-        {
-            return Bind(term.Expressions[0]);
-        }
-
-        return new BoundBinaryExpression(Bind(term.Expressions[0]), Bind(term.Expressions[1]), GetOperator(term.Op));
+        var left = Bind(arithmeticOperation.Expressions[0]);
+        var right = Bind(arithmeticOperation.Expressions[1]);
+        return new BoundBinaryExpression(left, right, GetOperator(arithmeticOperation.Op));
     }
 
     private static BinaryOperator GetOperator(string? term)

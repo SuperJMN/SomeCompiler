@@ -1,7 +1,6 @@
-using SomeCompiler.Binding.Model;
 using Zafiro.Core.Mixins;
 
-namespace SomeCompiler.Generation.Intermediate;
+namespace SomeCompiler.Binding.Model;
 
 public record BoundBlock(IEnumerable<BoundStatement> Statements) : BoundStatement
 {

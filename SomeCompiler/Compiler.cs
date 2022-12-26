@@ -2,7 +2,7 @@
 using SomeCompiler.Binding.Model;
 using SomeCompiler.Generation.Intermediate;
 using SomeCompiler.Generation.Intermediate.Model;
-using SomeCompiler.Parsing;
+using SomeCompiler.Parser.Antlr4;
 
 namespace SomeCompiler;
 

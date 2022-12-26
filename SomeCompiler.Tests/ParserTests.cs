@@ -80,7 +80,7 @@ public class ParserTests
 
     private static void AssertParse(string source)
     {
-        var sut = new Parser.Antlr4.Parser();
+        var sut = new Parser.Antlr4.SomeParser();
         var result = sut.Parse(source);
 
         result.Should().BeSuccess()
