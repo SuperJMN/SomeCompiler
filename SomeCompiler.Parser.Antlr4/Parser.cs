@@ -53,10 +53,33 @@ public class Parser
 
     private Block ParseBlock(CParser.FunctionDefinitionContext functionDefinitionContext)
     {
-        var cs = functionDefinitionContext.Descendant<CParser.CompoundStatementContext>();
-        var statementContexts = cs.Descendants<CParser.StatementContext>();
-        var statements = statementContexts.Select(ParseStatement);
-        return new Block(statements);
+        var block = functionDefinitionContext.Descendant<CParser.CompoundStatementContext>();
+
+        var blockItems = block
+            .Descendants<CParser.BlockItemContext>()
+            .Select(ParseBlockItem)
+            .ToList();
+        
+        return new Block(blockItems);
+    }
+
+    private Statement ParseBlockItem(CParser.BlockItemContext arg)
+    {
+        var child = arg.GetChild(0);
+        return child switch
+        {
+            CParser.DeclarationContext decl => ParseDeclaration(decl),
+            CParser.StatementContext st => ParseStatement(st),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    private DeclarationStatement ParseDeclaration(CParser.DeclarationContext decl)
+    {
+        var specifiers = decl.Descendant<CParser.DeclarationSpecifiersContext>();
+        var type = specifiers.GetChild(0).GetText();
+        var name = specifiers.GetChild(1).GetText();
+        return new DeclarationStatement(new ArgumentType(type), name);
     }
 
     private Statement ParseStatement(CParser.StatementContext statementContext)
@@ -73,19 +96,6 @@ public class Parser
     {
         var expr = expressionStatement.children[0];
         return new ExpressionStatement(converter.ParseExpression((CParser.ExpressionContext) expr));
-    }
-
-    private Expression ParseAssignmentExpression(CParser.AssignmentExpressionContext ase)
-    {
-        var leftValue = ParseLValue(ase.GetChild(0));
-        var expression = converter.ParseExpression((CParser.ExpressionContext) ase.GetChild(2));
-
-        return new AssignmentExpression(leftValue, expression);
-    }
-
-    private static LeftValue ParseLValue(IParseTree last)
-    {
-        return new LeftValue(last.GetText());
     }
 
     private static string ParseFunctionName(IParseTree child)

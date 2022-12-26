@@ -30,10 +30,16 @@ public class ParserTests
         AssertParse(source);
     }
 
-    [Fact(Skip = "Grammar doesn't support it yet")]
+    [Fact]
     public void Declaration()
     {
-        var source = @"int main() { int a; }";
+        var source = """
+                     int main() 
+                     { 
+                        a = 1;
+                        int a;                         
+                     }
+                     """;
         AssertParse(source);
     }
 
