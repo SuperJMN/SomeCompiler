@@ -27,7 +27,7 @@ public class Parser
     {
         var funcs = input.Descendants<CParser.FunctionDefinitionContext>().Select(ParseFunction);
         
-        return (Program) new Program(new Functions(funcs.ToList()));
+        return new Program(new Functions(funcs.ToList()));
     }
 
     private Function ParseFunction(CParser.FunctionDefinitionContext func)
@@ -64,7 +64,7 @@ public class Parser
         return statementContext.children[0] switch
         {
             CParser.ExpressionStatementContext expr => ParseExpressionStatement(expr),
-            CParser.JumpStatementContext jmpStmt => new ReturnStatement(converter.ParseExpression((CParser.ExpressionContext) jmpStmt.GetChild(1))),
+            CParser.JumpStatementContext jmpStmt => new ReturnStatement(jmpStmt.ChildCount == 3 ? converter.ParseExpression((CParser.ExpressionContext) jmpStmt.GetChild(1)) : Maybe<Expression>.None),
             _ => throw new ArgumentOutOfRangeException()
         };
     }

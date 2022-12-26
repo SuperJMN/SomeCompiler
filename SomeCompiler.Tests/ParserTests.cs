@@ -65,7 +65,7 @@ public class ParserTests
         AssertParse(source);
     }
 
-    [Fact(Skip = "Grammar doesn't support it yet")]
+    [Fact]
     public void Empty_return()
     {
         var source = @"int main() { return; }";
