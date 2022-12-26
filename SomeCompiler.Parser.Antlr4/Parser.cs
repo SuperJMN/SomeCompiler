@@ -8,6 +8,8 @@ namespace SomeCompiler.Parser.Antlr4;
 
 public class Parser
 {
+    private ExpressionConverter converter;
+
     public Result<Program> Parse(string input)
     {
         var lexer = new CLexer(CharStreams.fromString(input));
@@ -16,7 +18,9 @@ public class Parser
         var p = parser.translationUnit();
         var b = new ToStringVisitor();
         var toString = p.Accept(b);
+        converter = new ExpressionConverter();
         return Parse(p);
+        
     }
 
     private Result<Program> Parse(CParser.TranslationUnitContext input)
@@ -47,7 +51,7 @@ public class Parser
         return new Parameter(new ArgumentType(type), name);
     }
 
-    private static Block ParseBlock(CParser.FunctionDefinitionContext functionDefinitionContext)
+    private Block ParseBlock(CParser.FunctionDefinitionContext functionDefinitionContext)
     {
         var cs = functionDefinitionContext.Descendant<CParser.CompoundStatementContext>();
         var statementContexts = cs.Descendants<CParser.StatementContext>();
@@ -55,31 +59,26 @@ public class Parser
         return new Block(statements);
     }
 
-    private static Statement ParseStatement(CParser.StatementContext statementContext)
+    private Statement ParseStatement(CParser.StatementContext statementContext)
     {
         return statementContext.children[0] switch
         {
             CParser.ExpressionStatementContext expr => ParseExpressionStatement(expr),
-            CParser.JumpStatementContext jmpStmt => new ReturnStatement(ParseExpression(jmpStmt.GetChild(1))),
+            CParser.JumpStatementContext jmpStmt => new ReturnStatement(converter.ParseExpression((CParser.ExpressionContext) jmpStmt.GetChild(1))),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
 
-    private static Statement ParseExpressionStatement(CParser.ExpressionStatementContext expr)
+    private Statement ParseExpressionStatement(CParser.ExpressionStatementContext expressionStatement)
     {
-        var assignmentExpression = expr.children[0].GetChild(0);
-        var assExpr = assignmentExpression switch
-        {
-            CParser.AssignmentExpressionContext ase => ParseAssignmentExpression(ase),
-            _ => throw new ArgumentOutOfRangeException()
-        };
-        return new ExpressionStatement(assExpr);
+        var expr = expressionStatement.children[0];
+        return new ExpressionStatement(converter.ParseExpression((CParser.ExpressionContext) expr));
     }
 
-    private static Expression ParseAssignmentExpression(CParser.AssignmentExpressionContext ase)
+    private Expression ParseAssignmentExpression(CParser.AssignmentExpressionContext ase)
     {
         var leftValue = ParseLValue(ase.GetChild(0));
-        var expression = ParseExpression(ase.GetChild(2));
+        var expression = converter.ParseExpression((CParser.ExpressionContext) ase.GetChild(2));
 
         return new AssignmentExpression(leftValue, expression);
     }
@@ -87,18 +86,6 @@ public class Parser
     private static LeftValue ParseLValue(IParseTree last)
     {
         return new LeftValue(last.GetText());
-    }
-
-    private static Expression ParseExpression(IParseTree expression)
-    {
-        var finalExpr = expression.Descendants<IParseTree>().Last();
-
-        return finalExpr switch
-        {
-            TerminalNodeImpl terminalNodeImpl => int.TryParse(terminalNodeImpl.GetText(), out var n) ? new ConstantExpression(n) : new IdentifierExpression(terminalNodeImpl.GetText()),
-            CParser.PrimaryExpressionContext primaryExpressionContext => throw new NotImplementedException(),
-            _ => throw new ArgumentOutOfRangeException(nameof(expression), expression, null)
-        };
     }
 
     private static string ParseFunctionName(IParseTree child)
