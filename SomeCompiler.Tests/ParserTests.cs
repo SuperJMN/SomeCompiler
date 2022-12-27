@@ -100,6 +100,9 @@ public class ExpressionParsingTests
     [InlineData("!a")]
     [InlineData("a=1")]
     [InlineData("id=1")]
+    [InlineData("7/2*4")]
+    [InlineData("7-2+4")]
+    [InlineData("7*2+4/2")]
     public void Expression(string input)
     {
         AssertExpression(input);
