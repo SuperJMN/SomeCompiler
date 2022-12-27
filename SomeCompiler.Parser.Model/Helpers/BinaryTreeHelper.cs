@@ -2,7 +2,7 @@
 
 public static class BinaryTreeHelper
 {
-    public static BinaryNode<T>? Build<T>(IList<T> array, int skip = 0)
+    public static BinaryNode<T>? FromPostFix<T>(IList<T> array, int skip = 0)
     {
         var list = array.Skip(skip).Take(2).ToList();
 	
@@ -17,7 +17,7 @@ public static class BinaryTreeHelper
         }
 
         var left = new BinaryNode<T>(list[0]);
-        var right = Build(array, skip + 2);
+        var right = FromPostFix(array, skip + 2);
         return new BinaryNode<T>(list[1], left, right);
     }
 }

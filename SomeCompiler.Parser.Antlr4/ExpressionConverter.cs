@@ -1,5 +1,4 @@
 using Antlr4.Runtime.Tree;
-using DynamicData;
 using SomeCompiler.Parser.Model;
 using SomeCompiler.Parser.Model.Helpers;
 
@@ -74,8 +73,8 @@ public class ExpressionConverter
     {
         if (node.ChildCount > 1)
         {
-            return FromPostfixListAdditive(node.Children().ToList());
-        }
+            var binaryTree = BinaryTreeHelper.FromPostFix(node.Children().ToList());
+            return ToExpression(binaryTree!, tree => Multiplicative((CParser.MultiplicativeExpressionContext) tree));        }
 
         return Multiplicative((CParser.MultiplicativeExpressionContext) node.GetChild(0));
     }
@@ -89,69 +88,37 @@ public class ExpressionConverter
     {
         if (node.ChildCount > 1)
         {
-            return FromPostfixList(node.Children().ToList());
+            var binaryTree = BinaryTreeHelper.FromPostFix(node.Children().ToList().ToList());
+            return ToExpression(binaryTree!, tree => Cast((CParser.CastExpressionContext)tree));
         }
 
         return Cast((CParser.CastExpressionContext) node.GetChild(0));
     }
 
-    private Expression? FromPostfixList(List<IParseTree> nodes)
+    private ArithmeticOperation ToExpression(BinaryNode<IParseTree> binaryTree, Func<IParseTree, Expression> convertExpression)
     {
-        var binaryTree = BinaryTreeHelper.Build(nodes.ToList());
-        var expr = ToMultiplicativeExpression(binaryTree!);
-        return expr;
-    }
-
-    private Expression? FromPostfixListAdditive(List<IParseTree> nodes)
-    {
-        var binaryTree = BinaryTreeHelper.Build(nodes.ToList());
-        var expr = ToAdditiveExpression(binaryTree!);
-        return expr;
-    }
-
-    private ArithmeticOperation? ToMultiplicativeExpression(BinaryNode<IParseTree>? binaryTree)
-    {
-        if (binaryTree is null)
+        if (binaryTree == null)
         {
-            return null;
+            throw new ArgumentNullException(nameof(binaryTree));
+        }
+
+        if (convertExpression == null)
+        {
+            throw new ArgumentNullException(nameof(convertExpression));
         }
 
         var op = binaryTree.Value is ITerminalNode terminal ? GetOp(terminal) : null;
         
-        var left = Cast((CParser.CastExpressionContext) binaryTree.Left.Value);
+        var left = convertExpression(binaryTree.Left!.Value);
 
         Expression right;
-        if (binaryTree.Right.Value is ITerminalNode)
+        if (binaryTree.Right!.Value is ITerminalNode)
         {
-            right = ToMultiplicativeExpression(binaryTree.Right);
+            right = ToExpression(binaryTree.Right, convertExpression);
         }
         else
         {
-            right = Cast((CParser.CastExpressionContext) binaryTree.Right.Value);
-        }
-        
-        return new ArithmeticOperation(op, left, right);
-    }
-
-    private ArithmeticOperation? ToAdditiveExpression(BinaryNode<IParseTree>? binaryTree)
-    {
-        if (binaryTree is null)
-        {
-            return null;
-        }
-
-        var op = binaryTree.Value is ITerminalNode terminal ? GetOp(terminal) : null;
-        
-        var left = Multiplicative((CParser.MultiplicativeExpressionContext) binaryTree.Left.Value);
-
-        Expression right;
-        if (binaryTree.Right.Value is ITerminalNode)
-        {
-            right = ToAdditiveExpression(binaryTree.Right);
-        }
-        else
-        {
-            right = Multiplicative((CParser.MultiplicativeExpressionContext) binaryTree.Right.Value);
+            right = convertExpression(binaryTree.Right.Value);
         }
         
         return new ArithmeticOperation(op, left, right);
