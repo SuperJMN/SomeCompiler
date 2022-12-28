@@ -1,7 +1,7 @@
 using System.Runtime.Intrinsics.Arm;
 using Antlr4.Runtime.Tree;
+using SomeCompiler.Core.Helpers;
 using SomeCompiler.Parser.Model;
-using SomeCompiler.Parser.Model.Helpers;
 
 namespace SomeCompiler.Parser.Antlr4;
 

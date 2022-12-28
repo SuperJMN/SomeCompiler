@@ -1,4 +1,4 @@
-﻿namespace SomeCompiler.Parser.Model.Helpers;
+﻿namespace SomeCompiler.Core.Helpers;
 
 public class BinaryNode<T>
 {
