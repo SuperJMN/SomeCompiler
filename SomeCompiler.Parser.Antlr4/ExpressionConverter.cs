@@ -103,16 +103,16 @@ public class ExpressionConverter
             throw new ArgumentNullException(nameof(convertExpression));
         }
 
-        var left = convertExpression(binaryTree.Left!.Value);
+        var right = convertExpression(binaryTree.Right!.Value);
 
-        Expression right;
-        if (binaryTree.Right!.Value is ITerminalNode)
+        Expression left;
+        if (binaryTree.Left!.Value is ITerminalNode)
         {
-            right = ToExpression(binaryTree.Right, convertExpression);
+            left = ToExpression(binaryTree.Left, convertExpression);
         }
         else
         {
-            right = convertExpression(binaryTree.Right.Value);
+            left = convertExpression(binaryTree.Left.Value);
         }
 
         return GetExpr(binaryTree, left, right);
