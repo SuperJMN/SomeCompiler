@@ -18,7 +18,6 @@ public class SomeParser
         var b = new ToStringVisitor();
         var toString = p.Accept(b);
         return Parse(p);
-        
     }
 
     private Result<Program, List<string>> Parse(CParser.TranslationUnitContext input)

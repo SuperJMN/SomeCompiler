@@ -8,7 +8,7 @@ public record ArithmeticOperation(string? Op, params Expression[] Expressions) :
     {
         if (Expressions.Length == 2)
         {
-            return $"{Expressions[0]} {Op} {Expressions[1]}";
+           return $"{Format(Expressions[0])} {Op} {Format(Expressions[1])}";
         }
 
         if (Expressions.Length == 1)
@@ -17,5 +17,15 @@ public record ArithmeticOperation(string? Op, params Expression[] Expressions) :
         }
 
         return "Not supported";
+    }
+
+    private string Format(Expression expression)
+    {
+        if ((Op == "*" || Op == "/") && expression is ArithmeticOperation { Op: "+" or "-" })
+        {
+            return "(" + expression + ")";
+        }
+
+        return expression.ToString();
     }
 }

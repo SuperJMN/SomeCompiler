@@ -22,4 +22,10 @@ public static class ParseNodeExtensions
             .Flatten()
             .OfType<T>();
     }
+
+    public static string ToAstFormat(this IParseTree node)
+    {
+        var visitor = new ToStringVisitor();
+        return node.Accept(visitor);
+    }
 }

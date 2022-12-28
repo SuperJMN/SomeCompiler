@@ -26,7 +26,7 @@ public class ToStringVisitor : IParseTreeVisitor<string>
             text = n.GetText();
         }
         
-        return rootName + "(" + text + "):\n" + visitChildren;
+        return rootName + "(" + text + ")\n" + visitChildren;
     }
 
     public string VisitTerminal(ITerminalNode node)

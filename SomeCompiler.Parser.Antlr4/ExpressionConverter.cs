@@ -158,6 +158,7 @@ public class ExpressionConverter
         {
             111 => new ConstantExpression(int.Parse(terminalNode.GetText())),
             110 => new IdentifierExpression(terminalNode.GetText()),
+            64 => ParseExpression((CParser.ExpressionContext) node.GetChild(1)),
             _ => throw new NotSupportedException()
         };
     }

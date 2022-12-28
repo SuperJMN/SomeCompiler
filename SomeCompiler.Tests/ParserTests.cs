@@ -103,6 +103,7 @@ public class ExpressionParsingTests
     [InlineData("7/2*4")]
     [InlineData("7-2+4")]
     [InlineData("7*2+4/2")]
+    [InlineData("(1+2)*4")]
     public void Expression(string input)
     {
         AssertExpression(input);
