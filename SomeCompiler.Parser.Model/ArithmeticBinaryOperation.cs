@@ -21,7 +21,7 @@ public record ArithmeticBinaryOperation(BinaryOperator Op, params Expression[] E
 
     private string Format(Expression expression)
     {
-        if ((Op == BinaryOperator.Multiply || Op == BinaryOperator.Divide) && expression is ArithmeticBinaryOperation ar && (ar.Op == BinaryOperator.Add || ar.Op == BinaryOperator.Subtract))
+        if (expression is ArithmeticBinaryOperation aop && Op > aop.Op)
         {
             return "(" + expression + ")";
         }
