@@ -1,4 +1,4 @@
-namespace SomeCompiler.Binding.Model;
+namespace SomeCompiler.Parser.Model;
 
 public class BinaryOperator : IComparable<BinaryOperator>
 {

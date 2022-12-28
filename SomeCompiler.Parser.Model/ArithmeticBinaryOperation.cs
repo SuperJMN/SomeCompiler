@@ -1,6 +1,6 @@
 namespace SomeCompiler.Parser.Model;
 
-public record ArithmeticOperation(string? Op, params Expression[] Expressions) : Expression
+public record ArithmeticBinaryOperation(BinaryOperator Op, params Expression[] Expressions) : Expression
 {
     public override IEnumerable<Expression> Children => Expressions;
 
@@ -13,7 +13,7 @@ public record ArithmeticOperation(string? Op, params Expression[] Expressions) :
 
         if (Expressions.Length == 1)
         {
-            return (Op ?? "") + Expressions[0];
+            return Op.ToString() + Expressions[0];
         }
 
         return "Not supported";
@@ -21,7 +21,7 @@ public record ArithmeticOperation(string? Op, params Expression[] Expressions) :
 
     private string Format(Expression expression)
     {
-        if ((Op == "*" || Op == "/") && expression is ArithmeticOperation { Op: "+" or "-" })
+        if ((Op == BinaryOperator.Multiply || Op == BinaryOperator.Divide) && expression is ArithmeticBinaryOperation ar && (ar.Op == BinaryOperator.Add || ar.Op == BinaryOperator.Subtract))
         {
             return "(" + expression + ")";
         }

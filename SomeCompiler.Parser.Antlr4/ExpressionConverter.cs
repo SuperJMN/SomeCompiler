@@ -79,9 +79,17 @@ public class ExpressionConverter
         return Multiplicative((CParser.MultiplicativeExpressionContext) node.GetChild(0));
     }
 
-    private string GetOp(ITerminalNode terminal)
+    private BinaryOperator GetOp(ITerminalNode terminal)
     {
-        return terminal.GetText();
+        var op = terminal.GetText();
+        return op switch
+        {
+            "+" => BinaryOperator.Add,
+            "-" => BinaryOperator.Subtract,
+            "*" => BinaryOperator.Multiply,
+            "/" => BinaryOperator.Divide,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
     private Expression Multiplicative(CParser.MultiplicativeExpressionContext node)
@@ -95,7 +103,7 @@ public class ExpressionConverter
         return Cast((CParser.CastExpressionContext) node.GetChild(0));
     }
 
-    private ArithmeticOperation ToExpression(BinaryNode<IParseTree> binaryTree, Func<IParseTree, Expression> convertExpression)
+    private ArithmeticBinaryOperation ToExpression(BinaryNode<IParseTree> binaryTree, Func<IParseTree, Expression> convertExpression)
     {
         if (binaryTree == null)
         {
@@ -121,7 +129,7 @@ public class ExpressionConverter
             right = convertExpression(binaryTree.Right.Value);
         }
         
-        return new ArithmeticOperation(op, left, right);
+        return new ArithmeticBinaryOperation(op, left, right);
     }
 
     private Expression Cast(CParser.CastExpressionContext node)
