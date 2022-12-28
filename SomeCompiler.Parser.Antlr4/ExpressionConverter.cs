@@ -1,3 +1,4 @@
+using System.Runtime.Intrinsics.Arm;
 using Antlr4.Runtime.Tree;
 using SomeCompiler.Parser.Model;
 using SomeCompiler.Parser.Model.Helpers;
@@ -79,19 +80,6 @@ public class ExpressionConverter
         return Multiplicative((CParser.MultiplicativeExpressionContext) node.GetChild(0));
     }
 
-    private BinaryOperator GetOp(ITerminalNode terminal)
-    {
-        var op = terminal.GetText();
-        return op switch
-        {
-            "+" => BinaryOperator.Add,
-            "-" => BinaryOperator.Subtract,
-            "*" => BinaryOperator.Multiply,
-            "/" => BinaryOperator.Divide,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
-
     private Expression Multiplicative(CParser.MultiplicativeExpressionContext node)
     {
         if (node.ChildCount > 1)
@@ -103,7 +91,7 @@ public class ExpressionConverter
         return Cast((CParser.CastExpressionContext) node.GetChild(0));
     }
 
-    private ArithmeticBinaryOperation ToExpression(BinaryNode<IParseTree> binaryTree, Func<IParseTree, Expression> convertExpression)
+    private Expression ToExpression(BinaryNode<IParseTree> binaryTree, Func<IParseTree, Expression> convertExpression)
     {
         if (binaryTree == null)
         {
@@ -115,8 +103,6 @@ public class ExpressionConverter
             throw new ArgumentNullException(nameof(convertExpression));
         }
 
-        var op = binaryTree.Value is ITerminalNode terminal ? GetOp(terminal) : null;
-        
         var left = convertExpression(binaryTree.Left!.Value);
 
         Expression right;
@@ -128,8 +114,25 @@ public class ExpressionConverter
         {
             right = convertExpression(binaryTree.Right.Value);
         }
-        
-        return new ArithmeticBinaryOperation(op, left, right);
+
+        return GetExpr(binaryTree, left, right);
+    }
+
+    private static Expression GetExpr(BinaryNode<IParseTree> binaryTree, Expression left, Expression right)
+    {
+        if (binaryTree.Value is ITerminalNode t)
+        {
+            return t.GetText() switch
+            {
+                "+" => new AddExpression(left, right),
+                "-" => new SubtractExpression(left, right),
+                "*" => new MultiplyExpression(left, right),
+                "/" => new DivideExpression(left, right),
+                _ => throw new ArgumentOutOfRangeException(t.GetText())
+            };
+        }
+
+        throw new ArgumentOutOfRangeException(binaryTree.Value.GetText());
     }
 
     private Expression Cast(CParser.CastExpressionContext node)

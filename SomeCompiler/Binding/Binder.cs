@@ -57,7 +57,7 @@ public class Binder
     {
         return expression switch
         {
-            ArithmeticBinaryOperation arithmeticOperation => Bind(arithmeticOperation),
+            BinaryExpression arithmeticOperation => Bind(arithmeticOperation),
             AssignmentExpression assignmentExpression => Bind(assignmentExpression),
             ConstantExpression constantExpression => new BoundConstantExpression(constantExpression.Value),
             IdentifierExpression identifierExpression => new BoundIdentifierExpression(identifierExpression.Identifier),
@@ -65,38 +65,25 @@ public class Binder
         };
     }
 
-    private BoundExpression Bind(ArithmeticBinaryOperation arithmeticBinaryOperation)
+    private BoundExpression Bind(BinaryExpression arithmeticBinaryOperation)
     {
-        var left = Bind(arithmeticBinaryOperation.Expressions[0]);
-        var right = Bind(arithmeticBinaryOperation.Expressions[1]);
-        return new BoundBinaryExpression(left, right, GetOperator(arithmeticBinaryOperation.Op));
+        var left = Bind(arithmeticBinaryOperation.Left);
+        var right = Bind(arithmeticBinaryOperation.Right);
+        switch (arithmeticBinaryOperation)
+        {
+            case AddExpression:
+                return new BoundAddExpression(left, right);
+            case DivideExpression:
+                return new BoundDivideExpression(left, right);
+            case MultiplyExpression:
+                return new BoundMultiplyExpression(left, right);
+            case SubtractExpression:
+                return new BoundSubtractExpression(left, right);
+            default:
+                throw new ArgumentOutOfRangeException(nameof(arithmeticBinaryOperation));
+        }
     }
-
-    private static BinaryOperator GetOperator(Parser.Model.BinaryOperator term)
-    {
-        if (term == Parser.Model.BinaryOperator.Add)
-        {
-            return BinaryOperator.Add;
-        }
-
-        if (term == Parser.Model.BinaryOperator.Subtract)
-        {
-            return BinaryOperator.Subtract;
-        }
-
-        if (term == Parser.Model.BinaryOperator.Multiply)
-        {
-            return BinaryOperator.Multiply;
-        }
-
-        if (term == Parser.Model.BinaryOperator.Divide)
-        {
-            return BinaryOperator.Divide;
-        }
-
-        throw new NotSupportedException(term.ToString());
-    }
-
+    
     private BoundExpression Bind(AssignmentExpression assignmentExpression)
     {
         return new BoundAssignmentExpression(Bind(assignmentExpression.Left), Bind(assignmentExpression.Right));
@@ -126,3 +113,4 @@ public class Binder
 
     private static FunctionDeclaration GetFunctionDeclaration(Function function) => new(function.Name);
 }
+
