@@ -79,6 +79,10 @@ public class Binder
                 return new BoundMultiplyExpression(left, right);
             case SubtractExpression:
                 return new BoundSubtractExpression(left, right);
+            case AndExpression:
+                return new BoundAndExpression(left, right);
+            case OrExpression:
+                return new BoundOrExpression(left, right);
             default:
                 throw new ArgumentOutOfRangeException(nameof(arithmeticBinaryOperation));
         }

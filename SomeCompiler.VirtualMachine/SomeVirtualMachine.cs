@@ -98,6 +98,7 @@ public class SomeVirtualMachine : IMachine
         return instructionMemoryEntry.Code switch
         {
             Add add => new AddCommand(this, add.Left, add.Right, add.Target),
+            And and => new AndCommand(this, and.Left, and.Right, and.Target),
             Assign assign => new AssignReferenceCommand(this, assign.Source, assign.Target),
             AssignConstant assignConstant => new AssignConstantCommand(this, assignConstant.Source, assignConstant.Target),
             Call call => new CallCommand(this, call.Name),
@@ -105,6 +106,7 @@ public class SomeVirtualMachine : IMachine
             EmptyReturn emptyReturn => new ReturnCommand(this),
             Halt halt => new HaltCommand(this),
             Multiply multiply => new MultiplyCommand(this, multiply.Left, multiply.Right, multiply.Target),
+            Or or => new OrCommand(this, or.Left, or.Right, or.Target),
             Return @return => new ReturnReferenceCommand(this, @return.Reference),
             Subtract subtract => new SubtractCommand(this, subtract.Left, subtract.Right, subtract.Target),
             _ => throw new ArgumentOutOfRangeException()

@@ -113,6 +113,20 @@ public class VirtualMachineTests
         state.Memory["a"].Should().BeEquivalentTo(new DataMemoryEntry(6));
     }
 
+    [Fact]
+    public async Task And()
+    {
+        var state = await Run("int main() { a = 1 && 1; }");
+        state.Memory["a"].Should().NotBeEquivalentTo(0);
+    }
+
+    [Fact]
+    public async Task Or()
+    {
+        var state = await Run("int main() { a = 1 || 0; }");
+        state.Memory["a"].Should().NotBeEquivalentTo(0);
+    }
+
     private static IObservable<VirtualMachineState> Run(string code)
     {
         var gen = new Compiler();
