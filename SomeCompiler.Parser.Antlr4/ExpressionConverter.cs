@@ -31,6 +31,12 @@ public class ExpressionConverter
 
     private Expression LogicalOr(CParser.LogicalOrExpressionContext node)
     {
+        if (node.ChildCount > 1)
+        {
+            var binaryTree = BinaryTreeHelper.FromPostFix(node.Children().ToList());
+            return ToExpression(binaryTree!, tree => LogicalAnd((CParser.LogicalAndExpressionContext) tree));
+        }
+
         return LogicalAnd((CParser.LogicalAndExpressionContext) node.GetChild(0));
     }
 
