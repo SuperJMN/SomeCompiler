@@ -1,6 +1,5 @@
 ﻿using SomeCompiler.Binding.Model;
 using SomeCompiler.Parser.Model;
-using BinaryOperator = SomeCompiler.Binding.Model.BinaryOperator;
 
 namespace SomeCompiler.Binding;
 
@@ -13,34 +12,45 @@ public class Binder
         errors = new List<Error>();
         var declarations = GetFunctionDeclarations(source.Functions);
         ValidateDeclarations(declarations);
-        var functions = source.Functions.Select(Bind);
 
+        var scope = new BinderScope();
+
+        var functions = source.Functions.Select(function => Bind(function, scope));
         if (errors.Any())
         {
             return Result.Failure<CompiledProgram, List<Error>>(errors);
         }
-        
+
         return new CompiledProgram(functions);
     }
 
-    private BoundFunction Bind(Function function)
+    private BoundFunction Bind(Function function, BinderScope parentScope)
     {
-        return new BoundFunction(new ReturnType("int"), function.Name, Bind(function.Block));
+        var scope = parentScope.CreateChild();
+        var boundFunction = new BoundFunction(new ReturnType("int"), function.Name, Bind(function.Block, scope));
+        return boundFunction;
     }
 
-    private BoundBlock Bind(Block block)
+    private BoundBlock Bind(Block block, BinderScope scope)
     {
-        return new BoundBlock(block.Select(Bind));
+        return new BoundBlock(block.Select(statement => Bind(statement, scope)));
     }
 
-    private BoundStatement Bind(Statement statement)
+    private BoundStatement Bind(Statement statement, BinderScope parentScope)
     {
         return statement switch
         {
             ExpressionStatement expr => Bind(expr),
             ReturnStatement ret => Bind(ret),
+            DeclarationStatement decl => Bind(decl, parentScope),
             _ => throw new ArgumentOutOfRangeException(nameof(statement))
         };
+    }
+
+    private BoundStatement Bind(DeclarationStatement declarationStatement, BinderScope scope)
+    {
+        scope.Declare(declarationStatement.Name, new Symbol(BoundType.Parse(declarationStatement.ArgumentType.ToString())));
+        return new BoundDeclaration(declarationStatement.ArgumentType, declarationStatement.Name);
     }
 
     private BoundStatement Bind(ReturnStatement returnStatement)
@@ -79,17 +89,20 @@ public class Binder
                 return new BoundMultiplyExpression(left, right);
             case SubtractExpression:
                 return new BoundSubtractExpression(left, right);
+            case AndExpression:
+                return new BoundAndExpression(left, right);
+            case OrExpression:
+                return new BoundOrExpression(left, right);
             default:
                 throw new ArgumentOutOfRangeException(nameof(arithmeticBinaryOperation));
         }
     }
-    
+
     private BoundExpression Bind(AssignmentExpression assignmentExpression)
     {
         return new BoundAssignmentExpression(Bind(assignmentExpression.Left), Bind(assignmentExpression.Right));
     }
 
-    // Acabo de meter los métodos para LValue y assignment expression. Nada funciona. Ir rellenando hasta que se pueda y luego chutar los tests.
     private LeftValue Bind(LeftValue leftValue)
     {
         return leftValue;
@@ -113,4 +126,3 @@ public class Binder
 
     private static FunctionDeclaration GetFunctionDeclaration(Function function) => new(function.Name);
 }
-

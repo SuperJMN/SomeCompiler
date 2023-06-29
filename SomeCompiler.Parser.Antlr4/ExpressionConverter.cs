@@ -1,4 +1,3 @@
-using System.Runtime.Intrinsics.Arm;
 using Antlr4.Runtime.Tree;
 using SomeCompiler.Core.Helpers;
 using SomeCompiler.Parser.Model;
@@ -27,32 +26,44 @@ public class ExpressionConverter
 
     private Expression ParseConditionalExpression(CParser.ConditionalExpressionContext node)
     {
-        return ParseSomething((CParser.LogicalOrExpressionContext) node.GetChild(0));
+        return LogicalOr((CParser.LogicalOrExpressionContext) node.GetChild(0));
     }
 
-    private Expression ParseSomething(CParser.LogicalOrExpressionContext node)
+    private Expression LogicalOr(CParser.LogicalOrExpressionContext node)
     {
-        return ParseLogicalAnd((CParser.LogicalAndExpressionContext) node.GetChild(0));
+        if (node.ChildCount > 1)
+        {
+            var binaryTree = BinaryTreeHelper.FromPostFix(node.Children().ToList());
+            return ToExpression(binaryTree!, tree => LogicalAnd((CParser.LogicalAndExpressionContext) tree));
+        }
+
+        return LogicalAnd((CParser.LogicalAndExpressionContext) node.GetChild(0));
     }
 
-    private Expression ParseLogicalAnd(CParser.LogicalAndExpressionContext node)
+    private Expression LogicalAnd(CParser.LogicalAndExpressionContext node)
     {
-        return ParseInclusiveOr((CParser.InclusiveOrExpressionContext) node.GetChild(0));
+        if (node.ChildCount > 1)
+        {
+            var binaryTree = BinaryTreeHelper.FromPostFix(node.Children().ToList());
+            return ToExpression(binaryTree!, tree => InclusiveOr((CParser.InclusiveOrExpressionContext) tree));
+        }
+
+        return InclusiveOr((CParser.InclusiveOrExpressionContext) node.GetChild(0));
     }
 
-    private Expression ParseInclusiveOr(CParser.InclusiveOrExpressionContext node)
+    private Expression InclusiveOr(CParser.InclusiveOrExpressionContext node)
     {
-        return ParseExclusive((CParser.ExclusiveOrExpressionContext)node.GetChild(0));
+        return ExclusiveOr((CParser.ExclusiveOrExpressionContext)node.GetChild(0));
     }
 
-    private Expression ParseExclusive(CParser.ExclusiveOrExpressionContext exclusiveOrExpressionContext)
+    private Expression ExclusiveOr(CParser.ExclusiveOrExpressionContext exclusiveOrExpressionContext)
     {
-        return AndExpression((CParser.AndExpressionContext) exclusiveOrExpressionContext.GetChild(0));
+        return And((CParser.AndExpressionContext) exclusiveOrExpressionContext.GetChild(0));
     }
 
-    private Expression AndExpression(CParser.AndExpressionContext exclusiveOrExpressionContext)
+    private Expression And(CParser.AndExpressionContext andExpressionContext)
     {
-        return EqualityExpr((CParser.EqualityExpressionContext) exclusiveOrExpressionContext.GetChild(0));
+        return EqualityExpr((CParser.EqualityExpressionContext) andExpressionContext.GetChild(0));
     }
 
     private Expression EqualityExpr(CParser.EqualityExpressionContext node)
@@ -62,10 +73,10 @@ public class ExpressionConverter
 
     private Expression Relational(CParser.RelationalExpressionContext node)
     {
-        return ShiftExpression((CParser.ShiftExpressionContext) node.GetChild(0));
+        return Shift((CParser.ShiftExpressionContext) node.GetChild(0));
     }
 
-    private Expression ShiftExpression(CParser.ShiftExpressionContext node)
+    private Expression Shift(CParser.ShiftExpressionContext node)
     {
         return Additive((CParser.AdditiveExpressionContext) node.GetChild(0));
     }
@@ -75,7 +86,8 @@ public class ExpressionConverter
         if (node.ChildCount > 1)
         {
             var binaryTree = BinaryTreeHelper.FromPostFix(node.Children().ToList());
-            return ToExpression(binaryTree!, tree => Multiplicative((CParser.MultiplicativeExpressionContext) tree));        }
+            return ToExpression(binaryTree!, tree => Multiplicative((CParser.MultiplicativeExpressionContext) tree));
+        }
 
         return Multiplicative((CParser.MultiplicativeExpressionContext) node.GetChild(0));
     }
@@ -128,6 +140,8 @@ public class ExpressionConverter
                 "-" => new SubtractExpression(left, right),
                 "*" => new MultiplyExpression(left, right),
                 "/" => new DivideExpression(left, right),
+                "&&" => new AndExpression(left, right),
+                "||" => new OrExpression(left, right),
                 _ => throw new ArgumentOutOfRangeException(t.GetText())
             };
         }

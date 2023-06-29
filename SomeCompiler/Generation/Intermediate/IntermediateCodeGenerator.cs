@@ -74,6 +74,8 @@ public class IntermediateCodeGenerator
             BoundSubtractExpression => new Subtract(reference, left.Reference, right.Reference),
             BoundMultiplyExpression => new Multiply(reference, left.Reference, right.Reference),
             BoundDivideExpression => new Divide(reference, left.Reference, right.Reference),
+            BoundAndExpression => new And(reference, left.Reference, right.Reference),
+            BoundOrExpression => new Or(reference, left.Reference, right.Reference),
             _ => throw new ArgumentOutOfRangeException(nameof(op))
         };
     }
