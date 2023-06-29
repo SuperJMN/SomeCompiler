@@ -103,7 +103,6 @@ public class Binder
         return new BoundAssignmentExpression(Bind(assignmentExpression.Left), Bind(assignmentExpression.Right));
     }
 
-    // Acabo de meter los métodos para LValue y assignment expression. Nada funciona. Ir rellenando hasta que se pueda y luego chutar los tests.
     private LeftValue Bind(LeftValue leftValue)
     {
         return leftValue;
