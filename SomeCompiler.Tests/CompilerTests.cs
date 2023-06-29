@@ -44,6 +44,12 @@ public class CompilerTests
         AssertError("int other() { }", ErrorKind.MainNotDeclared);
     }
 
+    [Fact]
+    public void Variable_declaration()
+    {
+        AssertSuccess("int main() { int p; }");
+    }
+
     private static void AssertSuccess(string code)
     {
         Compile(code)
