@@ -33,8 +33,8 @@ public class ParserTests
         var source = """
                      int main() 
                      { 
-                        a = 1;
-                        int a;                         
+                        int a = 1;
+                        int b = 2;                         
                      }
                      """;
         AssertParse(source);
@@ -43,7 +43,7 @@ public class ParserTests
     [Fact]
     public void Multiple_lines()
     {
-        var source = @"int main() { b = 13; a = 1; }";
+        var source = @"int main() { int b = 13; int a = 1; }";
         AssertParse(source);
     }
 

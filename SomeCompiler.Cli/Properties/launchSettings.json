@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SomeCompiler.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\JMN\\Desktop\\sample.txt\""
+    }
+  }
+}

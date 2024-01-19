@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
 using SomeCompiler.Parser.Model;
+using static CParser;
 
 namespace SomeCompiler.Parser.Antlr4;
 
@@ -75,8 +76,18 @@ public class SomeParser
     {
         var specifiers = decl.Descendant<CParser.DeclarationSpecifiersContext>();
         var type = specifiers.GetChild(0).GetText();
-        var name = specifiers.GetChild(1).GetText();
-        return new DeclarationStatement(new ArgumentType(type), name);
+        string name;
+        if (decl.GetChild(1) is InitDeclaratorListContext d)
+        {
+            var declaratorContext = d.GetChild(0) as InitDeclaratorContext;
+            name = declaratorContext.GetChild(0).GetText();
+            var value = declaratorContext.GetChild(2).GetText();
+            return new DeclarationStatement(new ArgumentType(type), name, value);
+        }
+        
+        name = decl.GetChild(0).GetChild(1).GetText();
+        
+        return new DeclarationStatement(new ArgumentType(type), name, Maybe<string>.None);
     }
 
     private Statement ParseStatement(CParser.StatementContext statementContext)

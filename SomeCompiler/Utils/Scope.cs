@@ -16,8 +16,7 @@ public class Scope<TKey, TValue> : IScope<TKey, TValue> where TKey : notnull
 
     public Result Declare(TKey key, TValue value)
     {
-        declarations.Add(key, value);
-        return Result.Success();
+        return declarations.TryAdd(key, value) ? Result.Success() : Result.Failure($"{key} is already declared");
     }
 
     public Maybe<TValue> Get(TKey key)
