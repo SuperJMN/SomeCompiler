@@ -46,7 +46,7 @@ public class Binder
             _ => throw new ArgumentOutOfRangeException(nameof(statement))
         };
     }
-
+    
     private BoundStatement Bind(DeclarationStatement declarationStatement, BinderScope scope)
     {
         scope.Declare(declarationStatement.Name, new Symbol(BoundType.Parse(declarationStatement.ArgumentType.ToString())));

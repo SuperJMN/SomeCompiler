@@ -75,6 +75,13 @@ public class ParserTests
         AssertParse(source);
     }
 
+    [Fact]
+    public void If_statement_without_else()
+    {
+        var source = @"int main() { if (a > b) { return a; }}";
+        AssertParse(source);
+    }
+
     private static void AssertParse(string source)
     {
         var sut = new Parser.Antlr4.SomeParser();
