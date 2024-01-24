@@ -212,13 +212,3 @@ public class ExpressionConverter
         };
     }
 }
-
-internal enum RelationalOperator
-{
-    Greater,
-    GreaterEqual,
-    Less,
-    LessEqual,
-    Equal,
-    NotEqual
-}

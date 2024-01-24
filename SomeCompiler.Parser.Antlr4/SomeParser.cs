@@ -28,37 +28,25 @@ public class SomeParser
         return new Program(new Functions(funcs.ToList()));
     }
 
-    private Function ParseFunction(CParser.FunctionDefinitionContext func)
+    private Function ParseFunction(FunctionDefinitionContext func)
     {
         var returnType = new ReturnType(ParseReturnType(func.children[0]));
         var functionName = ParseFunctionName(func.children[1]);
         var args = ParseArgs(func.children[1]);
-        var block = ParseBlock(func);
+        var block = Maybe.From(func.compoundStatement()).Map(ParseBlock).GetValueOrDefault(new Block());
         return new Function(returnType, functionName, args, block);
     }
 
     private ParameterList ParseArgs(IParseTree funcChild)
     {
-        return new ParameterList(funcChild.Descendants<CParser.ParameterDeclarationContext>().Select(ParseParameterDeclaration));
+        return new ParameterList(funcChild.Descendants<ParameterDeclarationContext>().Select(ParseParameterDeclaration));
     }
 
-    private Parameter ParseParameterDeclaration(CParser.ParameterDeclarationContext parameter)
+    private Parameter ParseParameterDeclaration(ParameterDeclarationContext parameter)
     {
         var type = parameter.GetChild(0).GetText();
         var name = parameter.GetChild(1).GetText();
         return new Parameter(new ArgumentType(type), name);
-    }
-
-    private Block ParseBlock(CParser.FunctionDefinitionContext functionDefinitionContext)
-    {
-        var block = functionDefinitionContext.Descendant<CParser.CompoundStatementContext>();
-
-        var blockItems = block
-            .Descendants<CParser.BlockItemContext>()
-            .Select(ParseBlockItem)
-            .ToList();
-
-        return new Block(blockItems);
     }
 
     private Statement ParseBlockItem(CParser.BlockItemContext arg)
@@ -106,36 +94,24 @@ public class SomeParser
         // Parse the condition expression
         var condition = converter.ParseExpression(sel.expression());
         // Parse the "then" statement
-        var thenStatement = ParseBlock(sel.statement()[0].compoundStatement());
+        var thenBlock = ParseBlock(sel.statement()[0].compoundStatement());
         // Check if there's an "else" statement
         if (sel.Else() != null)
         {
-            var elseStatement = ParseStatement(sel.statement(1));
-            return new IfElseStatement(condition, thenStatement, elseStatement);
+            var elseBlock = ParseBlock(sel.statement(1).compoundStatement());
+            return new IfElseStatement(condition, thenBlock, elseBlock);
         }
         else
         {
-            return new IfStatement(condition, thenStatement);
+            return new IfElseStatement(condition, thenBlock, Maybe<Block>.None);
         }
     }
 
     private Block ParseBlock(CompoundStatementContext compoundStatement)
     {
-        return new Block(compoundStatement.blockItemList().children
-            .Cast<BlockItemContext>().Select(tree => ParseBlockItem(tree)));
-    }
-
-    public record IfElseStatement(Expression Condition, Block ThenStatement, Statement ElseStatement) : Statement
-    {
-        public override IEnumerable<INode> Children
-        {
-            get
-            {
-                yield return Condition;
-                yield return ThenStatement;
-                yield return ElseStatement;
-            }
-        }
+        return Maybe.From(compoundStatement.blockItemList())
+            .Map(i => new Block(i.children.Cast<BlockItemContext>().Select(ParseBlockItem)))
+            .GetValueOrDefault([]);
     }
 
     private Statement ParseExpressionStatement(CParser.ExpressionStatementContext expressionStatement)

@@ -2,7 +2,7 @@ using SomeCompiler.Parser.Model;
 
 namespace SomeCompiler.Parser.Antlr4;
 
-internal record RelationalExpression(Expression Left, Expression Right, RelationalOperator Operator) : Expression
+public record RelationalExpression(Expression Left, Expression Right, RelationalOperator Operator) : Expression
 {
     public override IEnumerable<INode> Children
     {

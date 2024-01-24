@@ -81,6 +81,13 @@ public class ParserTests
         var source = @"int main() { if (a > b) { return a; }}";
         AssertParse(source);
     }
+    
+    [Fact]
+    public void If_statement_with_else()
+    {
+        var source = @"int main() { if (a > b) { return a; } else { return b; } }";
+        AssertParse(source);
+    }
 
     private static void AssertParse(string source)
     {
