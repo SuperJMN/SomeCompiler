@@ -88,13 +88,13 @@ public class ParserTests
         var source = @"int main() { if (a > b) { return a; } else { return b; } }";
         AssertParse(source);
     }
-
+    
     private static void AssertParse(string source)
     {
         var sut = new Parser.Antlr4.SomeParser();
         var result = sut.Parse(source);
 
         result.Should().BeSuccess()
-            .And.Subject.Value.ToString().RemoveWhitespace().Should().Be(source.RemoveWhitespace());
+            .And.Subject.Value.ToString().Should().BeEquivalentToIgnoringWhitespace(source);
     }
 }

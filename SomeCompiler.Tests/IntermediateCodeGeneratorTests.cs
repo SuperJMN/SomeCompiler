@@ -18,8 +18,7 @@ public class IntermediateCodeGeneratorTests
     {
         var result = new CompilerFrontend().Generate(input);
         result
-            .Should().BeSuccess()
-            .And.Subject.Value.ToString().RemoveWhitespace()
-            .Should().BeEquivalentTo(output.RemoveWhitespace());
+        .Should().BeSuccess()
+            .And.Subject.Value.ToString().Should().BeEquivalentToIgnoringWhitespace(output);
     }
 }

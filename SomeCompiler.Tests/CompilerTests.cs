@@ -54,8 +54,7 @@ public class CompilerTests
     {
         Compile(code)
             .Should().BeSuccess()
-            .And.Subject.Value.ToString().RemoveWhitespace()
-            .Should().Be(code.RemoveWhitespace());
+            .And.Subject.Value.ToString().Should().BeEquivalentToIgnoringWhitespace(code);
     }
 
     private static void AssertError(string input, ErrorKind error)
