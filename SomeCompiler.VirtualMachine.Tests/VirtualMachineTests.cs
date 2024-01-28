@@ -25,7 +25,7 @@ public class VirtualMachineTests
     public async Task Return_constant_puts_data_in_stack()
     {
         var state = await Run("int main() { return 123; }");
-        state.StackContents.Should().BeEquivalentTo(new DataMemoryEntry(123));
+        state.StackContents.Should().BeEquivalentTo([new DataMemoryEntry(123)]);
     }
 
     [Fact]

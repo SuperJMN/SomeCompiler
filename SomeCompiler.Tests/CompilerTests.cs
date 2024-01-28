@@ -53,7 +53,7 @@ public class CompilerTests
     private static void AssertSuccess(string code)
     {
         Compile(code)
-            .Should().BeSuccess()
+            .Should().Succeed()
             .And.Subject.Value.ToString().Should().BeEquivalentToIgnoringWhitespace(code);
     }
 
@@ -61,7 +61,7 @@ public class CompilerTests
     {
         var result = Compile(input);
         result.Should()
-            .BeFailure()
+            .Fail()
             .And
             .Subject.Error
             .Should()

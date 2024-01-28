@@ -1,4 +1,5 @@
-﻿using SomeCompiler.Parser.Model;
+﻿using SomeCompiler.Binding2;
+using SomeCompiler.Parser.Model;
 
 namespace SomeCompiler.Tests;
 
@@ -28,5 +29,39 @@ public class ScopeTests
 
         result.HasValue.Should().BeTrue();
         result.Value.Should().Be(symbol);
+    }
+
+    [Fact]
+    public void Given_scope_with_declaration_get_succeeds()
+    {
+        var scope = new Scope(Maybe<Scope>.None);
+        scope.TryDeclare("variable", IntType.Instance);
+        scope.Get("variable").Should().HaveValue(IntType.Instance);
+    }
+    
+    [Fact]
+    public void Looking_for_undeclared_gives_error()
+    {
+        var scope = new Scope(Maybe<Scope>.None);
+        scope.Get("variable").Should().HaveNoValue();
+    }
+    
+    [Fact]
+    public void Declaring_same_symbol_gives_error()
+    {
+        var scope = new Scope(Maybe<Scope>.None);
+        scope.TryDeclare("variable", IntType.Instance).Should().Succeed();
+        scope.TryDeclare("variable", IntType.Instance).Should().Fail();
+    }
+    
+    [Fact]
+    public void Given_child_scope_parent_symbols_are_reachable()
+    {
+        var scope = new Scope(Maybe<Scope>.None);
+        scope.TryDeclare("variable", IntType.Instance);
+        using (var child = scope.Create())
+        {
+            child.Get("variable").Should().HaveValue(IntType.Instance);
+        }
     }
 }

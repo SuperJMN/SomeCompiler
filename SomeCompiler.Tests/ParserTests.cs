@@ -94,7 +94,7 @@ public class ParserTests
         var sut = new Parser.Antlr4.SomeParser();
         var result = sut.Parse(source);
 
-        result.Should().BeSuccess()
+        result.Should().Succeed()
             .And.Subject.Value.ToString().Should().BeEquivalentToIgnoringWhitespace(source);
     }
 }
