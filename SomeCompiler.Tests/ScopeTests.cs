@@ -34,7 +34,7 @@ public class ScopeTests
     [Fact]
     public void Given_scope_with_declaration_get_succeeds()
     {
-        var scope = new Scope(Maybe<Scope>.None);
+        var scope = new Scope(Maybe<Scope>.None, Maybe<Dictionary<string, SymbolType>>.None);
         scope.TryDeclare("variable", IntType.Instance);
         scope.Get("variable").Should().HaveValue(IntType.Instance);
     }
@@ -42,14 +42,14 @@ public class ScopeTests
     [Fact]
     public void Looking_for_undeclared_gives_error()
     {
-        var scope = new Scope(Maybe<Scope>.None);
+        var scope = new Scope(Maybe<Scope>.None, Maybe<Dictionary<string, SymbolType>>.None);
         scope.Get("variable").Should().HaveNoValue();
     }
     
     [Fact]
     public void Declaring_same_symbol_gives_error()
     {
-        var scope = new Scope(Maybe<Scope>.None);
+        var scope = Scope.Empty;
         scope.TryDeclare("variable", IntType.Instance).Should().Succeed();
         scope.TryDeclare("variable", IntType.Instance).Should().Fail();
     }
@@ -57,11 +57,9 @@ public class ScopeTests
     [Fact]
     public void Given_child_scope_parent_symbols_are_reachable()
     {
-        var scope = new Scope(Maybe<Scope>.None);
+        var scope = Scope.Empty;
         scope.TryDeclare("variable", IntType.Instance);
-        using (var child = scope.Create())
-        {
-            child.Get("variable").Should().HaveValue(IntType.Instance);
-        }
+        var child = new Scope(scope);
+        child.Get("variable").Should().HaveValue(IntType.Instance);
     }
 }
