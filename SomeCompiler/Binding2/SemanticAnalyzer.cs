@@ -4,7 +4,7 @@ namespace SomeCompiler.Binding2;
 
 public class SemanticAnalyzer
 {
-    private (SemanticNode, Scope) AnalyzeProgram(Program node)
+    public (SemanticNode, Scope) AnalyzeProgram(Program node)
     {
         var scope = Scope.Empty;
         var functions = new List<FunctionNode>();
@@ -14,17 +14,27 @@ public class SemanticAnalyzer
             scope = newScope;
             functions.Add(functionNode);
         }
-        return (new SemanticProgramNode(functions), scope);
+        return (new ProgramNode(functions), scope);
     }
 
     private (FunctionNode, Scope) AnalyzeFunction(Function function, Scope scope)
     {
-        return (new FunctionNode(function.Name, AnalyzeBlock(function.Block, scope).Item1), scope);
+        return (new FunctionNode(function.Name, AnalyzeBlock(function.Block, scope)), scope);
     }
-    private (BlockNode, Scope) AnalyzeBlock(Block block, Scope scope)
+
+    private BlockNode AnalyzeBlock(Block block, Scope scope)
     {
-        return (new BlockNode(block.Select(statement => AnalyzeStatement(statement, scope).Item1)), scope);
+        var statements = new List<StatementNode>();
+        foreach (var statement in block)
+        {
+            var (analyzedStatement, newScope) = AnalyzeStatement(statement, scope);
+            statements.Add(analyzedStatement);
+            scope = newScope;
+        }
+        return new BlockNode(statements, scope);
     }
+
+
     private (StatementNode, Scope) AnalyzeStatement(Statement statement, Scope scope)
     {
         switch (statement)
@@ -46,41 +56,52 @@ public class SemanticAnalyzer
 
     private (StatementNode, Scope) AnalyzeDeclaration(DeclarationStatement declarationStatement, Scope scope)
     {
+        return (new DeclarationNode(), scope.TryDeclare(declarationStatement.Name, IntType.Instance).Value);
+    }
+
+    public ProgramNode Analize(string input)
+    {
         throw new NotImplementedException();
     }
 }
 
 
-internal class DeclarationStatementNode : StatementNode
-{
-}
+internal class DeclarationNode : StatementNode
+{}
 
-internal class StatementNode : SemanticNode
-{
-}
+public class StatementNode : SemanticNode
+{}
 
-internal class BlockNode : SemanticNode
+public class BlockNode : SemanticNode
 {
-    public IEnumerable<StatementNode> Statements { get; }
-
-    public BlockNode(IEnumerable<StatementNode> statements)
+    public BlockNode(IEnumerable<StatementNode> statements, Scope scope)
     {
         Statements = statements;
+        Scope = scope;
+    }
+
+    public IEnumerable<StatementNode> Statements { get; }
+    public Scope Scope { get; }
+}
+
+public class FunctionNode : SemanticNode
+{
+    public string Name { get; }
+    public BlockNode Block { get; }
+
+    public FunctionNode(string name, BlockNode block)
+    {
+        Name = name;
+        Block = block;
     }
 }
 
-internal class FunctionNode : SemanticNode
+public class ProgramNode : SemanticNode
 {
-    public FunctionNode(string functionName, BlockNode block)
-    {
-        throw new NotImplementedException();
-    }
-}
+    public List<FunctionNode> Functions { get; }
 
-internal class SemanticProgramNode : SemanticNode
-{
-    public SemanticProgramNode(List<FunctionNode> functions)
+    public ProgramNode(List<FunctionNode> functions)
     {
-        throw new NotImplementedException();
+        Functions = functions;
     }
 }
