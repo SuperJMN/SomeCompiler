@@ -13,7 +13,7 @@ public class PrintNodeVisitor : INodeVisitor
     }
 
     public void VisitBlockNode(BlockNode node)
-    {
+    { 
         resultBuilder.AppendLine(new string('\t', indentationLevel) + "{");
         indentationLevel++;
         foreach (var statement in node.Statements)
@@ -27,9 +27,7 @@ public class PrintNodeVisitor : INodeVisitor
     public void VisitFunctionNode(FunctionNode node)
     {
         resultBuilder.AppendLine($"void {node.Name}()");
-        indentationLevel++;
         node.Block.Accept(this);
-        indentationLevel--;
     }
 
     public void VisitProgramNode(ProgramNode node)
@@ -37,18 +35,26 @@ public class PrintNodeVisitor : INodeVisitor
         foreach (var function in node.Functions)
         {
             function.Accept(this);
-            resultBuilder.AppendLine();
         }
-    }
-
-    public void VisitExpression(ExpressionNode expression)
-    {
-        throw new NotImplementedException();
     }
 
     public void VisitAssignment(AssignmentNode assignmentNode)
     {
-        throw new NotImplementedException();
+        resultBuilder.Append(assignmentNode.Left.Name);
+        resultBuilder.Append("=");
+        assignmentNode.Right.Accept(this);
+    }
+
+    public void VisitConstant(ConstantNode constantNode)
+    {
+        resultBuilder.Append(constantNode.Value);
+    }
+
+    public void VisitExpressionStatement(ExpressionStatementNode expressionStatementNode)
+    {
+        resultBuilder.Append(new string('\t', indentationLevel));
+        expressionStatementNode.Expression.Accept(this);
+        resultBuilder.AppendLine(";");
     }
 
     public override string ToString()

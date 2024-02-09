@@ -28,6 +28,15 @@ public class SemanticAnalysisTests
 
         result.Should().BeEquivalentToIgnoringWhitespace(input);
     }
+    
+    [Fact]
+    public void Assignment()
+    {
+        var input = "void main(){ int a; a = 1; }";
+        var result = Analyze(input);
+
+        result.Should().BeEquivalentToIgnoringWhitespace(input);
+    }
 
     private static string Analyze(string input)
     {

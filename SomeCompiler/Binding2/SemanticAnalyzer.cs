@@ -68,8 +68,13 @@ public class SemanticAnalyzer
     {
         if (expression is AssignmentExpression a)
         {
-            scope.Get(a.Left.Identifier);
-            return (new AssignmentNode(), scope);
+            var left = scope.Get(a.Left.Identifier);
+            var right = AnalyzeExpression(a.Right, scope);
+            
+            return (new AssignmentNode(left.Value, right.Item1), scope);
+        } else if (expression is ConstantExpression c)
+        {
+            return (new ConstantNode(c.Value), scope);
         }
 
         throw new InvalidOperationException("Por aquí no vas a ningún sitio");
@@ -79,32 +84,5 @@ public class SemanticAnalyzer
     {
         var declScope = scope.TryDeclare(new Symbol(declarationStatement.Name, IntType.Instance)).Value;
         return (new DeclarationNode(declarationStatement.Name, declScope), declScope);
-    }
-}
-
-public class AssignmentNode : ExpressionNode
-{
-    public override void Accept(INodeVisitor visitor)
-    {
-        visitor.VisitAssignment(this);
-    }
-}
-
-public abstract class ExpressionNode : SemanticNode
-{
-}
-
-internal class ExpressionStatementNode : StatementNode
-{
-    public ExpressionNode Expression { get; }
-
-    public ExpressionStatementNode(ExpressionNode expression)
-    {
-        Expression = expression;
-    }
-
-    public override void Accept(INodeVisitor visitor)
-    {
-        visitor.VisitExpression(Expression);
     }
 }
