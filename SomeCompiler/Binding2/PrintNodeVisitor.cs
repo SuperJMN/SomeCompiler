@@ -9,7 +9,7 @@ public class PrintNodeVisitor : INodeVisitor
 
     public void VisitDeclarationNode(DeclarationNode node)
     {
-        resultBuilder.AppendLine(new string('\t', indentationLevel) + $"{node.Scope.Get(node.Name).Value} {node.Name};");
+        resultBuilder.AppendLine(new string('\t', indentationLevel) + $"{node.Scope.Get(node.Name).Value};");
     }
 
     public void VisitBlockNode(BlockNode node)
@@ -39,6 +39,16 @@ public class PrintNodeVisitor : INodeVisitor
             function.Accept(this);
             resultBuilder.AppendLine();
         }
+    }
+
+    public void VisitExpression(ExpressionNode expression)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void VisitAssignment(AssignmentNode assignmentNode)
+    {
+        throw new NotImplementedException();
     }
 
     public override string ToString()

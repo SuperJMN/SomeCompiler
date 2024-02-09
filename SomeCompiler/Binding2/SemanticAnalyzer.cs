@@ -8,7 +8,7 @@ public class SemanticAnalyzer
     {
         return AnalyzeProgram(program, Scope.Empty).Item1;
     }
-    
+
     public (SemanticNode, Scope) AnalyzeProgram(Program node, Scope scope)
     {
         var functions = new List<FunctionNode>();
@@ -46,7 +46,7 @@ public class SemanticAnalyzer
             case DeclarationStatement declarationStatement:
                 return AnalyzeDeclaration(declarationStatement, scope);
             case ExpressionStatement expressionStatement:
-                break;
+                return AnalyzeExpressionStatement(expressionStatement, scope);
             case IfElseStatement ifElseStatement:
                 break;
             case ReturnStatement returnStatement:
@@ -58,9 +58,53 @@ public class SemanticAnalyzer
         throw new InvalidOperationException();
     }
 
+    private (StatementNode, Scope) AnalyzeExpressionStatement(ExpressionStatement expressionStatement, Scope scope)
+    {
+        var analyzeExpression = AnalyzeExpression(expressionStatement.Expression, scope);
+        return (new ExpressionStatementNode(analyzeExpression.Item1), scope);
+    }
+
+    private (ExpressionNode, Scope) AnalyzeExpression(Expression expression, Scope scope)
+    {
+        if (expression is AssignmentExpression a)
+        {
+            scope.Get(a.Left.Identifier);
+            return (new AssignmentNode(), scope);
+        }
+
+        throw new InvalidOperationException("Por aquí no vas a ningún sitio");
+    }
+
     private (StatementNode, Scope) AnalyzeDeclaration(DeclarationStatement declarationStatement, Scope scope)
     {
-        var declScope = scope.TryDeclare(declarationStatement.Name, IntType.Instance).Value;
+        var declScope = scope.TryDeclare(new Symbol(declarationStatement.Name, IntType.Instance)).Value;
         return (new DeclarationNode(declarationStatement.Name, declScope), declScope);
+    }
+}
+
+public class AssignmentNode : ExpressionNode
+{
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.VisitAssignment(this);
+    }
+}
+
+public abstract class ExpressionNode : SemanticNode
+{
+}
+
+internal class ExpressionStatementNode : StatementNode
+{
+    public ExpressionNode Expression { get; }
+
+    public ExpressionStatementNode(ExpressionNode expression)
+    {
+        Expression = expression;
+    }
+
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.VisitExpression(Expression);
     }
 }

@@ -16,5 +16,5 @@ public class DeclarationNode : StatementNode
         visitor.VisitDeclarationNode(this);
     }
 
-    public override string ToString() => Scope.Get(Name).Value + " " + Name;
+    public override string ToString() => Scope.Get(Name).Value.ToString();
 }

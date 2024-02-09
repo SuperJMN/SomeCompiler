@@ -3,21 +3,21 @@
 public class Scope
 {
     public Maybe<Scope> Parent { get; }
-    private readonly Dictionary<string, SymbolType> variables;
+    private readonly Dictionary<string, Symbol> variables;
 
-    public Scope(Maybe<Scope> parent, Maybe<Dictionary<string, SymbolType>> variables)
+    public Scope(Maybe<Scope> parent, Maybe<Dictionary<string, Symbol>> variables)
     {
         Parent = parent;
-        this.variables = variables.GetValueOrDefault(new Dictionary<string, SymbolType>());
+        this.variables = variables.GetValueOrDefault(new Dictionary<string, Symbol>());
     }
 
-    public Scope(Scope parent) : this(parent, new Dictionary<string, SymbolType>())
+    public Scope(Scope parent) : this(parent, new Dictionary<string, Symbol>())
     {
     }
 
-    public Result<Scope> TryDeclare(string name, SymbolType type)
+    public Result<Scope> TryDeclare(Symbol symbol)
     {
-        if (variables.ContainsKey(name))
+        if (variables.ContainsKey(symbol.Name))
         {
             // La variable ya existe en este alcance, devolver el mismo alcance
             return Result.Failure<Scope>("Symbol is declared");
@@ -25,21 +25,21 @@ public class Scope
         else
         {
             // Crear un nuevo diccionario con la nueva variable
-            var newVariables = new Dictionary<string, SymbolType>(variables)
+            var newVariables = new Dictionary<string, Symbol>(variables)
             {
-                [name] = type
+                [symbol.Name] = symbol
             };
             // Devolver un nuevo alcance con las nuevas variables
             return new Scope(Parent, newVariables);
         }
     }
 
-    public Maybe<SymbolType> Get(string name)
+    public Maybe<Symbol> Get(string name)
     {
         return variables
             .TryFind(name)
             .Or(() => Parent.Bind(scope => scope.Get(name)));
     }
 
-    public static Scope Empty = new Scope(Maybe<Scope>.None, Maybe<Dictionary<string, SymbolType>>.None);
+    public static Scope Empty = new Scope(Maybe<Scope>.None, Maybe<Dictionary<string, Symbol>>.None);
 }

@@ -2,9 +2,9 @@
 
 namespace SomeCompiler.Binding;
 
-public class Symbol
+public class SymbolType
 {
-    public Symbol(BoundType type)
+    public SymbolType(BoundType type)
     {
         Type = type;
     }

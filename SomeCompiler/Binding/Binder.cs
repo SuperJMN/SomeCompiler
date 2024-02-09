@@ -49,7 +49,7 @@ public class Binder
     
     private BoundStatement Bind(DeclarationStatement declarationStatement, BinderScope scope)
     {
-        scope.Declare(declarationStatement.Name, new Symbol(BoundType.Parse(declarationStatement.ArgumentType.ToString())));
+        scope.Declare(declarationStatement.Name, new SymbolType(BoundType.Parse(declarationStatement.ArgumentType.ToString())));
         return new BoundDeclaration(declarationStatement.ArgumentType, declarationStatement.Name);
     }
 
