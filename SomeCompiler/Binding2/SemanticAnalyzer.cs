@@ -1,12 +1,17 @@
 ﻿using SomeCompiler.Parser.Model;
+using Zafiro.Core.Mixins;
 
 namespace SomeCompiler.Binding2;
 
 public class SemanticAnalyzer
 {
-    public (SemanticNode, Scope) AnalyzeProgram(Program node)
+    public SemanticNode Analyze(Program program)
     {
-        var scope = Scope.Empty;
+        return AnalyzeProgram(program, Scope.Empty).Item1;
+    }
+    
+    public (SemanticNode, Scope) AnalyzeProgram(Program node, Scope scope)
+    {
         var functions = new List<FunctionNode>();
         foreach (var statement in node.Functions)
         {
@@ -56,18 +61,25 @@ public class SemanticAnalyzer
 
     private (StatementNode, Scope) AnalyzeDeclaration(DeclarationStatement declarationStatement, Scope scope)
     {
-        return (new DeclarationNode(), scope.TryDeclare(declarationStatement.Name, IntType.Instance).Value);
-    }
-
-    public ProgramNode Analize(string input)
-    {
-        throw new NotImplementedException();
+        var declScope = scope.TryDeclare(declarationStatement.Name, IntType.Instance).Value;
+        return (new DeclarationNode(declarationStatement.Name, declScope), declScope);
     }
 }
 
 
 internal class DeclarationNode : StatementNode
-{}
+{
+    public string Name { get; }
+    public Scope Scope { get; }
+
+    public DeclarationNode(string name, Scope scope)
+    {
+        Name = name;
+        Scope = scope;
+    }
+
+    public override string ToString() => Scope.Get(Name).Value + " " + Name;
+}
 
 public class StatementNode : SemanticNode
 {}
@@ -82,6 +94,12 @@ public class BlockNode : SemanticNode
 
     public IEnumerable<StatementNode> Statements { get; }
     public Scope Scope { get; }
+    
+    public override string ToString()
+    {
+        var statements = Statements.Select(x => "\t" + x + ";").JoinWithLines();
+        return $"\n{{\n{statements}\n}}";
+    }
 }
 
 public class FunctionNode : SemanticNode
@@ -94,6 +112,11 @@ public class FunctionNode : SemanticNode
         Name = name;
         Block = block;
     }
+
+    public override string ToString()
+    {
+        return $"void {Name}() {Block}";
+    }
 }
 
 public class ProgramNode : SemanticNode
@@ -103,5 +126,10 @@ public class ProgramNode : SemanticNode
     public ProgramNode(List<FunctionNode> functions)
     {
         Functions = functions;
+    }
+
+    public override string ToString()
+    {
+        return Functions.JoinWithLines();
     }
 }

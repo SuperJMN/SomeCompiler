@@ -1,5 +1,4 @@
 ﻿using SomeCompiler.Binding2;
-using SomeCompiler.Parser.Model;
 
 namespace SomeCompiler.Tests;
 
