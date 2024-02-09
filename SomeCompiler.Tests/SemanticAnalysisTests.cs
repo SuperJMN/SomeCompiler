@@ -43,10 +43,11 @@ public class SemanticAnalysisTests
         }
         // Create a new instance of the SemanticAnalyzer class.
         var analyzer = new SemanticAnalyzer();
+        
         // Analyze the parsed program.
         var analyzeResult = analyzer.Analyze(parseResult.Value);
-        // Convert the result to a string and return it.
-        return analyzeResult.ToString();
+        var printNodeVisitor = new PrintNodeVisitor();
+        analyzeResult.Accept(printNodeVisitor);
+        return printNodeVisitor.ToString();
     }
-
 }

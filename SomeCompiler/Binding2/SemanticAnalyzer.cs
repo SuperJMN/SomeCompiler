@@ -66,8 +66,7 @@ public class SemanticAnalyzer
     }
 }
 
-
-internal class DeclarationNode : StatementNode
+public class DeclarationNode : StatementNode
 {
     public string Name { get; }
     public Scope Scope { get; }
@@ -78,11 +77,15 @@ internal class DeclarationNode : StatementNode
         Scope = scope;
     }
 
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.VisitDeclarationNode(this);
+    }
+
     public override string ToString() => Scope.Get(Name).Value + " " + Name;
 }
 
-public class StatementNode : SemanticNode
-{}
+public abstract class StatementNode : SemanticNode;
 
 public class BlockNode : SemanticNode
 {
@@ -95,9 +98,20 @@ public class BlockNode : SemanticNode
     public IEnumerable<StatementNode> Statements { get; }
     public Scope Scope { get; }
     
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.VisitBlockNode(this);
+    }
+
     public override string ToString()
     {
         var statements = Statements.Select(x => "\t" + x + ";").JoinWithLines();
+        return $"\n{{\n{statements}\n}}";
+    }
+    
+    public string ToString(int indentLevel)
+    {
+        var statements = Statements.Select(x => Enumerable.Repeat('\t', indentLevel+1).AsString() + x + ";").JoinWithLines();
         return $"\n{{\n{statements}\n}}";
     }
 }
@@ -111,6 +125,11 @@ public class FunctionNode : SemanticNode
     {
         Name = name;
         Block = block;
+    }
+
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.VisitFunctionNode(this);
     }
 
     public override string ToString()
@@ -128,8 +147,21 @@ public class ProgramNode : SemanticNode
         Functions = functions;
     }
 
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.VisitProgramNode(this);
+    }
+
     public override string ToString()
     {
         return Functions.JoinWithLines();
     }
+}
+
+public interface INodeVisitor
+{
+    void VisitDeclarationNode(DeclarationNode node);
+    void VisitBlockNode(BlockNode node);
+    void VisitFunctionNode(FunctionNode node);
+    void VisitProgramNode(ProgramNode node);
 }
