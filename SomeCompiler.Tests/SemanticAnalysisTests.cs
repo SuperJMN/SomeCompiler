@@ -9,7 +9,7 @@ public class SemanticAnalysisTests
     {
         var input = "";
         var result = Analyze(input);
-        Assert.NotNull(result);
+        result.Should().BeEquivalentToIgnoringWhitespace(input);
     }
     
     [Fact]
@@ -17,7 +17,7 @@ public class SemanticAnalysisTests
     {
         var input = "void main(){}";
         var result = Analyze(input);
-        Assert.NotNull(result);
+        result.Should().BeEquivalentToIgnoringWhitespace(input);
     }
     
     [Fact]
@@ -25,7 +25,8 @@ public class SemanticAnalysisTests
     {
         var input = "void main(){ int a; }";
         var result = Analyze(input);
-        Assert.NotNull(result);
+
+        result.Should().BeEquivalentToIgnoringWhitespace(input);
     }
 
     private static string Analyze(string input)
