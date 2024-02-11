@@ -66,13 +66,11 @@ public class SemanticAnalyzer
 
     private (ExpressionNode, Scope) AnalyzeExpression(Expression expression, Scope scope)
     {
-        if (expression is AssignmentExpression a)
+        if (expression is AssignmentExpression assignmentExpression)
         {
-            var left = scope.Get(a.Left.Identifier);
-            var right = AnalyzeExpression(a.Right, scope);
-            
-            return (new AssignmentNode(left.Value, right.Item1), scope);
-        } else if (expression is ConstantExpression c)
+            return AnalyzeAssignmentExpression(scope, assignmentExpression);
+        }
+        else if (expression is ConstantExpression c)
         {
             return (new ConstantNode(c.Value), scope);
         }
@@ -80,9 +78,29 @@ public class SemanticAnalyzer
         throw new InvalidOperationException("Por aquí no vas a ningún sitio");
     }
 
+    private (AssignmentNode, Scope scope) AnalyzeAssignmentExpression(Scope scope, AssignmentExpression assignmentExpression)
+    {
+        var right = AnalyzeExpression(assignmentExpression.Right, scope);
+        var left = scope.Get(assignmentExpression.Left.Identifier);
+        return left.Match(
+            symbol => (new AssignmentNode(symbol, right.Item1), scope),
+            () => (new AssignmentNode(Symbol.Unknown(assignmentExpression.Left.Identifier), right.Item1)
+            {
+                Errors = [$"Use of undeclared variable {assignmentExpression.Left.Identifier}"]
+            }, scope));
+    }
+
     private (StatementNode, Scope) AnalyzeDeclaration(DeclarationStatement declarationStatement, Scope scope)
     {
-        var declScope = scope.TryDeclare(new Symbol(declarationStatement.Name, IntType.Instance)).Value;
-        return (new DeclarationNode(declarationStatement.Name, declScope), declScope);
+        var declaration = scope
+            .TryDeclare(new Symbol(declarationStatement.Name, IntType.Instance))
+            .Match(
+                s => (new DeclarationNode(declarationStatement.Name, s), s),
+                _ => (new DeclarationNode(declarationStatement.Name, scope)
+                {
+                    Errors = [$"Variable {declarationStatement.Name} is already declared"]
+                }, scope));
+
+        return declaration;
     }
 }

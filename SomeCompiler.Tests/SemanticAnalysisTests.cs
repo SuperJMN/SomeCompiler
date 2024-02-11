@@ -38,6 +38,15 @@ public class SemanticAnalysisTests
         result.Should().BeEquivalentToIgnoringWhitespace(input);
     }
 
+    [Fact]
+    public void Using_undeclared_variable_fails()
+    {
+        var input = "void main(){ a = 1; }";
+        var result = Analyze(input);
+
+        result.Should().BeEquivalentToIgnoringWhitespace(input);
+    }
+
     private static string Analyze(string input)
     {
         // Create a new instance of the SomeParser class.

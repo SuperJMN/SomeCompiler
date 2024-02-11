@@ -4,7 +4,7 @@ public class DeclarationNode : StatementNode
 {
     public string Name { get; }
     public Scope Scope { get; }
-
+    
     public DeclarationNode(string name, Scope scope)
     {
         Name = name;
