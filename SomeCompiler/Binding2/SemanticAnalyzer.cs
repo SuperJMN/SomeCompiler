@@ -86,7 +86,7 @@ public class SemanticAnalyzer
             symbol => (new AssignmentNode(new KnownSymbolNode(symbol), right.Item1), scope),
             () => (new AssignmentNode(new UnknownSymbol(assignmentExpression.Left.Identifier), right.Item1)
             {
-                Errors = [$"Use of undeclared variable {assignmentExpression.Left.Identifier}"]
+                Errors = [$"Use of undeclared variable '{assignmentExpression.Left.Identifier}'"]
             }, scope));
     }
 

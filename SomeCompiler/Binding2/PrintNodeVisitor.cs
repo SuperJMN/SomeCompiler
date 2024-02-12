@@ -59,7 +59,7 @@ public class PrintNodeVisitor : INodeVisitor
 
     public void VisitKnownSymbol(KnownSymbolNode knownSymbolNode)
     {
-        resultBuilder.Append(knownSymbolNode.Symbol.Type + " " + knownSymbolNode.Symbol.Name);
+        resultBuilder.Append(knownSymbolNode.Symbol.Name);
     }
 
     public void VisitUnknownSymbol(UnknownSymbol unknownSymbol)

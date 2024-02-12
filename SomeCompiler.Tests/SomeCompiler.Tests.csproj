@@ -23,6 +23,7 @@
     <PackageReference Include="Zafiro.Core" Version="3.2.36" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\6502DotNet\Sixty502DotNet\Sixty502DotNet.csproj" />
     <ProjectReference Include="..\SomeCompiler.Parser.Antlr4\SomeCompiler.Parser.Antlr4.csproj" />
     <ProjectReference Include="..\SomeCompiler.VirtualMachine.Tests\SomeCompiler.VirtualMachine.Tests.csproj" />
     <ProjectReference Include="..\SomeCompiler\SomeCompiler.csproj" />

@@ -11,7 +11,7 @@ public class SemanticAnalysisTests
         var result = Analyze(input);
         result.Should().BeEquivalentToIgnoringWhitespace(input);
     }
-    
+
     [Fact]
     public void Empty_main()
     {
@@ -19,7 +19,7 @@ public class SemanticAnalysisTests
         var result = Analyze(input);
         result.Should().BeEquivalentToIgnoringWhitespace(input);
     }
-    
+
     [Fact]
     public void Declaration()
     {
@@ -28,7 +28,7 @@ public class SemanticAnalysisTests
 
         result.Should().BeEquivalentToIgnoringWhitespace(input);
     }
-    
+
     [Fact]
     public void Assignment()
     {
@@ -42,9 +42,25 @@ public class SemanticAnalysisTests
     public void Using_undeclared_variable_fails()
     {
         var input = "void main(){ a = 1; }";
-        var result = Analyze(input);
+        Errors(input).Should().ContainMatch("*undeclared*");
+    }
 
-        result.Should().BeEquivalentToIgnoringWhitespace(input);
+    private IEnumerable<string> Errors(string input)
+    {
+        // Create a new instance of the SomeParser class.
+        var parser = new SomeCompiler.Parser.Antlr4.SomeParser();
+        // Parse the input string.
+        var parseResult = parser.Parse(input);
+        // Check if the parsing was successful.
+        if (parseResult.IsFailure)
+        {
+            // If the parsing failed, return the error messages.
+            return ["Can't analyze"];
+        }
+
+        var analyzer = new SemanticAnalyzer();
+        var analyzeResult = analyzer.Analyze(parseResult.Value);
+        return analyzeResult.GetAllErrors();
     }
 
     private static string Analyze(string input)
@@ -61,7 +77,7 @@ public class SemanticAnalysisTests
         }
         // Create a new instance of the SemanticAnalyzer class.
         var analyzer = new SemanticAnalyzer();
-        
+
         // Analyze the parsed program.
         var analyzeResult = analyzer.Analyze(parseResult.Value);
         var printNodeVisitor = new PrintNodeVisitor();
