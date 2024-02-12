@@ -16,6 +16,8 @@ public class ProgramNode : SemanticNode
         visitor.VisitProgramNode(this);
     }
 
+    public override IEnumerable<SemanticNode> Children => Functions;
+
     public override string ToString()
     {
         return Functions.JoinWithLines();

@@ -9,4 +9,6 @@ public interface INodeVisitor
     void VisitAssignment(AssignmentNode assignmentNode);
     void VisitConstant(ConstantNode constantNode);
     void VisitExpressionStatement(ExpressionStatementNode expressionStatementNode);
+    void VisitKnownSymbol(KnownSymbolNode knownSymbolNode);
+    void VisitUnknownSymbol(UnknownSymbol unknownSymbol);
 }

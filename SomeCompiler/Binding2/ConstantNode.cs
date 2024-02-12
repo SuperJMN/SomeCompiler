@@ -13,4 +13,6 @@ public class ConstantNode : ExpressionNode
     {
         visitor.VisitConstant(this);
     }
+
+    public override IEnumerable<SemanticNode> Children => [];
 }

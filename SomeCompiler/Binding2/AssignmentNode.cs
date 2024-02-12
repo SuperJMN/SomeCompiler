@@ -2,10 +2,10 @@
 
 public class AssignmentNode : ExpressionNode
 {
-    public Symbol Left { get; }
+    public SymbolNode Left { get; }
     public ExpressionNode Right { get; }
 
-    public AssignmentNode(Symbol left, ExpressionNode right)
+    public AssignmentNode(SymbolNode left, ExpressionNode right)
     {
         Left = left;
         Right = right;
@@ -15,4 +15,6 @@ public class AssignmentNode : ExpressionNode
     {
         visitor.VisitAssignment(this);
     }
+
+    public override IEnumerable<SemanticNode> Children => [Left, Right];
 }

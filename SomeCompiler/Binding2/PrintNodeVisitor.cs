@@ -40,7 +40,7 @@ public class PrintNodeVisitor : INodeVisitor
 
     public void VisitAssignment(AssignmentNode assignmentNode)
     {
-        resultBuilder.Append(assignmentNode.Left.Name);
+        assignmentNode.Left.Accept(this);
         resultBuilder.Append("=");
         assignmentNode.Right.Accept(this);
     }
@@ -55,6 +55,16 @@ public class PrintNodeVisitor : INodeVisitor
         resultBuilder.Append(new string('\t', indentationLevel));
         expressionStatementNode.Expression.Accept(this);
         resultBuilder.AppendLine(";");
+    }
+
+    public void VisitKnownSymbol(KnownSymbolNode knownSymbolNode)
+    {
+        resultBuilder.Append(knownSymbolNode.Symbol.Type + " " + knownSymbolNode.Symbol.Name);
+    }
+
+    public void VisitUnknownSymbol(UnknownSymbol unknownSymbol)
+    {
+        resultBuilder.Append($"<Unknown '{unknownSymbol}' 😕>");
     }
 
     public override string ToString()

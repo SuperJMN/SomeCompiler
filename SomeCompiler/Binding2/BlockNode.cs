@@ -18,6 +18,8 @@ public class BlockNode : SemanticNode
         visitor.VisitBlockNode(this);
     }
 
+    public override IEnumerable<SemanticNode> Children => Statements;
+
     public override string ToString()
     {
         var statements = Statements.Select(x => "\t" + x + ";").JoinWithLines();

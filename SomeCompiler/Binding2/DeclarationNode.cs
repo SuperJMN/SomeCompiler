@@ -16,5 +16,7 @@ public class DeclarationNode : StatementNode
         visitor.VisitDeclarationNode(this);
     }
 
+    public override IEnumerable<SemanticNode> Children => [];
+
     public override string ToString() => Scope.Get(Name).Value.ToString();
 }

@@ -83,8 +83,8 @@ public class SemanticAnalyzer
         var right = AnalyzeExpression(assignmentExpression.Right, scope);
         var left = scope.Get(assignmentExpression.Left.Identifier);
         return left.Match(
-            symbol => (new AssignmentNode(symbol, right.Item1), scope),
-            () => (new AssignmentNode(Symbol.Unknown(assignmentExpression.Left.Identifier), right.Item1)
+            symbol => (new AssignmentNode(new KnownSymbolNode(symbol), right.Item1), scope),
+            () => (new AssignmentNode(new UnknownSymbol(assignmentExpression.Left.Identifier), right.Item1)
             {
                 Errors = [$"Use of undeclared variable {assignmentExpression.Left.Identifier}"]
             }, scope));

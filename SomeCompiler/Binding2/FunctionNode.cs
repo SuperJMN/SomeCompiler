@@ -16,6 +16,8 @@ public class FunctionNode : SemanticNode
         visitor.VisitFunctionNode(this);
     }
 
+    public override IEnumerable<SemanticNode> Children => [Block];
+
     public override string ToString()
     {
         return $"void {Name}() {Block}";

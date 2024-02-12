@@ -13,4 +13,6 @@ public class ExpressionStatementNode : StatementNode
     {
         visitor.VisitExpressionStatement(this);
     }
+
+    public override IEnumerable<SemanticNode> Children => [Expression];
 }
