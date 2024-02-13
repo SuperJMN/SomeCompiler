@@ -11,4 +11,6 @@ public interface INodeVisitor
     void VisitExpressionStatement(ExpressionStatementNode expressionStatementNode);
     void VisitKnownSymbol(KnownSymbolNode knownSymbolNode);
     void VisitUnknownSymbol(UnknownSymbol unknownSymbol);
+    void VisitAddition(AddExpressionNode addExpressionNode);
+    void VisitSymbolExpression(SymbolExpressionNode symbolExpressionNode);
 }

@@ -45,6 +45,23 @@ public class SemanticAnalysisTests
         Errors(input).Should().ContainMatch("*undeclared*");
     }
 
+    [Fact]
+    public void Addition()
+    {
+        var input = "void main(){ int a; int b; int c; a = 1; b = 2; c = a + b; }";
+        var result = Analyze(input);
+
+        result.Should().BeEquivalentToIgnoringWhitespace(input);
+    }
+    
+    [Fact]
+    public void Addition_with_undeclared_vars()
+    {
+        var input = "void main(){ a = 1; b = 2; c = a + b; }";
+        var enumerable = Errors(input);
+        enumerable.Should().ContainMatch("*undeclared*");
+    }
+
     private IEnumerable<string> Errors(string input)
     {
         // Create a new instance of the SomeParser class.

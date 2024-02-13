@@ -75,7 +75,35 @@ public class SemanticAnalyzer
             return (new ConstantNode(c.Value), scope);
         }
 
+        if (expression is BinaryExpression binaryExpression)
+        {
+            return AnalyzeBinaryExpression(binaryExpression, scope);
+        }
+
+        if (expression is IdentifierExpression i)
+        {
+            var symbolNode = GetSymbolNode(scope, i.Identifier);
+            return (new SymbolExpressionNode(symbolNode), scope);
+        }
+
         throw new InvalidOperationException("Por aquí no vas a ningún sitio");
+    }
+
+    private SymbolNode GetSymbolNode(Scope scope, string name)
+    {
+        return scope.Get(name).Match(symbol => (SymbolNode)new KnownSymbolNode(symbol), () => new UnknownSymbol(name));
+    }
+
+    private (ExpressionNode, Scope) AnalyzeBinaryExpression(BinaryExpression binaryExpression, Scope scope)
+    {
+        if (binaryExpression is AddExpression)
+        {
+            var left = AnalyzeExpression(binaryExpression.Left, scope);
+            var right = AnalyzeExpression(binaryExpression.Right, scope);
+            return (new AddExpressionNode(left.Item1, right.Item1), scope);
+        }
+
+        throw new InvalidOperationException("Por aquí no vas a ningún sitio tampoco");
     }
 
     private (AssignmentNode, Scope scope) AnalyzeAssignmentExpression(Scope scope, AssignmentExpression assignmentExpression)
@@ -102,5 +130,34 @@ public class SemanticAnalyzer
                 }, scope));
 
         return declaration;
+    }
+}
+
+public class SymbolExpressionNode : ExpressionNode
+{
+    public SymbolNode SymbolNode { get; }
+
+    public SymbolExpressionNode(SymbolNode symbolNode)
+    {
+        SymbolNode = symbolNode;
+    }
+
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.VisitSymbolExpression(this);
+    }
+
+    public override IEnumerable<SemanticNode> Children => [SymbolNode];
+}
+
+public class AddExpressionNode : BinaryExpressionNode
+{
+    public AddExpressionNode(ExpressionNode left, ExpressionNode right) : base(left, right, "+")
+    {
+    }
+
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.VisitAddition(this);
     }
 }
