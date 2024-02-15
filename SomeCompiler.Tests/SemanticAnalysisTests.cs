@@ -77,7 +77,7 @@ public class SemanticAnalysisTests
 
         var analyzer = new SemanticAnalyzer();
         var analyzeResult = analyzer.Analyze(parseResult.Value);
-        return analyzeResult.GetAllErrors();
+        return analyzeResult.Node.GetAllErrors();
     }
 
     private static string Analyze(string input)
@@ -98,7 +98,7 @@ public class SemanticAnalysisTests
         // Analyze the parsed program.
         var analyzeResult = analyzer.Analyze(parseResult.Value);
         var printNodeVisitor = new PrintNodeVisitor();
-        analyzeResult.Accept(printNodeVisitor);
+        analyzeResult.Node.Accept(printNodeVisitor);
         return printNodeVisitor.ToString();
     }
 }

@@ -2,45 +2,52 @@
 
 namespace SomeCompiler.Binding2;
 
+public class AnalyzeResult<T>
+{
+    public T Node { get; }
+    public Scope Scope { get; }
+
+    public AnalyzeResult(T node, Scope scope)
+    {
+        Node = node;
+        Scope = scope;
+    }
+}
+
 public class SemanticAnalyzer
 {
-    public SemanticNode Analyze(Program program)
+    public AnalyzeResult<SemanticNode> Analyze(Program program)
     {
-        return AnalyzeProgram(program, Scope.Empty).Item1;
+        return AnalyzeProgram(program, Scope.Empty);
     }
-
-    public (SemanticNode, Scope) AnalyzeProgram(Program node, Scope scope)
+    public AnalyzeResult<SemanticNode> AnalyzeProgram(Program node, Scope scope)
     {
         var functions = new List<FunctionNode>();
         foreach (var statement in node.Functions)
         {
-            var (functionNode, newScope) = AnalyzeFunction(statement, scope);
-            scope = newScope;
-            functions.Add(functionNode);
+            var functionResult = AnalyzeFunction(statement, scope);
+            scope = functionResult.Scope;
+            functions.Add(functionResult.Node);
         }
-        return (new ProgramNode(functions), scope);
+        return new AnalyzeResult<SemanticNode>(new ProgramNode(functions), scope);
     }
-
-    private (FunctionNode, Scope) AnalyzeFunction(Function function, Scope parentScope)
+    private AnalyzeResult<FunctionNode> AnalyzeFunction(Function function, Scope parentScope)
     {
-        var analyzeBlock = AnalyzeBlock(function.Block, parentScope);
-        return (new FunctionNode(function.Name, analyzeBlock.Item1), analyzeBlock.Item2);
+        var analyzeBlockResult = AnalyzeBlock(function.Block, parentScope);
+        return new AnalyzeResult<FunctionNode>(new FunctionNode(function.Name, analyzeBlockResult.Node), analyzeBlockResult.Scope);
     }
-
-    private (BlockNode, Scope) AnalyzeBlock(Block block, Scope scope)
+    private AnalyzeResult<BlockNode> AnalyzeBlock(Block block, Scope scope)
     {
         var statements = new List<StatementNode>();
         foreach (var statement in block)
         {
-            var (analyzedStatement, newScope) = AnalyzeStatement(statement, scope);
-            statements.Add(analyzedStatement);
-            scope = newScope;
+            var analyzedStatementResult = AnalyzeStatement(statement, scope);
+            statements.Add(analyzedStatementResult.Node);
+            scope = analyzedStatementResult.Scope;
         }
-        return (new BlockNode(statements), scope);
+        return new AnalyzeResult<BlockNode>(new BlockNode(statements), scope);
     }
-
-
-    private (StatementNode, Scope) AnalyzeStatement(Statement statement, Scope scope)
+    private AnalyzeResult<StatementNode> AnalyzeStatement(Statement statement, Scope scope)
     {
         switch (statement)
         {
@@ -55,17 +62,14 @@ public class SemanticAnalyzer
             default:
                 throw new ArgumentOutOfRangeException(nameof(statement));
         }
-
         throw new InvalidOperationException();
     }
-
-    private (StatementNode, Scope) AnalyzeExpressionStatement(ExpressionStatement expressionStatement, Scope scope)
+    private AnalyzeResult<StatementNode> AnalyzeExpressionStatement(ExpressionStatement expressionStatement, Scope scope)
     {
-        var analyzeExpression = AnalyzeExpression(expressionStatement.Expression, scope);
-        return (new ExpressionStatementNode(analyzeExpression.Item1), scope);
+        var analyzeExpressionResult = AnalyzeExpression(expressionStatement.Expression, scope);
+        return new AnalyzeResult<StatementNode>(new ExpressionStatementNode(analyzeExpressionResult.Node), scope);
     }
-
-    private (ExpressionNode, Scope) AnalyzeExpression(Expression expression, Scope scope)
+    private AnalyzeResult<ExpressionNode> AnalyzeExpression(Expression expression, Scope scope)
     {
         if (expression is AssignmentExpression assignmentExpression)
         {
@@ -73,66 +77,58 @@ public class SemanticAnalyzer
         }
         else if (expression is ConstantExpression c)
         {
-            return (new ConstantNode(c.Value), scope);
+            return new AnalyzeResult<ExpressionNode>(new ConstantNode(c.Value), scope);
         }
-
         if (expression is BinaryExpression binaryExpression)
         {
             return AnalyzeBinaryExpression(binaryExpression, scope);
         }
-
         if (expression is IdentifierExpression i)
         {
             var symbolNode = GetSymbolNode(scope, i.Identifier);
-            return (new SymbolExpressionNode(symbolNode), scope);
+            return new AnalyzeResult<ExpressionNode>(new SymbolExpressionNode(symbolNode), scope);
         }
-
         throw new InvalidOperationException("Por aquí no vas a ningún sitio");
     }
-
     private SymbolNode GetSymbolNode(Scope scope, string name)
     {
         return scope.Get(name).Match(symbol => (SymbolNode)new KnownSymbolNode(symbol), () => new UnknownSymbol(name));
     }
-
-    private (ExpressionNode, Scope) AnalyzeBinaryExpression(BinaryExpression binaryExpression, Scope scope)
+    private AnalyzeResult<ExpressionNode> AnalyzeBinaryExpression(BinaryExpression binaryExpression, Scope scope)
     {
         if (binaryExpression is AddExpression)
         {
             var left = AnalyzeExpression(binaryExpression.Left, scope);
             var right = AnalyzeExpression(binaryExpression.Right, scope);
-            return (new AddExpressionNode(left.Item1, right.Item1), scope);
+            return new AnalyzeResult<ExpressionNode>(new AddExpressionNode(left.Node, right.Node), scope);
         }
-
         throw new InvalidOperationException("Por aquí no vas a ningún sitio tampoco");
     }
-
-    private (AssignmentNode, Scope scope) AnalyzeAssignmentExpression(Scope scope, AssignmentExpression assignmentExpression)
+    private AnalyzeResult<ExpressionNode> AnalyzeAssignmentExpression(Scope scope, AssignmentExpression assignmentExpression)
     {
         var right = AnalyzeExpression(assignmentExpression.Right, scope);
         var left = scope.Get(assignmentExpression.Left.Identifier);
         return left.Match(
-            symbol => (new AssignmentNode(new KnownSymbolNode(symbol), right.Item1), scope),
-            () => (new AssignmentNode(new UnknownSymbol(assignmentExpression.Left.Identifier), right.Item1)
+            symbol => new AnalyzeResult<ExpressionNode>(new AssignmentNode(new KnownSymbolNode(symbol), right.Node), scope),
+            () => new AnalyzeResult<ExpressionNode>(new AssignmentNode(new UnknownSymbol(assignmentExpression.Left.Identifier), right.Node)
             {
                 Errors = [$"Use of undeclared variable '{assignmentExpression.Left.Identifier}'"]
             }, scope));
     }
-
-    private (StatementNode, Scope) AnalyzeDeclaration(DeclarationStatement declarationStatement, Scope scope)
+    private AnalyzeResult<StatementNode> AnalyzeDeclaration(DeclarationStatement declarationStatement, Scope scope)
     {
         var declaration = scope
             .TryDeclare(new Symbol(declarationStatement.Name, IntType.Instance))
             .Match(
-                s => (new DeclarationNode(declarationStatement.Name, s), s),
-                _ => (new DeclarationNode(declarationStatement.Name, scope)
+                s => new AnalyzeResult<StatementNode>(new DeclarationNode(declarationStatement.Name, s), s),
+                _ => new AnalyzeResult<StatementNode>(new DeclarationNode(declarationStatement.Name, scope)
                 {
                     Errors = [$"Variable {declarationStatement.Name} is already declared"]
                 }, scope));
-
         return declaration;
     }
 }
+
 
 public class SymbolExpressionNode : ExpressionNode
 {
