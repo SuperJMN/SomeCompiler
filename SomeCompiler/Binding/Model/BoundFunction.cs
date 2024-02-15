@@ -18,7 +18,3 @@ public class BoundFunction
     private IScope Scope { get; }
     public override string ToString() => new object[] { $"{ReturnType} {Name}()", Block }.JoinWithLines();
 }
-
-internal interface IScope
-{
-}
