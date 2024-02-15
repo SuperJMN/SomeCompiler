@@ -21,12 +21,13 @@ public class SemanticAnalyzer
         return (new ProgramNode(functions), scope);
     }
 
-    private (FunctionNode, Scope) AnalyzeFunction(Function function, Scope scope)
+    private (FunctionNode, Scope) AnalyzeFunction(Function function, Scope parentScope)
     {
-        return (new FunctionNode(function.Name, AnalyzeBlock(function.Block, scope)), scope);
+        var analyzeBlock = AnalyzeBlock(function.Block, parentScope);
+        return (new FunctionNode(function.Name, analyzeBlock.Item1), analyzeBlock.Item2);
     }
 
-    private BlockNode AnalyzeBlock(Block block, Scope scope)
+    private (BlockNode, Scope) AnalyzeBlock(Block block, Scope scope)
     {
         var statements = new List<StatementNode>();
         foreach (var statement in block)
@@ -35,7 +36,7 @@ public class SemanticAnalyzer
             statements.Add(analyzedStatement);
             scope = newScope;
         }
-        return new BlockNode(statements, scope);
+        return (new BlockNode(statements), scope);
     }
 
 

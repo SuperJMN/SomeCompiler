@@ -4,14 +4,12 @@ namespace SomeCompiler.Binding2;
 
 public class BlockNode : SemanticNode
 {
-    public BlockNode(IEnumerable<StatementNode> statements, Scope scope)
+    public BlockNode(IEnumerable<StatementNode> statements)
     {
         Statements = statements;
-        Scope = scope;
     }
 
     public IEnumerable<StatementNode> Statements { get; }
-    public Scope Scope { get; }
     
     public override void Accept(INodeVisitor visitor)
     {

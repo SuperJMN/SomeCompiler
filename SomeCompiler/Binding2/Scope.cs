@@ -20,7 +20,7 @@ public class Scope
         if (variables.ContainsKey(symbol.Name))
         {
             // La variable ya existe en este alcance, devolver el mismo alcance
-            return Result.Failure<Scope>("Symbol is declared");
+            return Result.Failure<Scope>($"'{symbol}' is already declared");
         }
         else
         {
