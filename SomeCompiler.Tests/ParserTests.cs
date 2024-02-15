@@ -89,6 +89,13 @@ public class ParserTests
         AssertParse(source);
     }
     
+    [Fact]
+    public void Call()
+    {
+        var source = @"int main() { Func(13); }";
+        AssertParse(source);
+    }
+    
     private static void AssertParse(string source)
     {
         var sut = new Parser.Antlr4.SomeParser();

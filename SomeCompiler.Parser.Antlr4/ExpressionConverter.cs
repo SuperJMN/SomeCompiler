@@ -201,14 +201,21 @@ public class ExpressionConverter
 
     private Expression ParsePrimary(CParser.PrimaryExpressionContext node)
     {
-        var terminalNode = (ITerminalNode)node.GetChild(0);
-
-        return terminalNode.Symbol.Type switch
+        if (node.Constant() is { } c)
         {
-            111 => new ConstantExpression(int.Parse(terminalNode.GetText())),
-            110 => new IdentifierExpression(terminalNode.GetText()),
-            64 => ParseExpression((CParser.ExpressionContext)node.GetChild(1)),
-            _ => throw new NotSupportedException()
-        };
+            return new ConstantExpression(int.Parse(c.GetText()));
+        }
+
+        if (node.Identifier() is { } id)
+        {
+            return new IdentifierExpression(id.GetText());
+        }
+
+        if (node.expression() is { } expression)
+        {
+            return ParseExpression(expression);
+        }
+
+        throw new NotSupportedException();
     }
 }

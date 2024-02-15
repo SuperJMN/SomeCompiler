@@ -110,7 +110,7 @@ public class SemanticAnalyzer
 
     private SymbolNode GetSymbolNode(Scope scope, string name)
     {
-        return scope.Get(name).Match(symbol => (SymbolNode)new KnownSymbolNode(symbol), () => new UnknownSymbol(name));
+        return scope.Get(name).Match(symbol => (SymbolNode) new KnownSymbolNode(symbol), () => new UnknownSymbol(name));
     }
 
     private AnalyzeResult<ExpressionNode> AnalyzeBinaryExpression(BinaryExpression binaryExpression, Scope scope)
