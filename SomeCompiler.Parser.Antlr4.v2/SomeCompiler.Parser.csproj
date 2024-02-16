@@ -10,7 +10,7 @@
 
 	<ItemGroup>
 		<Antlr4 Include="SomeLanguage.g4">
-			<Package>SomeCompiler.Generated</Package>
+			<Package>SomeCompiler.Parser</Package>
 		</Antlr4>
 	</ItemGroup>
 

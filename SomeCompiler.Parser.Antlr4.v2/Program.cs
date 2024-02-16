@@ -1,9 +1,8 @@
 ﻿// Template generated code from Antlr4BuildTasks.Template v 8.17
 
 using Antlr4.Runtime;
-using SomeCompiler.Generated;
 
-namespace SomeCompiler.Parser.Antlr4.v2
+namespace SomeCompiler.Parser
 {
     public class Program
     {

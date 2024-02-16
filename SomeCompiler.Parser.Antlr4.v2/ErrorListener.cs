@@ -2,7 +2,7 @@
 
 using Antlr4.Runtime;
 
-namespace SomeCompiler.Parser.Antlr4.v2
+namespace SomeCompiler.Parser
 {
     public class ErrorListener<S> : ConsoleErrorListener<S>
     {

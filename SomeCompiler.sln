@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser.Model",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Core", "SomeCompiler.Core\SomeCompiler.Core.csproj", "{4B9A8180-29A9-4C98-BB33-904A9213B59A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser.Antlr4.v2", "SomeCompiler.Parser.Antlr4.v2\SomeCompiler.Parser.Antlr4.v2.csproj", "{3EE64B3C-F442-4DF6-8424-8D609DB7CD1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser", "SomeCompiler.Parser.Antlr4.v2\SomeCompiler.Parser.csproj", "{3EE64B3C-F442-4DF6-8424-8D609DB7CD1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
