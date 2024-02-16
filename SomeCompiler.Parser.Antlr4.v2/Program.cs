@@ -1,9 +1,10 @@
 ﻿// Template generated code from Antlr4BuildTasks.Template v 8.17
-namespace foo
-{
-    using Antlr4.Runtime;
-    using System.Text;
 
+using Antlr4.Runtime;
+using SomeCompiler.Generated;
+
+namespace SomeCompiler.Parser.Antlr4.v2
+{
     public class Program
     {
         static void Main(string[] args)
