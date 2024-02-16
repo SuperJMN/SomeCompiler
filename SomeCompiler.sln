@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser.Antlr4"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser.Model", "SomeCompiler.Parser.Model\SomeCompiler.Parser.Model.csproj", "{695DCB79-E350-4E13-98A0-A052E13D3BB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SomeCompiler.Core", "SomeCompiler.Core\SomeCompiler.Core.csproj", "{4B9A8180-29A9-4C98-BB33-904A9213B59A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Core", "SomeCompiler.Core\SomeCompiler.Core.csproj", "{4B9A8180-29A9-4C98-BB33-904A9213B59A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser.Antlr4.v2", "SomeCompiler.Parser.Antlr4.v2\SomeCompiler.Parser.Antlr4.v2.csproj", "{3EE64B3C-F442-4DF6-8424-8D609DB7CD1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,10 @@ Global
 		{4B9A8180-29A9-4C98-BB33-904A9213B59A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B9A8180-29A9-4C98-BB33-904A9213B59A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B9A8180-29A9-4C98-BB33-904A9213B59A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EE64B3C-F442-4DF6-8424-8D609DB7CD1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EE64B3C-F442-4DF6-8424-8D609DB7CD1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EE64B3C-F442-4DF6-8424-8D609DB7CD1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EE64B3C-F442-4DF6-8424-8D609DB7CD1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
