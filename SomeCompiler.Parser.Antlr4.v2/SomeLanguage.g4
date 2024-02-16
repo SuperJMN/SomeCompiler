@@ -1,58 +1,58 @@
 ﻿grammar SomeLanguage;
 
-// Definimos la regla principal que comienza a parsear el archivo
-programa: (declaracionVar | funcion | sentencia)* EOF;
+// We define the main rule that starts parsing the file
+program: (variableDeclaration | function | statement)* EOF;
 
-// Declaración de variables
-declaracionVar: tipo IDENTIFICADOR ';';
+// Variable declaration
+variableDeclaration: type IDENTIFIER ';';
 
-// Tipos de datos
-tipo: 'void' | 'int' | 'char' | 'string' | 'byte';
+// Data types
+type: 'void' | 'int' | 'char' | 'string' | 'byte';
 
-// Definición de funciones
-funcion: tipo IDENTIFICADOR '(' parametros? ')' bloque;
+// Function definition
+function: type IDENTIFIER '(' parameters? ')' block;
 
-// Parámetros de función, separados por comas
-parametros: parametro (',' parametro)*;
-parametro: tipo IDENTIFICADOR;
+// Function parameters, separated by commas
+parameters: parameter (',' parameter)*;
+parameter: type IDENTIFIER;
 
-// Bloques de código, para funciones, condicionales y bucles
-bloque: '{' (declaracionVar | sentencia)* '}';
+// Code blocks, for functions, conditionals, and loops
+block: '{' (variableDeclaration | statement)* '}';
 
-// Sentencias que pueden aparecer dentro de las funciones y bloques
-sentencia: asignacion
-          | llamadaFuncion ';'
-          | condicional
-          | bucleWhile
+// Statements that can appear within functions and blocks
+statement: assignment
+          | functionCall ';'
+          | conditional
+          | whileLoop
           ;
 
-// Asignación de valores a variables
-asignacion: IDENTIFICADOR '=' expresion ';';
+// Assignment of values to variables
+assignment: IDENTIFIER '=' expression ';';
 
-// Expresiones
-expresion: expresion ('+' | '-' | '*' | '/') expresion
-         | '(' expresion ')'
-         | IDENTIFICADOR
-         | llamadaFuncion
-         | LITERAL
-         ;
+// Expressions
+expression: expression ('+' | '-' | '*' | '/') expression
+          | '(' expression ')'
+          | IDENTIFIER
+          | functionCall
+          | LITERAL
+          ;
 
-// Llamada a funciones
-llamadaFuncion: IDENTIFICADOR '(' argumentos? ')';
+// Function call
+functionCall: IDENTIFIER '(' arguments? ')';
 
-// Argumentos en llamadas a funciones, separados por comas
-argumentos: expresion (',' expresion)*;
+// Arguments in function calls, separated by commas
+arguments: expression (',' expression)*;
 
-// Estructuras de control
-condicional: 'if' '(' expresion ')' bloque ('else' bloque)?;
-bucleWhile: 'while' '(' expresion ')' bloque;
+// Control structures
+conditional: 'if' '(' expression ')' block ('else' block)?;
+whileLoop: 'while' '(' expression ')' block;
 
 // Tokens
-IDENTIFICADOR: [a-zA-Z_][a-zA-Z_0-9]*;
+IDENTIFIER: [a-zA-Z_][a-zA-Z_0-9]*;
 LITERAL: LITERAL_INT | LITERAL_CHAR | LITERAL_STRING;
 LITERAL_INT: [0-9]+;
 LITERAL_CHAR: '\'' . '\'';
 LITERAL_STRING: '"' ('\\"' | .)*? '"';
 
-// Espacios y saltos de línea (ignorados)
+// Spaces and line breaks (ignored)
 WS: [ \t\r\n]+ -> skip;
