@@ -101,7 +101,8 @@ public class ParserTests
         var sut = new SomeParser();
         var result = sut.Parse(source);
 
+        var visitor = new PrintNodeVisitor();
         result.Should().Succeed()
-            .And.Subject.Value.ToString().Should().BeEquivalentToIgnoringWhitespace(source);
+            .And.Subject.Value.ToSyntaxString().Should().BeEquivalentToIgnoringWhitespace(source);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace SomeCompiler.Parser;
 
-public class ProgramSyntax
+public class ProgramSyntax : Syntax
 {
     public IList<FunctionSyntax> Functions { get; }
 
@@ -8,14 +8,9 @@ public class ProgramSyntax
     {
         Functions = functions;
     }
-}
 
-public class FunctionSyntax
-{
-    public BlockSyntax Block { get; }
-
-    public FunctionSyntax(BlockSyntax block)
+    public override void Accept(ISyntaxVisitor visitor)
     {
-        Block = block;
+        visitor.VisitProgram(this);
     }
 }

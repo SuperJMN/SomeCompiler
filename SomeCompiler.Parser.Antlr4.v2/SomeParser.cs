@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
 using Zafiro.Core.Mixins;
 using static SomeCompiler.Parser.SomeLanguageParser;
@@ -7,12 +8,9 @@ namespace SomeCompiler.Parser;
 
 public class SomeParser
 {
-    public Result<ProgramSyntax> Parse(string input)
-    {
-        return Tokenize(input)
-            .Bind(Parse)
-            .Map(ParseProgram);
-    }
+    public Result<ProgramSyntax> Parse(string input) => Tokenize(input)
+        .Bind(Parse)
+        .Map(ParseProgram);
 
     private static Result<ProgramContext> Parse(CommonTokenStream tokenStream)
     {
@@ -28,7 +26,7 @@ public class SomeParser
 
         return result;
     }
-    
+
     private static Result<CommonTokenStream> Tokenize(string input)
     {
         var lexer = new SomeLanguageLexer(CharStreams.fromString(input));
@@ -54,7 +52,7 @@ public class SomeParser
     private FunctionSyntax ParseFunction(FunctionContext functionContext)
     {
         var block = ParseBlock(functionContext.block());
-        return new FunctionSyntax(block);
+        return new FunctionSyntax(functionContext.type().GetText(), functionContext.IDENTIFIER().ToString(), block);
     }
 
     private BlockSyntax ParseBlock(BlockContext block)
@@ -88,20 +86,11 @@ public class SomeParser
         throw new InvalidOperationException();
     }
 
-    private StatementSyntax ParseFunctionCall(FunctionCallContext functionCall)
-    {
-        return new ExpressionStatementSyntax(new FunctionCall());
-    }
+    private StatementSyntax ParseFunctionCall(FunctionCallContext functionCall) => new ExpressionStatementSyntax(new FunctionCall(functionCall.IDENTIFIER().ToString()));
 
-    private StatementSyntax ParseWhileLoop(WhileLoopContext whileLoop)
-    {
-        throw new NotImplementedException();
-    }
+    private StatementSyntax ParseWhileLoop(WhileLoopContext whileLoop) => throw new NotImplementedException();
 
-    private StatementSyntax ParseConditional(ConditionalContext conditional)
-    {
-        throw new NotImplementedException();
-    }
+    private StatementSyntax ParseConditional(ConditionalContext conditional) => throw new NotImplementedException();
 
     private StatementSyntax ParseAssignment(AssignmentContext assignment)
     {
@@ -113,78 +102,22 @@ public class SomeParser
     {
         if (expression.addExpression() is { } addExpression)
         {
-            return ParseAddExpression(addExpression);
+            var expressionSyntax = ParseExpression((ExpressionContext) addExpression.children[0]);
+            return new AddExpression(expressionSyntax, ParseExpression((ExpressionContext) addExpression.children[1]));
         }
 
         throw new NotImplementedException(expression.ToString());
     }
 
-    private ExpressionSyntax ParseAddExpression(AddExpressionContext addExpression)
+    private LValue ParseLValue(IParseTree addExpressionChild)
     {
-        return ParseMultExpression(addExpression.mulExpression());
+        return new IdentifierLValue(addExpressionChild.GetText());
     }
+
+    private ExpressionSyntax ParseAddExpression(AddExpressionContext addExpression) => ParseMultExpression(addExpression.mulExpression());
 
     private ExpressionSyntax ParseMultExpression(MulExpressionContext mulExpression)
     {
-        return new ExpressionSyntax();
-    }
-}
-
-internal class ExpressionStatementSyntax : StatementSyntax
-{
-    public ExpressionSyntax Expression { get; }
-
-    public ExpressionStatementSyntax(ExpressionSyntax expression)
-    {
-        Expression = expression;
-    }
-}
-
-internal class FunctionCall : ExpressionSyntax
-{
-}
-
-internal class AssignmentSyntax : StatementSyntax
-{
-    public LValue Lvalue { get; }
-    public ExpressionSyntax Expression { get; }
-
-    public AssignmentSyntax(LValue lvalue, ExpressionSyntax expression)
-    {
-        Lvalue = lvalue;
-        Expression = expression;
-    }
-}
-
-internal class ExpressionSyntax
-{
-}
-
-public abstract class LValue
-{
-    
-}
-
-internal class IdentifierLValue : LValue
-{
-    public string Identifier { get; }
-
-    public IdentifierLValue(string identifier)
-    {
-        Identifier = identifier;
-    }
-}
-
-public class StatementSyntax
-{
-}
-
-public class BlockSyntax
-{
-    public List<StatementSyntax> Statements { get; }
-
-    public BlockSyntax(List<StatementSyntax> statements)
-    {
-        Statements = statements;
+        return new MultExpression(ParseExpression((ExpressionContext) mulExpression.children[0]), ParseExpression((ExpressionContext) mulExpression.children[1]));
     }
 }
