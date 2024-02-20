@@ -1,77 +1,177 @@
 ﻿using Antlr4.Runtime;
+using CSharpFunctionalExtensions;
+using Zafiro.Core.Mixins;
+using static SomeCompiler.Parser.SomeLanguageParser;
 
 namespace SomeCompiler.Parser;
 
 public class SomeParser
 {
-    public ProgramSyntax Parse(string input)
+    public Result<ProgramSyntax> Parse(string input)
     {
-        var lexer = new SomeLanguageLexer(CharStreams.fromString(input));
-        var parser = new SomeLanguageParser(new CommonTokenStream(lexer));
-        return ParseProgram(parser.program());
+        return Tokenize(input)
+            .Bind(Parse)
+            .Map(ParseProgram);
     }
 
-    private ProgramSyntax ParseProgram(SomeLanguageParser.ProgramContext program)
+    private static Result<ProgramContext> Parse(CommonTokenStream tokenStream)
+    {
+        var parser = new SomeLanguageParser(tokenStream);
+        var listenerLexer = new ErrorListener<IToken>();
+        parser.AddErrorListener(listenerLexer);
+        var result = parser.program();
+
+        if (listenerLexer.Errors.Any())
+        {
+            return Result.Failure<ProgramContext>(listenerLexer.Errors.Select(x => x.ToString()).JoinWithLines());
+        }
+
+        return result;
+    }
+    
+    private static Result<CommonTokenStream> Tokenize(string input)
+    {
+        var lexer = new SomeLanguageLexer(CharStreams.fromString(input));
+        var listenerLexer = new ErrorListener<int>();
+        lexer.AddErrorListener(listenerLexer);
+
+        var tokenStream = new CommonTokenStream(lexer);
+
+        if (listenerLexer.Errors.Any())
+        {
+            return Result.Failure<CommonTokenStream>(listenerLexer.Errors.Select(x => x.ToString()).JoinWithLines());
+        }
+
+        return tokenStream;
+    }
+
+    private ProgramSyntax ParseProgram(ProgramContext program)
     {
         var funcs = program.function().Select(f => ParseFunction(f));
         return new ProgramSyntax(funcs.ToList());
     }
 
-    private FunctionSyntax ParseFunction(SomeLanguageParser.FunctionContext functionContext)
+    private FunctionSyntax ParseFunction(FunctionContext functionContext)
     {
         var block = ParseBlock(functionContext.block());
         return new FunctionSyntax(block);
     }
 
-    private BlockSyntax ParseBlock(SomeLanguageParser.BlockContext block)
+    private BlockSyntax ParseBlock(BlockContext block)
     {
         var statements = block.statement().Select(ParseStatement);
         return new BlockSyntax(statements.ToList());
     }
 
-    private StatementSyntax ParseStatement(SomeLanguageParser.StatementContext statementContext)
+    private StatementSyntax ParseStatement(StatementContext statementContext)
     {
         if (statementContext.assignment() is { } assignment)
         {
             return ParseAssignment(assignment);
         }
-        
+
         if (statementContext.conditional() is { } conditional)
         {
             return ParseConditional(conditional);
         }
-        
+
         if (statementContext.whileLoop() is { } whileLoop)
         {
             return ParseWhileLoop(whileLoop);
         }
-        
+
         if (statementContext.functionCall() is { } functionCall)
         {
-            return ParseFunctionaCall(functionCall);
+            return ParseFunctionCall(functionCall);
         }
 
         throw new InvalidOperationException();
     }
 
-    private StatementSyntax ParseFunctionaCall(SomeLanguageParser.FunctionCallContext functionCall)
+    private StatementSyntax ParseFunctionCall(FunctionCallContext functionCall)
+    {
+        return new ExpressionStatementSyntax(new FunctionCall());
+    }
+
+    private StatementSyntax ParseWhileLoop(WhileLoopContext whileLoop)
     {
         throw new NotImplementedException();
     }
 
-    private StatementSyntax ParseWhileLoop(SomeLanguageParser.WhileLoopContext whileLoop)
+    private StatementSyntax ParseConditional(ConditionalContext conditional)
     {
         throw new NotImplementedException();
     }
 
-    private StatementSyntax ParseConditional(SomeLanguageParser.ConditionalContext conditional)
+    private StatementSyntax ParseAssignment(AssignmentContext assignment)
     {
-        throw new NotImplementedException();
+        LValue lvalue = new IdentifierLValue(assignment.IDENTIFIER().ToString());
+        return new AssignmentSyntax(lvalue, ParseExpression(assignment.expression()));
     }
 
-    private StatementSyntax ParseAssignment(SomeLanguageParser.AssignmentContext assignment)
+    private ExpressionSyntax ParseExpression(ExpressionContext expression)
     {
-        throw new NotImplementedException();
+        if (expression.addExpression() is { } addExpression)
+        {
+            return ParseAddExpression(addExpression);
+        }
+
+        throw new NotImplementedException(expression.ToString());
+    }
+
+    private ExpressionSyntax ParseAddExpression(AddExpressionContext addExpression)
+    {
+        return ParseMultExpression(addExpression.mulExpression());
+    }
+
+    private ExpressionSyntax ParseMultExpression(MulExpressionContext mulExpression)
+    {
+        return new ExpressionSyntax();
+    }
+}
+
+internal class ExpressionStatementSyntax : StatementSyntax
+{
+    public ExpressionSyntax Expression { get; }
+
+    public ExpressionStatementSyntax(ExpressionSyntax expression)
+    {
+        Expression = expression;
+    }
+}
+
+internal class FunctionCall : ExpressionSyntax
+{
+}
+
+internal class AssignmentSyntax : StatementSyntax
+{
+    public LValue Lvalue { get; }
+    public ExpressionSyntax Expression { get; }
+
+    public AssignmentSyntax(LValue lvalue, ExpressionSyntax expression)
+    {
+        Lvalue = lvalue;
+        Expression = expression;
+    }
+}
+
+internal class ExpressionSyntax
+{
+}
+
+public abstract class LValue
+{
+    
+}
+
+internal class IdentifierLValue : LValue
+{
+    public string Identifier { get; }
+
+    public IdentifierLValue(string identifier)
+    {
+        Identifier = identifier;
     }
 }
 

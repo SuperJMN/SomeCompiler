@@ -30,12 +30,21 @@ statement: assignment
 assignment: IDENTIFIER '=' expression ';';
 
 // Expressions
-expression: expression ('+' | '-' | '*' | '/') expression
-          | '(' expression ')'
-          | IDENTIFIER
-          | functionCall
-          | LITERAL
-          ;
+expression: addExpression;
+
+addExpression: addExpression ('+' | '-') mulExpression
+             | mulExpression
+             ;
+
+mulExpression: mulExpression ('*' | '/') atom
+             | atom
+             ;
+
+atom: '(' expression ')'
+    | IDENTIFIER
+    | functionCall
+    | LITERAL
+    ;
 
 // Function call
 functionCall: IDENTIFIER '(' arguments? ')';

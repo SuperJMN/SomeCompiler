@@ -23,7 +23,7 @@ public class Program
         lexer.AddErrorListener(listener_lexer);
         parser.AddErrorListener(listener_parser);
         var tree = parser.program();
-        if (listener_lexer.had_error || listener_parser.had_error)
+        if (listener_lexer.HadErrors || listener_parser.HadErrors)
             System.Console.WriteLine("error in parse.");
         else
             System.Console.WriteLine("parse completed.");

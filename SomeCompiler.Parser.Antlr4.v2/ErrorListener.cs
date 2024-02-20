@@ -1,18 +1,23 @@
 ﻿// Template generated code from Antlr4BuildTasks.Template v 8.17
 
+using System.Collections.ObjectModel;
 using Antlr4.Runtime;
 
-namespace SomeCompiler.Parser
-{
-    public class ErrorListener<S> : ConsoleErrorListener<S>
-    {
-        public bool had_error;
+namespace SomeCompiler.Parser;
 
-        public override void SyntaxError(TextWriter output, IRecognizer recognizer, S offendingSymbol, int line,
-            int col, string msg, RecognitionException e)
-        {
-            had_error = true;
-            base.SyntaxError(output, recognizer, offendingSymbol, line, col, msg, e);
-        }
+public class ErrorListener<T> : ConsoleErrorListener<T>
+{
+    private readonly List<Error<T>> errors = new();
+
+    public bool HadErrors;
+
+    public ReadOnlyCollection<Error<T>> Errors => errors.AsReadOnly();
+
+    public override void SyntaxError(TextWriter output, IRecognizer recognizer, T offendingSymbol, int line,
+        int col, string msg, RecognitionException e)
+    {
+        HadErrors = true;
+        base.SyntaxError(output, recognizer, offendingSymbol, line, col, msg, e);
+        errors.Add(new Error<T>(offendingSymbol, line, col, msg));
     }
 }
