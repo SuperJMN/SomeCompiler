@@ -1,4 +1,5 @@
-﻿using Antlr4.Runtime;
+﻿using System.Collections;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using CSharpFunctionalExtensions;
 using Zafiro.Core.Mixins;
@@ -86,7 +87,12 @@ public class SomeParser
         throw new InvalidOperationException();
     }
 
-    private StatementSyntax ParseFunctionCall(FunctionCallContext functionCall) => new ExpressionStatementSyntax(new FunctionCall(functionCall.IDENTIFIER().ToString()));
+    private StatementSyntax ParseFunctionCall(FunctionCallContext functionCall)
+    {
+        var name = functionCall.IDENTIFIER().ToString()!;
+        var arguments = functionCall.arguments().expression().Select(ParseExpression);;
+        return new ExpressionStatementSyntax(new FunctionCall(name, arguments));
+    }
 
     private StatementSyntax ParseWhileLoop(WhileLoopContext whileLoop) => throw new NotImplementedException();
 
@@ -102,8 +108,7 @@ public class SomeParser
     {
         if (expression.addExpression() is { } addExpression)
         {
-            var expressionSyntax = ParseExpression((ExpressionContext) addExpression.children[0]);
-            return new AddExpression(expressionSyntax, ParseExpression((ExpressionContext) addExpression.children[1]));
+            return ParseAddExpression(addExpression);
         }
 
         throw new NotImplementedException(expression.ToString());
@@ -114,10 +119,34 @@ public class SomeParser
         return new IdentifierLValue(addExpressionChild.GetText());
     }
 
-    private ExpressionSyntax ParseAddExpression(AddExpressionContext addExpression) => ParseMultExpression(addExpression.mulExpression());
+    private ExpressionSyntax ParseAddExpression(AddExpressionContext addExpression)
+    {
+        if (addExpression.mulExpression() is {} multExpression)
+        {
+            return ParseMultExpression(multExpression);
+        }
+
+        var left = ParseExpression((ExpressionContext) addExpression.children[0]);
+        var right = ParseExpression((ExpressionContext) addExpression.children[1]);
+        return new AddExpression(left, right);
+    }
 
     private ExpressionSyntax ParseMultExpression(MulExpressionContext mulExpression)
     {
+        if (mulExpression.atom() is { } atom)
+        {
+            return ParseAtom(mulExpression.atom());
+        }
         return new MultExpression(ParseExpression((ExpressionContext) mulExpression.children[0]), ParseExpression((ExpressionContext) mulExpression.children[1]));
+    }
+
+    private ExpressionSyntax ParseAtom(AtomContext atom)
+    {
+        if (atom.LITERAL() is { } node)
+        {
+            return new ConstantSyntax(node.GetText());
+        }
+
+        throw new NotImplementedException();
     }
 }

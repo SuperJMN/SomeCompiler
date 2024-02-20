@@ -35,7 +35,13 @@ public class PrintNodeVisitor : ISyntaxVisitor
 
     public void VisitFunctionCall(FunctionCall functionCall)
     {
-        resultBuilder.Append(functionCall.Name + "()");
+        resultBuilder.Append(functionCall.Name);
+        resultBuilder.Append("(");
+        foreach (var parameter in functionCall.Parameters)
+        {
+            parameter.Accept(this);
+        }
+        resultBuilder.Append(")");
     }
 
     public void VisitMult(MultExpression multExpression)
@@ -62,6 +68,8 @@ public class PrintNodeVisitor : ISyntaxVisitor
         assignmentSyntax.Left.Accept(this);
         resultBuilder.Append("=");
         assignmentSyntax.Right.Accept(this);
+        resultBuilder.Append(";");
+        resultBuilder.AppendLine();
     }
 
     public void VisitExpressionStatement(ExpressionStatementSyntax expressionStatementSyntax)
@@ -75,5 +83,10 @@ public class PrintNodeVisitor : ISyntaxVisitor
     {
         resultBuilder.AppendLine($"{function.Type} {function.Name}()");
         function.Block.Accept(this);
+    }
+
+    public void VisitConstant(ConstantSyntax constantSyntax)
+    {
+        resultBuilder.Append(constantSyntax.Value);
     }
 }

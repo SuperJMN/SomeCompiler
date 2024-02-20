@@ -2,9 +2,10 @@
 
 public class FunctionCall : ExpressionSyntax
 {
-    public FunctionCall(string name)
+    public FunctionCall(string name, IEnumerable<ExpressionSyntax> parameters)
     {
         Name = name;
+        Parameters = parameters;
     }
 
     public override void Accept(ISyntaxVisitor visitor)
@@ -13,4 +14,5 @@ public class FunctionCall : ExpressionSyntax
     }
 
     public string Name { get; }
+    public IEnumerable<ExpressionSyntax> Parameters { get; }
 }

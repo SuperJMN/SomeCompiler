@@ -11,4 +11,5 @@ public interface ISyntaxVisitor
     void VisitAssignment(AssignmentSyntax assignmentSyntax);
     void VisitExpressionStatement(ExpressionStatementSyntax expressionStatementSyntax);
     void VisitFunction(FunctionSyntax function);
+    void VisitConstant(ConstantSyntax constantSyntax);
 }
