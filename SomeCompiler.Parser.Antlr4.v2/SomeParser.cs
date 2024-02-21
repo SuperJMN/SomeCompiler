@@ -3,7 +3,6 @@ using CSharpFunctionalExtensions;
 using System.Xml.Linq;
 using Zafiro.Core.Mixins;
 using static SomeCompiler.Parser.SomeLanguageParser;
-
 namespace SomeCompiler.Parser;
 
 public class SomeParser
@@ -124,7 +123,7 @@ public class SomeParser
     {
         var name = functionCall.IDENTIFIER().ToString()!;
         var arguments = functionCall.arguments().expression().Select(ParseExpression);
-        ;
+        
         return new ExpressionStatementSyntax(new FunctionCall(name, arguments));
     }
 
@@ -140,12 +139,61 @@ public class SomeParser
 
     private ExpressionSyntax ParseExpression(ExpressionContext expression)
     {
-        if (expression.addExpression() is { } addExpression)
+        if (expression.conditionalOrExpression() is { } conditionalOr)
         {
-            return ParseAddExpression(addExpression);
+            return ParseConditionalOr(conditionalOr);
         }
 
         throw new NotImplementedException(expression.ToString());
+    }
+
+    private ExpressionSyntax ParseConditionalOr(ConditionalOrExpressionContext conditionalOr)
+    {
+        if (conditionalOr.conditionalOrExpression() is { } or)
+        {
+            var left = ParseConditionalOr(or);
+            var right = ParseConditionalAnd(conditionalOr.conditionalAndExpression());
+            return new BinaryExpressionSyntax(left, right, "||");
+        }
+
+        return ParseConditionalAnd(conditionalOr.conditionalAndExpression());
+    }
+
+    private ExpressionSyntax ParseConditionalAnd(ConditionalAndExpressionContext conditionalAndExpression)
+    {
+        if (conditionalAndExpression.conditionalAndExpression() is { } conditionalAnd)
+        {
+            var left = ParseConditionalAnd(conditionalAnd);
+            var right = ParseConditionalEquality(conditionalAnd.equalityExpression());
+            return new BinaryExpressionSyntax(left, right, "&&");
+        }
+        
+        return ParseConditionalEquality(conditionalAndExpression.equalityExpression());
+    }
+
+    private ExpressionSyntax ParseConditionalEquality(EqualityExpressionContext equalityExpression)
+    {
+        if (equalityExpression.equalityExpression() is { } equality)
+        {
+            var left = ParseConditionalEquality(equality);
+            var right = ParseConditionalRelational(equalityExpression.relationalExpression());
+            return new BinaryExpressionSyntax(left, right, equalityExpression.children[1].GetText());
+        }
+        
+        return ParseConditionalRelational(equalityExpression.relationalExpression());
+    }
+
+    private ExpressionSyntax ParseConditionalRelational(RelationalExpressionContext relationalExpression)
+    {
+        if (relationalExpression.relationalExpression() is { } relational)
+        {
+            var left = ParseConditionalRelational(relational);
+            var right = ParseAddExpression(relationalExpression.addExpression());
+            var @operator = relationalExpression.children[1].GetText();
+            return new BinaryExpressionSyntax(left, right, @operator);
+        }
+        
+        return ParseAddExpression(relationalExpression.addExpression());
     }
 
     private LValue ParseLValue(string identifier) => new IdentifierLValue(identifier);
@@ -167,11 +215,11 @@ public class SomeParser
         if (mulExpression.mulExpression() is {} multExpr)
         {
             var left = ParseMultExpression(multExpr);
-            var right = ParseAtom(mulExpression.atom());
+            var right = ParseAtom(mulExpression.primary());
             return new MultExpression(left, right);
         }
         
-        if (mulExpression.atom() is { } atom)
+        if (mulExpression.primary() is { } atom)
         {
             return ParseAtom(atom);
         }
@@ -179,7 +227,7 @@ public class SomeParser
         return new MultExpression(ParseExpression((ExpressionContext)mulExpression.children[0]), ParseExpression((ExpressionContext)mulExpression.children[1]));
     }
 
-    private ExpressionSyntax ParseAtom(AtomContext atom)
+    private ExpressionSyntax ParseAtom(PrimaryContext atom)
     {
         if (atom.LITERAL() is { } node)
         {
@@ -192,54 +240,5 @@ public class SomeParser
         }
 
         throw new NotImplementedException();
-    }
-}
-
-public class IdentifierSyntax : ExpressionSyntax
-{
-    public string Identifier { get; }
-
-    public IdentifierSyntax(string identifier)
-    {
-        Identifier = identifier;
-    }
-
-    public override void Accept(ISyntaxVisitor visitor)
-    {
-        visitor.VisitIdentifier(this);
-    }
-}
-
-public class ReturnSyntax : StatementSyntax
-{
-    public Maybe<ExpressionSyntax> Expression { get; }
-
-    public ReturnSyntax(Maybe<ExpressionSyntax> expression)
-    {
-        Expression = expression;
-    }
-
-    public override void Accept(ISyntaxVisitor visitor)
-    {
-        visitor.VisitReturn(this);
-    }
-}
-
-public class DeclarationSyntax : StatementSyntax
-{
-    public DeclarationSyntax(string type, string name, Maybe<ExpressionSyntax> initialization)
-    {
-        Type = type;
-        Name = name;
-        Initialization = initialization;
-    }
-
-    public string Type { get; }
-    public string Name { get; }
-    public Maybe<ExpressionSyntax> Initialization { get; }
-
-    public override void Accept(ISyntaxVisitor visitor)
-    {
-        visitor.VisitDeclaration(this);
     }
 }

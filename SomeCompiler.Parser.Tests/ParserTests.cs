@@ -73,6 +73,48 @@ public class ParserTests
         var source = @"int main() { a = b * c; }";
         AssertParse(source);
     }
+    
+    [Fact]
+    public void Equality()
+    {
+        var source = @"int main() { a = b == c; }";
+        AssertParse(source);
+    }
+    
+    [Fact]
+    public void Inequality()
+    {
+        var source = @"int main() { a = b != c; }";
+        AssertParse(source);
+    }
+    
+    [Fact]
+    public void Greater_than()
+    {
+        var source = @"int main() { a = b > c; }";
+        AssertParse(source);
+    }
+    
+    [Fact]
+    public void Less_than()
+    {
+        var source = @"int main() { a = b < c; }";
+        AssertParse(source);
+    }
+    
+    [Fact]
+    public void Less_than_or_equal()
+    {
+        var source = @"int main() { a = b <= c; }";
+        AssertParse(source);
+    }
+    
+    [Fact]
+    public void Greater_than_or_equal()
+    {
+        var source = @"int main() { a = b >= c; }";
+        AssertParse(source);
+    }
 
     [Fact]
     public void Empty_return()

@@ -33,21 +33,37 @@ statement: variableDeclaration
 assignment: IDENTIFIER '=' expression ';';
 
 // Expressions
-expression: addExpression;
+expression : conditionalOrExpression;
+
+conditionalOrExpression: conditionalOrExpression '||' conditionalAndExpression
+                       | conditionalAndExpression
+                       ;
+
+conditionalAndExpression: conditionalAndExpression '&&' equalityExpression
+                        | equalityExpression
+                        ;
+
+equalityExpression: equalityExpression ('==' | '!=') relationalExpression
+                  | relationalExpression
+                  ;
+
+relationalExpression: relationalExpression ('<' | '<=' | '>' | '>=') addExpression
+                    | addExpression
+                    ;
 
 addExpression: addExpression ('+' | '-') mulExpression
              | mulExpression
              ;
 
-mulExpression: mulExpression ('*' | '/') atom
-             | atom
+mulExpression: mulExpression ('*' | '/') primary
+             | primary
              ;
 
-atom: '(' expression ')'
-    | IDENTIFIER
-    | functionCall
-    | LITERAL
-    ;
+primary: '(' expression ')'
+       | IDENTIFIER
+       | functionCall
+       | LITERAL
+       ;
 
 // Function call
 functionCall: IDENTIFIER '(' arguments? ')';
@@ -64,7 +80,7 @@ returnStatement: 'return' expression? ';';
 
 // Tokens
 IDENTIFIER: [a-zA-Z_][a-zA-Z_0-9]*;
-LITERAL: LITERAL_INT | LITERAL_CHAR | LITERAL_STRING;
+LITERAL: LITERAL_INT | LITERAL_CHAR | LITERAL_STRING  | 'true' | 'false';
 LITERAL_INT: [0-9]+;
 LITERAL_CHAR: '\'' . '\'';
 LITERAL_STRING: '"' ('\\"' | .)*? '"';

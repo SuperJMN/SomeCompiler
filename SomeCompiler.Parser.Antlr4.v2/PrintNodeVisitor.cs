@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using CSharpFunctionalExtensions;
-using MoreLinq.Extensions;
 
 namespace SomeCompiler.Parser;
 
@@ -133,4 +132,10 @@ public class PrintNodeVisitor : ISyntaxVisitor
     {
         resultBuilder.Append(identifierSyntax.Identifier);
     }
+
+    public void VisitBinaryOperator(BinaryExpressionSyntax binaryExpressionSyntax)
+    {
+        binaryExpressionSyntax.Left.Accept(this);
+        resultBuilder.Append(binaryExpressionSyntax.Operator);
+        binaryExpressionSyntax.Right.Accept(this);    }
 }
