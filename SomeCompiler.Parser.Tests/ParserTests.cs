@@ -115,6 +115,20 @@ public class ParserTests
         var source = @"int main() { a = b >= c; }";
         AssertParse(source);
     }
+    
+    [Fact]
+    public void True()
+    {
+        var source = @"int main() { a = true; }";
+        AssertParse(source);
+    }
+    
+    [Fact]
+    public void False()
+    {
+        var source = @"int main() { a = false; }";
+        AssertParse(source);
+    }
 
     [Fact]
     public void Empty_return()
