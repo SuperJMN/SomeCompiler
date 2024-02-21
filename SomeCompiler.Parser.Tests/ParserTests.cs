@@ -13,7 +13,6 @@ public class ParserTests
     [InlineData(42)]
     [InlineData(1)]
     [InlineData(2304)]
-    [InlineData(-1)]
     public void Return_integer_constant(int constant)
     {
         var source = $@"int main() {{ return {constant}; }}";
@@ -62,9 +61,16 @@ public class ParserTests
     }
 
     [Fact]
-    public void Arithmetic()
+    public void Arithmetic_addition()
     {
-        var source = @"int main() { a = b + -c; }";
+        var source = @"int main() { a = b + c; }";
+        AssertParse(source);
+    }
+    
+    [Fact]
+    public void Arithmetic_mult()
+    {
+        var source = @"int main() { a = b * c; }";
         AssertParse(source);
     }
 

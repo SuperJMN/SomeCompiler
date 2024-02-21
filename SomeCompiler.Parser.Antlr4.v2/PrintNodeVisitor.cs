@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using CSharpFunctionalExtensions;
+using MoreLinq.Extensions;
 
 namespace SomeCompiler.Parser;
 
@@ -68,8 +70,7 @@ public class PrintNodeVisitor : ISyntaxVisitor
         assignmentSyntax.Left.Accept(this);
         resultBuilder.Append("=");
         assignmentSyntax.Right.Accept(this);
-        resultBuilder.Append(";");
-        resultBuilder.AppendLine();
+        resultBuilder.AppendLine(";");
     }
 
     public void VisitExpressionStatement(ExpressionStatementSyntax expressionStatementSyntax)
@@ -81,12 +82,55 @@ public class PrintNodeVisitor : ISyntaxVisitor
 
     public void VisitFunction(FunctionSyntax function)
     {
-        resultBuilder.AppendLine($"{function.Type} {function.Name}()");
+        resultBuilder.AppendLine($"{function.Type} {function.Name}");
+        resultBuilder.Append("(");
+        for (int i = 0; i < function.Parameters.Count; i++)
+        {
+            function.Parameters[i].Accept(this);
+            if (i < function.Parameters.Count - 1)
+            {
+                resultBuilder.Append(", ");
+            }
+        }
+        resultBuilder.Append(")");
         function.Block.Accept(this);
     }
 
     public void VisitConstant(ConstantSyntax constantSyntax)
     {
         resultBuilder.Append(constantSyntax.Value);
+    }
+
+    public void VisitDeclaration(DeclarationSyntax declarationSyntax)
+    {
+        resultBuilder.Append(new string('\t', indentationLevel));
+        resultBuilder.Append(declarationSyntax.Type + " " + declarationSyntax.Name);
+        declarationSyntax.Initialization.Execute(init =>
+        {
+            resultBuilder.Append("=");
+            init.Accept(this);
+        });
+        resultBuilder.AppendLine(";");
+    }
+
+    public void VisitParameter(ParameterSyntax parameterSyntax)
+    {
+        resultBuilder.Append(parameterSyntax.Type + " " + parameterSyntax.Name);
+    }
+
+    public void VisitReturn(ReturnSyntax returnSyntax)
+    {
+        resultBuilder.Append("return");
+        returnSyntax.Expression.Execute(init =>
+        {
+            resultBuilder.Append(" ");
+            init.Accept(this);
+        });
+        resultBuilder.AppendLine(";");
+    }
+
+    public void VisitIdentifier(IdentifierSyntax identifierSyntax)
+    {
+        resultBuilder.Append(identifierSyntax.Identifier);
     }
 }

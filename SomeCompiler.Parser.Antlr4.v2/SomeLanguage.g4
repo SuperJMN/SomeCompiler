@@ -3,8 +3,8 @@
 // We define the main rule that starts parsing the file
 program: (variableDeclaration | function | statement)* EOF;
 
-// Variable declaration
-variableDeclaration: type IDENTIFIER ';';
+// Variable declaration with optional inline initialization
+variableDeclaration: type IDENTIFIER ('=' expression)? ';';
 
 // Data types
 type: 'void' | 'int' | 'char' | 'string' | 'byte';
@@ -17,13 +17,16 @@ parameters: parameter (',' parameter)*;
 parameter: type IDENTIFIER;
 
 // Code blocks, for functions, conditionals, and loops
-block: '{' (variableDeclaration | statement)* '}';
+block: '{' statement* '}';
 
 // Statements that can appear within functions and blocks
-statement: assignment
+statement: variableDeclaration
+          | assignment
           | functionCall ';'
           | conditional
           | whileLoop
+          | block // Allows nested blocks
+          | returnStatement
           ;
 
 // Assignment of values to variables
@@ -55,6 +58,9 @@ arguments: expression (',' expression)*;
 // Control structures
 conditional: 'if' '(' expression ')' block ('else' block)?;
 whileLoop: 'while' '(' expression ')' block;
+
+// Return 
+returnStatement: 'return' expression? ';';
 
 // Tokens
 IDENTIFIER: [a-zA-Z_][a-zA-Z_0-9]*;

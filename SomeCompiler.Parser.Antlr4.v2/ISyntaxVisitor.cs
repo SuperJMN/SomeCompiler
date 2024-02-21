@@ -12,4 +12,8 @@ public interface ISyntaxVisitor
     void VisitExpressionStatement(ExpressionStatementSyntax expressionStatementSyntax);
     void VisitFunction(FunctionSyntax function);
     void VisitConstant(ConstantSyntax constantSyntax);
+    void VisitDeclaration(DeclarationSyntax declarationSyntax);
+    void VisitParameter(ParameterSyntax parameterSyntax);
+    void VisitReturn(ReturnSyntax returnSyntax);
+    void VisitIdentifier(IdentifierSyntax identifierSyntax);
 }
