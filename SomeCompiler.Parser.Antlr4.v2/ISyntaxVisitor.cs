@@ -17,4 +17,5 @@ public interface ISyntaxVisitor
     void VisitReturn(ReturnSyntax returnSyntax);
     void VisitIdentifier(IdentifierSyntax identifierSyntax);
     void VisitBinaryOperator(BinaryExpressionSyntax binaryExpressionSyntax);
+    void VisitIfElse(IfElseSyntax ifElseSyntax);
 }

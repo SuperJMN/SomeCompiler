@@ -138,4 +138,18 @@ public class PrintNodeVisitor : ISyntaxVisitor
         binaryExpressionSyntax.Left.Accept(this);
         resultBuilder.Append(binaryExpressionSyntax.Operator);
         binaryExpressionSyntax.Right.Accept(this);    }
+
+    public void VisitIfElse(IfElseSyntax ifElseSyntax)
+    {
+        resultBuilder.Append("if");
+        resultBuilder.Append("(");
+        ifElseSyntax.Condition.Accept(this);
+        resultBuilder.AppendLine(")");
+        ifElseSyntax.ThenBlock.Accept(this);
+        ifElseSyntax.ElseBlock.Execute(block =>
+        {
+            resultBuilder.AppendLine("else");
+            block.Accept(this);
+        });
+    }
 }

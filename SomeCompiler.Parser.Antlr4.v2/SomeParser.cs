@@ -129,7 +129,13 @@ public class SomeParser
 
     private StatementSyntax ParseWhileLoop(WhileLoopContext whileLoop) => throw new NotImplementedException();
 
-    private StatementSyntax ParseConditional(ConditionalContext conditional) => throw new NotImplementedException();
+    private StatementSyntax ParseConditional(ConditionalContext conditional)
+    {
+        var condition = ParseExpression(conditional.expression());
+        var thenBlock = ParseBlock(conditional.block()[0]);
+        var elseBlock = Maybe.From<BlockContext>(conditional.block().Length > 1 ? conditional.block()[1] : null).Map(context => ParseBlock(context!));
+        return new IfElseSyntax(condition, thenBlock, elseBlock);
+    }
 
     private StatementSyntax ParseAssignment(AssignmentContext assignment)
     {
