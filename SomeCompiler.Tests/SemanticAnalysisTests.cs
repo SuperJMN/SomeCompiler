@@ -1,4 +1,6 @@
 ﻿using SomeCompiler.Binding2;
+using SomeCompiler.Parser;
+using PrintNodeVisitor = SomeCompiler.Binding2.PrintNodeVisitor;
 
 namespace SomeCompiler.Tests;
 
@@ -65,7 +67,7 @@ public class SemanticAnalysisTests
     private IEnumerable<string> Errors(string input)
     {
         // Create a new instance of the SomeParser class.
-        var parser = new SomeCompiler.Parser.Antlr4.SomeParser();
+        var parser = new SomeParser();
         // Parse the input string.
         var parseResult = parser.Parse(input);
         // Check if the parsing was successful.
@@ -83,7 +85,7 @@ public class SemanticAnalysisTests
     private static string Analyze(string input)
     {
         // Create a new instance of the SomeParser class.
-        var parser = new SomeCompiler.Parser.Antlr4.SomeParser();
+        var parser = new SomeParser();
         // Parse the input string.
         var parseResult = parser.Parse(input);
         // Check if the parsing was successful.

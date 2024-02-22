@@ -2,9 +2,9 @@
 
 public class ConstantNode : ExpressionNode
 {
-    public int Value { get; }
+    public object Value { get; }
 
-    public ConstantNode(int value)
+    public ConstantNode(object value)
     {
         Value = value;
     }
