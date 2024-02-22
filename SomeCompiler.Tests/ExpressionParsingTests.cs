@@ -1,5 +1,4 @@
 using Antlr4.Runtime;
-using SomeCompiler.Generation.Intermediate.Model.Codes;
 using SomeCompiler.Parser.Antlr4;
 
 namespace SomeCompiler.Tests;

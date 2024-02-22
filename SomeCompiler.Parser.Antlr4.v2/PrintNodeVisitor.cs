@@ -42,7 +42,7 @@ public class PrintNodeVisitor : ISyntaxVisitor
         {
             parameter.Accept(this);
         }
-        resultBuilder.Append(")");
+        resultBuilder.AppendLine(")");
     }
 
     public void VisitMult(MultExpression multExpression)
@@ -69,7 +69,6 @@ public class PrintNodeVisitor : ISyntaxVisitor
         assignmentSyntax.Left.Accept(this);
         resultBuilder.Append("=");
         assignmentSyntax.Right.Accept(this);
-        resultBuilder.AppendLine(";");
     }
 
     public void VisitExpressionStatement(ExpressionStatementSyntax expressionStatementSyntax)
@@ -137,7 +136,8 @@ public class PrintNodeVisitor : ISyntaxVisitor
     {
         binaryExpressionSyntax.Left.Accept(this);
         resultBuilder.Append(binaryExpressionSyntax.Operator);
-        binaryExpressionSyntax.Right.Accept(this);    }
+        binaryExpressionSyntax.Right.Accept(this);
+    }
 
     public void VisitIfElse(IfElseSyntax ifElseSyntax)
     {

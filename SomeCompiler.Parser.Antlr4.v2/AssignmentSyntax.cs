@@ -1,6 +1,6 @@
 ﻿namespace SomeCompiler.Parser;
 
-public class AssignmentSyntax : StatementSyntax
+public class AssignmentSyntax : ExpressionSyntax
 {
     public AssignmentSyntax(LValue left, ExpressionSyntax right)
     {

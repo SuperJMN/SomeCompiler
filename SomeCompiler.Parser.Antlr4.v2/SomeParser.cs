@@ -74,9 +74,9 @@ public class SomeParser
 
     private StatementSyntax ParseStatement(StatementContext statementContext)
     {
-        if (statementContext.assignment() is { } assignment)
+        if (statementContext.expression() is { } expression)
         {
-            return ParseAssignment(assignment);
+            return new ExpressionStatementSyntax(ParseExpression(expression));
         }
 
         if (statementContext.conditional() is { } conditional)
@@ -87,11 +87,6 @@ public class SomeParser
         if (statementContext.whileLoop() is { } whileLoop)
         {
             return ParseWhileLoop(whileLoop);
-        }
-
-        if (statementContext.functionCall() is { } functionCall)
-        {
-            return ParseFunctionCall(functionCall);
         }
 
         if (statementContext.variableDeclaration() is { } declaration)
@@ -119,12 +114,12 @@ public class SomeParser
         return new DeclarationSyntax(declaration.type().GetText(), declaration.IDENTIFIER().GetText(), maybeInitialization);
     }
 
-    private StatementSyntax ParseFunctionCall(FunctionCallContext functionCall)
+    private ExpressionSyntax ParseFunctionCall(FunctionCallContext functionCall)
     {
         var name = functionCall.IDENTIFIER().ToString()!;
         var arguments = functionCall.arguments().expression().Select(ParseExpression);
         
-        return new ExpressionStatementSyntax(new FunctionCall(name, arguments));
+        return new FunctionCall(name, arguments);
     }
 
     private StatementSyntax ParseWhileLoop(WhileLoopContext whileLoop) => throw new NotImplementedException();
@@ -137,7 +132,7 @@ public class SomeParser
         return new IfElseSyntax(condition, thenBlock, elseBlock);
     }
 
-    private StatementSyntax ParseAssignment(AssignmentContext assignment)
+    private ExpressionSyntax ParseAssignment(AssignmentContext assignment)
     {
         var lvalue = ParseLValue(assignment.IDENTIFIER().GetText());
         return new AssignmentSyntax(lvalue, ParseExpression(assignment.expression()));
@@ -145,6 +140,11 @@ public class SomeParser
 
     private ExpressionSyntax ParseExpression(ExpressionContext expression)
     {
+        if (expression.assignment() is {} assignmentContext)
+        {
+            return ParseAssignment(assignmentContext);
+        }
+
         if (expression.conditionalOrExpression() is { } conditionalOr)
         {
             return ParseConditionalOr(conditionalOr);
@@ -221,30 +221,58 @@ public class SomeParser
         if (mulExpression.mulExpression() is {} multExpr)
         {
             var left = ParseMultExpression(multExpr);
-            var right = ParseAtom(mulExpression.primary());
+            var right = ParseUnary(mulExpression.unaryExpression());
             return new MultExpression(left, right);
         }
         
-        if (mulExpression.primary() is { } atom)
+        if (mulExpression.unaryExpression() is { } unary)
         {
-            return ParseAtom(atom);
+            return ParseUnary(unary);
         }
 
         return new MultExpression(ParseExpression((ExpressionContext)mulExpression.children[0]), ParseExpression((ExpressionContext)mulExpression.children[1]));
     }
 
-    private ExpressionSyntax ParseAtom(PrimaryContext atom)
+    private ExpressionSyntax ParseUnary(UnaryExpressionContext unaryExpression)
     {
-        if (atom.LITERAL() is { } node)
+        if (unaryExpression.unaryExpression() is { } unaryExpr)
+        {
+            return new UnaryExpressionSyntax(ParsePrimary(unaryExpr.primary()));
+        }
+
+        return ParsePrimary(unaryExpression.primary());
+    }
+
+    private ExpressionSyntax ParsePrimary(PrimaryContext primary)
+    {
+        if (primary.LITERAL() is { } node)
         {
             return new ConstantSyntax(node.GetText());
         }
 
-        if (atom.IDENTIFIER() is { } identifier)
+        if (primary.IDENTIFIER() is { } identifier)
         {
             return new IdentifierSyntax(identifier.GetText());
         }
+        
+        if (primary.functionCall() is { } functionCall)
+        {
+            return ParseFunctionCall(functionCall);
+        }
 
+        throw new NotImplementedException();
+    }
+}
+
+internal class UnaryExpressionSyntax : ExpressionSyntax
+{
+    public UnaryExpressionSyntax(ExpressionSyntax parseAtom)
+    {
+        
+    }
+
+    public override void Accept(ISyntaxVisitor visitor)
+    {
         throw new NotImplementedException();
     }
 }

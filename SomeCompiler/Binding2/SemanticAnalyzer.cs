@@ -1,7 +1,4 @@
 ﻿using SomeCompiler.Parser;
-using SomeCompiler.Parser.Model;
-using AddExpression = SomeCompiler.Parser.Model.AddExpression;
-using Program = SomeCompiler.Parser.Model.Program;
 
 namespace SomeCompiler.Binding2;
 
@@ -9,7 +6,7 @@ public class SemanticAnalyzer
 {
     public AnalyzeResult<SemanticNode> Analyze(ProgramSyntax program) => AnalyzeProgram(program, Scope.Empty);
 
-    public AnalyzeResult<SemanticNode> AnalyzeProgram(ProgramSyntax node, Scope scope)
+    private AnalyzeResult<SemanticNode> AnalyzeProgram(ProgramSyntax node, Scope scope)
     {
         var functions = new List<FunctionNode>();
         foreach (var function in node.Functions)
@@ -68,11 +65,6 @@ public class SemanticAnalyzer
 
     private AnalyzeResult<ExpressionNode> AnalyzeExpression(ExpressionSyntax expression, Scope scope)
     {
-        //if (expression is AssignmentExpression assignmentExpression)
-        //{
-        //    return AnalyzeAssignmentExpression(scope, assignmentExpression);
-        //}
-
         if (expression is ConstantSyntax c)
         {
             return new AnalyzeResult<ExpressionNode>(new ConstantNode(c.Value), scope);

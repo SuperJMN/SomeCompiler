@@ -5,8 +5,6 @@ VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler", "SomeCompiler\SomeCompiler.csproj", "{AD8FBFE8-34F6-4650-8DCF-AACBB16982E7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Tests", "SomeCompiler.Tests\SomeCompiler.Tests.csproj", "{C57C6CA4-FF5E-421E-B232-F8A6142F309F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Cli", "SomeCompiler.Cli\SomeCompiler.Cli.csproj", "{13B43791-B656-4121-A523-6D4460FFD247}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Z80", "SomeCompiler.Z80\SomeCompiler.Z80.csproj", "{532F7AD6-E51F-44E2-BC01-12CE3C7225AB}"
@@ -23,15 +21,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sixty502DotNet", "6502DotNe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Main", "Z80DotNet\Main\Main.csproj", "{DF64CDE6-590E-4879-8E0D-DABEBFE10332}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser.Antlr4", "SomeCompiler.Parser.Antlr4\SomeCompiler.Parser.Antlr4.csproj", "{D1D125DA-A75D-405B-BCB4-CCFF71785FCD}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser.Model", "SomeCompiler.Parser.Model\SomeCompiler.Parser.Model.csproj", "{695DCB79-E350-4E13-98A0-A052E13D3BB9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Core", "SomeCompiler.Core\SomeCompiler.Core.csproj", "{4B9A8180-29A9-4C98-BB33-904A9213B59A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser", "SomeCompiler.Parser.Antlr4.v2\SomeCompiler.Parser.csproj", "{3EE64B3C-F442-4DF6-8424-8D609DB7CD1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SomeCompiler.Parser.Tests", "SomeCompiler.Parser.Tests\SomeCompiler.Parser.Tests.csproj", "{152D4954-7A89-4F0D-8CC6-5C6CAF20EA75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Parser.Tests", "SomeCompiler.Parser.Tests\SomeCompiler.Parser.Tests.csproj", "{152D4954-7A89-4F0D-8CC6-5C6CAF20EA75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,10 +39,6 @@ Global
 		{AD8FBFE8-34F6-4650-8DCF-AACBB16982E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD8FBFE8-34F6-4650-8DCF-AACBB16982E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD8FBFE8-34F6-4650-8DCF-AACBB16982E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C57C6CA4-FF5E-421E-B232-F8A6142F309F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C57C6CA4-FF5E-421E-B232-F8A6142F309F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C57C6CA4-FF5E-421E-B232-F8A6142F309F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C57C6CA4-FF5E-421E-B232-F8A6142F309F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{13B43791-B656-4121-A523-6D4460FFD247}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{13B43791-B656-4121-A523-6D4460FFD247}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13B43791-B656-4121-A523-6D4460FFD247}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -75,10 +67,6 @@ Global
 		{DF64CDE6-590E-4879-8E0D-DABEBFE10332}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF64CDE6-590E-4879-8E0D-DABEBFE10332}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF64CDE6-590E-4879-8E0D-DABEBFE10332}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1D125DA-A75D-405B-BCB4-CCFF71785FCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1D125DA-A75D-405B-BCB4-CCFF71785FCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1D125DA-A75D-405B-BCB4-CCFF71785FCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1D125DA-A75D-405B-BCB4-CCFF71785FCD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{695DCB79-E350-4E13-98A0-A052E13D3BB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{695DCB79-E350-4E13-98A0-A052E13D3BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{695DCB79-E350-4E13-98A0-A052E13D3BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU

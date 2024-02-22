@@ -7,6 +7,11 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="CompilerFrontend.cs" />
+    <Compile Remove="CompilerTests.cs" />
+    <Compile Remove="IntermediateCodeGeneratorTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CodingHelmet.EasyParse" Version="1.3.2" />
     <PackageReference Include="CSharpFunctionalExtensions.FluentAssertions" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
@@ -24,7 +29,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\6502DotNet\Sixty502DotNet\Sixty502DotNet.csproj" />
-    <ProjectReference Include="..\SomeCompiler.Parser.Antlr4\SomeCompiler.Parser.Antlr4.csproj" />
     <ProjectReference Include="..\SomeCompiler.VirtualMachine.Tests\SomeCompiler.VirtualMachine.Tests.csproj" />
     <ProjectReference Include="..\SomeCompiler\SomeCompiler.csproj" />
   </ItemGroup>

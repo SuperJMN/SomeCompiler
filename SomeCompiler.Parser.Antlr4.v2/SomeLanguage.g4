@@ -21,49 +21,43 @@ block: '{' statement* '}';
 
 // Statements that can appear within functions and blocks
 statement: variableDeclaration
-          | assignment
-          | functionCall ';'
+          | expression ';'
           | conditional
           | whileLoop
           | block // Allows nested blocks
           | returnStatement
           ;
 
-// Assignment of values to variables
-assignment: IDENTIFIER '=' expression ';';
-
 // Expressions
-expression : conditionalOrExpression;
+expression: assignment | conditionalOrExpression ;
+
+assignment: IDENTIFIER '=' expression ;
 
 conditionalOrExpression: conditionalOrExpression '||' conditionalAndExpression
-                       | conditionalAndExpression
-                       ;
+                       | conditionalAndExpression ;
 
 conditionalAndExpression: conditionalAndExpression '&&' equalityExpression
-                        | equalityExpression
-                        ;
+                        | equalityExpression ;
 
 equalityExpression: equalityExpression ('==' | '!=') relationalExpression
-                  | relationalExpression
-                  ;
+                  | relationalExpression ;
 
 relationalExpression: relationalExpression ('<' | '<=' | '>' | '>=') addExpression
-                    | addExpression
-                    ;
+                    | addExpression ;
 
 addExpression: addExpression ('+' | '-') mulExpression
-             | mulExpression
-             ;
+             | mulExpression ;
 
-mulExpression: mulExpression ('*' | '/') primary
-             | primary
-             ;
+mulExpression: mulExpression ('*' | '/') unaryExpression
+             | unaryExpression ;
+
+unaryExpression: ('+' | '-' | '!') unaryExpression
+               | primary ;
 
 primary: '(' expression ')'
        | IDENTIFIER
        | functionCall
-       | LITERAL
-       ;
+       | LITERAL ;
 
 // Function call
 functionCall: IDENTIFIER '(' arguments? ')';
@@ -75,7 +69,7 @@ arguments: expression (',' expression)*;
 conditional: 'if' '(' expression ')' block ('else' block)?;
 whileLoop: 'while' '(' expression ')' block;
 
-// Return 
+// Return statement
 returnStatement: 'return' expression? ';';
 
 // Tokens

@@ -1,13 +1,13 @@
-﻿using SomeCompiler.Binding.Model;
+﻿//using SomeCompiler.Binding.Model;
 
-namespace SomeCompiler.Binding;
+//namespace SomeCompiler.Binding;
 
-public class SymbolType
-{
-    public SymbolType(BoundType type)
-    {
-        Type = type;
-    }
+//public class SymbolType
+//{
+//    public SymbolType(BoundType type)
+//    {
+//        Type = type;
+//    }
 
-    public BoundType Type { get; set; }
-}
+//    public BoundType Type { get; set; }
+//}
