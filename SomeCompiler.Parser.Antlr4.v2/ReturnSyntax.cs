@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace SomeCompiler.Parser;
+﻿namespace SomeCompiler.Parser;
 
 public class ReturnSyntax : StatementSyntax
 {

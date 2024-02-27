@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using SomeCompiler.Parser;
+﻿using SomeCompiler.Parser;
 
 namespace SomeCompiler.SemanticAnalysis;
 

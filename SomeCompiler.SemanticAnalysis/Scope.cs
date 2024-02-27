@@ -1,6 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-
-namespace SomeCompiler.SemanticAnalysis;
+﻿namespace SomeCompiler.SemanticAnalysis;
 
 public class Scope
 {

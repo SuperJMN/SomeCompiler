@@ -1,7 +1,6 @@
 ﻿// Template generated code from Antlr4BuildTasks.Template v 8.17
 
 using System.Collections.ObjectModel;
-using Antlr4.Runtime;
 
 namespace SomeCompiler.Parser;
 
