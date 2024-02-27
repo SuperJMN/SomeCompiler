@@ -7,11 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="Binding\Model\**" />
       <Compile Remove="Generation\**" />
-      <EmbeddedResource Remove="Binding\Model\**" />
       <EmbeddedResource Remove="Generation\**" />
-      <None Remove="Binding\Model\**" />
       <None Remove="Generation\**" />
     </ItemGroup>
 

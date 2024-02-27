@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions.ValueTasks;
-using SomeCompiler.Binding;
 using SomeCompiler.Parser;
 
 namespace SomeCompiler;
