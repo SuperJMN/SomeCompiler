@@ -152,6 +152,13 @@ public class ParserTests
     }
     
     [Fact]
+    public void Parenthesis_are_OK()
+    {
+        var source = @"int main() { a = 2*(3+2); }";
+        AssertParse(source);
+    }
+    
+    [Fact]
     public void Call()
     {
         var source = @"int main() { Func(13); }";

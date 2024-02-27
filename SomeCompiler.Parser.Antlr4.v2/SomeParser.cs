@@ -221,7 +221,7 @@ public class SomeParser
         {
             var left = ParseMultExpression(multExpr);
             var right = ParseUnary(mulExpression.unaryExpression());
-            return new MultExpression(left, right);
+            return new BinaryExpressionSyntax(left, right, Operator.Multiplication);
         }
         
         if (mulExpression.unaryExpression() is { } unary)
@@ -229,7 +229,9 @@ public class SomeParser
             return ParseUnary(unary);
         }
 
-        return new MultExpression(ParseExpression((ExpressionContext)mulExpression.children[0]), ParseExpression((ExpressionContext)mulExpression.children[1]));
+        var l = ParseExpression((ExpressionContext)mulExpression.children[0]);
+        var r = ParseExpression((ExpressionContext)mulExpression.children[1]);
+        return new BinaryExpressionSyntax(l, r, Operator.Multiplication);
     }
 
     private ExpressionSyntax ParseUnary(UnaryExpressionContext unaryExpression)
@@ -259,6 +261,10 @@ public class SomeParser
             return ParseFunctionCall(functionCall);
         }
 
+        if (primary.children[0].GetText() == "(")
+        {
+            return ParseExpression((ExpressionContext) primary.children[1]);
+        }
         throw new NotImplementedException();
     }
 }

@@ -44,13 +44,6 @@ public class PrintNodeVisitor : ISyntaxVisitor
         resultBuilder.AppendLine(")");
     }
 
-    public void VisitMult(MultExpression multExpression)
-    {
-        multExpression.Left.Accept(this);
-        resultBuilder.Append("*");
-        multExpression.Right.Accept(this);
-    }
-
     public void VisitIdentifierLValue(IdentifierLValue identifierLValue)
     {
         resultBuilder.Append(identifierLValue.Identifier);
@@ -126,9 +119,24 @@ public class PrintNodeVisitor : ISyntaxVisitor
 
     public void VisitBinaryOperator(BinaryExpressionSyntax binaryExpressionSyntax)
     {
-        binaryExpressionSyntax.Left.Accept(this);
+        VisitOperand(binaryExpressionSyntax, binaryExpressionSyntax.Left);
         resultBuilder.Append(binaryExpressionSyntax.Operator.Symbol);
-        binaryExpressionSyntax.Right.Accept(this);
+        VisitOperand(binaryExpressionSyntax, binaryExpressionSyntax.Right);
+    }
+
+    private void VisitOperand(BinaryExpressionSyntax parent, ExpressionSyntax child)
+    {
+        if (child is BinaryExpressionSyntax childBinary)
+        {
+            if (childBinary.Operator.Precedence > parent.Operator.Precedence)
+            {
+                resultBuilder.Append("(");
+                child.Accept(this);
+                resultBuilder.Append(")");
+                return;
+            }
+        }
+        child.Accept(this);
     }
 
     public void VisitIfElse(IfElseSyntax ifElseSyntax)
