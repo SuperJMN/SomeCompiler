@@ -209,7 +209,7 @@ public class SomeParser
         {
             var left = ParseAddExpression(addExpr);
             var right = ParseMultExpression(addExpression.mulExpression());
-            return new AddExpression(left, right);
+            return new BinaryExpressionSyntax(left, right, Operator.Addition);
         }
 
         return ParseMultExpression(addExpression.mulExpression());

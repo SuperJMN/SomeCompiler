@@ -56,13 +56,6 @@ public class PrintNodeVisitor : ISyntaxVisitor
         resultBuilder.Append(identifierLValue.Identifier);
     }
 
-    public void VisitAdd(AddExpression addExpression)
-    {
-        addExpression.Left.Accept(this);
-        resultBuilder.Append("+");
-        addExpression.Right.Accept(this);
-    }
-
     public void VisitAssignment(AssignmentSyntax assignmentSyntax)
     {
         assignmentSyntax.Left.Accept(this);

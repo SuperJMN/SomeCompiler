@@ -75,7 +75,7 @@ public class PrintNodeVisitor : INodeVisitor
     public void VisitBinaryExpression(BinaryExpressionNode binaryExpressionNode)
     {
         binaryExpressionNode.Left.Accept(this);
-        resultBuilder.Append(binaryExpressionNode.Operator);
+        resultBuilder.Append(binaryExpressionNode.Operator.Symbol);
         binaryExpressionNode.Right.Accept(this);
     }
 
@@ -84,4 +84,3 @@ public class PrintNodeVisitor : INodeVisitor
         return resultBuilder.ToString();
     }
 }
-
