@@ -1,16 +1,24 @@
-﻿namespace SomeCompiler.SemanticAnalysis;
+﻿
+using SomeCompiler.Core;
 
-public abstract class BinaryExpressionNode : ExpressionNode
+namespace SomeCompiler.SemanticAnalysis;
+
+public class BinaryExpressionNode : ExpressionNode
 {
     public ExpressionNode Left { get; }
     public ExpressionNode Right { get; }
-    public string Symbol { get; }
+    public Operator Operator { get; }
 
-    public BinaryExpressionNode(ExpressionNode left, ExpressionNode right, string symbol)
+    public BinaryExpressionNode(ExpressionNode left, ExpressionNode right, Operator op)
     {
         Left = left;
         Right = right;
-        Symbol = symbol;
+        Operator = op;
+    }
+
+    public override void Accept(INodeVisitor visitor)
+    {
+        visitor.VisitBinaryExpression(this);
     }
 
     public override IEnumerable<SemanticNode> Children => [Left, Right];

@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SomeCompiler.Core\SomeCompiler.Core.csproj" />
     <ProjectReference Include="..\SomeCompiler.Parser.Antlr4.v2\SomeCompiler.Parser.csproj" />
   </ItemGroup>
 

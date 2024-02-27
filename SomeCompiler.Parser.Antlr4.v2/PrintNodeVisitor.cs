@@ -134,7 +134,7 @@ public class PrintNodeVisitor : ISyntaxVisitor
     public void VisitBinaryOperator(BinaryExpressionSyntax binaryExpressionSyntax)
     {
         binaryExpressionSyntax.Left.Accept(this);
-        resultBuilder.Append(binaryExpressionSyntax.Operator);
+        resultBuilder.Append(binaryExpressionSyntax.Operator.Symbol);
         binaryExpressionSyntax.Right.Accept(this);
     }
 

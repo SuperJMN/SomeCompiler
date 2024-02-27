@@ -67,13 +67,6 @@ public class PrintNodeVisitor : INodeVisitor
         resultBuilder.Append($"<Unknown '{unknownSymbol}' 😕>");
     }
 
-    public void VisitAddition(AddExpressionNode addExpressionNode)
-    {
-        addExpressionNode.Left.Accept(this);
-        resultBuilder.Append("+");
-        addExpressionNode.Right.Accept(this);
-    }
-
     public void VisitSymbolExpression(SymbolExpressionNode symbolExpressionNode)
     {
         symbolExpressionNode.SymbolNode.Accept(this);
@@ -82,7 +75,7 @@ public class PrintNodeVisitor : INodeVisitor
     public void VisitBinaryExpression(BinaryExpressionNode binaryExpressionNode)
     {
         binaryExpressionNode.Left.Accept(this);
-        resultBuilder.Append(binaryExpressionNode.Symbol);
+        resultBuilder.Append(binaryExpressionNode.Operator);
         binaryExpressionNode.Right.Accept(this);
     }
 

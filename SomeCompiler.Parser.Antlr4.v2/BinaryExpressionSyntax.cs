@@ -1,12 +1,14 @@
-﻿namespace SomeCompiler.Parser;
+﻿using SomeCompiler.Core;
+
+namespace SomeCompiler.Parser;
 
 public class BinaryExpressionSyntax : ExpressionSyntax
 {
     public ExpressionSyntax Left { get; }
     public ExpressionSyntax Right { get; }
-    public string Operator { get; }
+    public Operator Operator { get; }
 
-    public BinaryExpressionSyntax(ExpressionSyntax left, ExpressionSyntax right, string @operator)
+    public BinaryExpressionSyntax(ExpressionSyntax left, ExpressionSyntax right, Operator @operator)
     {
         Left = left;
         Right = right;

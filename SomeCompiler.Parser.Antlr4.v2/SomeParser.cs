@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using SomeCompiler.Core;
 using Zafiro.Core.Mixins;
 using static SomeCompiler.Parser.SomeLanguageParser;
 namespace SomeCompiler.Parser;
@@ -157,7 +158,7 @@ public class SomeParser
         {
             var left = ParseConditionalOr(or);
             var right = ParseConditionalAnd(conditionalOr.conditionalAndExpression());
-            return new BinaryExpressionSyntax(left, right, "||");
+            return new BinaryExpressionSyntax(left, right, Operator.Get("||"));
         }
 
         return ParseConditionalAnd(conditionalOr.conditionalAndExpression());
@@ -169,7 +170,7 @@ public class SomeParser
         {
             var left = ParseConditionalAnd(conditionalAnd);
             var right = ParseConditionalEquality(conditionalAnd.equalityExpression());
-            return new BinaryExpressionSyntax(left, right, "&&");
+            return new BinaryExpressionSyntax(left, right, Operator.Get("&&"));
         }
         
         return ParseConditionalEquality(conditionalAndExpression.equalityExpression());
@@ -181,7 +182,7 @@ public class SomeParser
         {
             var left = ParseConditionalEquality(equality);
             var right = ParseConditionalRelational(equalityExpression.relationalExpression());
-            return new BinaryExpressionSyntax(left, right, equalityExpression.children[1].GetText());
+            return new BinaryExpressionSyntax(left, right, Operator.Get(equalityExpression.children[1].GetText()));
         }
         
         return ParseConditionalRelational(equalityExpression.relationalExpression());
@@ -194,7 +195,7 @@ public class SomeParser
             var left = ParseConditionalRelational(relational);
             var right = ParseAddExpression(relationalExpression.addExpression());
             var @operator = relationalExpression.children[1].GetText();
-            return new BinaryExpressionSyntax(left, right, @operator);
+            return new BinaryExpressionSyntax(left, right, Operator.Get(@operator));
         }
         
         return ParseAddExpression(relationalExpression.addExpression());

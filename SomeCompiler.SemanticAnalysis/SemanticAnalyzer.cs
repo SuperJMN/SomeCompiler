@@ -65,6 +65,11 @@ public class SemanticAnalyzer
 
     private AnalyzeResult<ExpressionNode> AnalyzeExpression(ExpressionSyntax expression, Scope scope)
     {
+        if (expression is AssignmentSyntax assignment)
+        {
+            return AnalyzeAssignmentExpression(assignment, scope);
+        }
+        
         if (expression is ConstantSyntax c)
         {
             return new AnalyzeResult<ExpressionNode>(new ConstantNode(c.Value), scope);
@@ -110,27 +115,24 @@ public class SemanticAnalyzer
 
     private AnalyzeResult<ExpressionNode> AnalyzeBinaryExpression(BinaryExpressionSyntax binaryExpression, Scope scope)
     {
-        if (binaryExpression is AddExpression)
-        {
-            var left = AnalyzeExpression(binaryExpression.Left, scope);
-            var right = AnalyzeExpression(binaryExpression.Right, scope);
-            return new AnalyzeResult<ExpressionNode>(new AddExpressionNode(left.Node, right.Node), scope);
-        }
+        var left = AnalyzeExpression(binaryExpression.Left, scope);
+        var right = AnalyzeExpression(binaryExpression.Right, scope);
+        return new AnalyzeResult<ExpressionNode>(new BinaryExpressionNode(left.Node, right.Node, binaryExpression.Operator), scope);
 
         throw new InvalidOperationException("Por aquí no vas a ningún sitio tampoco");
     }
 
-    //private AnalyzeResult<ExpressionNode> AnalyzeAssignmentExpression(Scope scope, AssignmentExpression assignmentExpression)
-    //{
-    //    var symbolNode = GetSymbolNode(scope, assignmentExpression.Left.Identifier);
+    private AnalyzeResult<ExpressionNode> AnalyzeAssignmentExpression(AssignmentSyntax assignment, Scope scope)
+    {
+        var symbolNode = GetSymbolNode(scope, ((IdentifierLValue)assignment.Left).Identifier);
 
-    //    var analyzeExpression = AnalyzeExpression(assignmentExpression.Right, scope);
+        var analyzeExpression = AnalyzeExpression(assignment.Right, scope);
 
-    //    return new AnalyzeResult<ExpressionNode>(new AssignmentNode(symbolNode, analyzeExpression.Node)
-    //    {
-    //        Errors = SymbolError(symbolNode)
-    //    }, scope);
-    //}
+        return new AnalyzeResult<ExpressionNode>(new AssignmentNode(symbolNode, analyzeExpression.Node)
+        {
+            Errors = SymbolError(symbolNode)
+        }, scope);
+    }
 
     private AnalyzeResult<StatementNode> AnalyzeDeclaration(DeclarationSyntax declarationStatement, Scope scope)
     {
