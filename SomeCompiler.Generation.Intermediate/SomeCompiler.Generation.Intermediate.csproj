@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Model\Fragment.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SomeCompiler.SemanticAnalysis\SomeCompiler.SemanticAnalysis.csproj" />
   </ItemGroup>
 

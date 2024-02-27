@@ -1,6 +1,3 @@
-using CodeGeneration.Model.Classes;
-using SomeCompiler.Generation.Intermediate.Model.Codes;
-
 namespace SomeCompiler.Generation.Intermediate.Model;
 
 public class Fragment
@@ -11,8 +8,8 @@ public class Fragment
 
     public Fragment(Func<Reference, Code> codeFactory, IEnumerable<Code> codes)
     {
-        Reference = new Placeholder();
-        Codes = codes.Concat(new[] {codeFactory(Reference)});
+        Reference = new PlaceholderReference();
+        Codes = codes.Concat(new[] { codeFactory(Reference) });
     }
 
     public Fragment(Reference reference, IEnumerable<Code> codes)

@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices.JavaScript;
 using CSharpFunctionalExtensions;
+using SomeCompiler.Core;
+using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.SemanticAnalysis;
 
 namespace SomeCompiler.Generation.Intermediate;
@@ -114,39 +116,102 @@ public class IntermediateCodeGenerator
         return statement switch
         {
             DeclarationNode decl => GenerateDeclaration(decl),
-            ExpressionStatementNode expressionStatement => GenerateExpressionStatement(expressionStatement),
+            ExpressionStatementNode expressionStatement => GenerateExpressionStatement(expressionStatement).Codes,
             _ => throw new ArgumentOutOfRangeException(nameof(statement))
         };
     }
 
-    private IEnumerable<Code> GenerateExpressionStatement(ExpressionStatementNode expressionStatement)
+    private Fragment GenerateExpressionStatement(ExpressionStatementNode expr)
     {
-        throw new NotImplementedException();
+        return GenerateExpression(expr.Expression);
+    }
+
+    private Fragment GenerateBinaryExpression(BinaryExpressionNode binaryExpression)
+    {
+        var left = GenerateExpression(binaryExpression.Left);
+        var right = GenerateExpression(binaryExpression.Right);
+        var op = binaryExpression.Operator;
+        return new Fragment(reference => GetCodeFromBinaryExpression(reference, left.Reference, right.Reference, op))
+            .Prepend(right)
+            .Prepend(left);
+    }
+
+    private Code GetCodeFromBinaryExpression(Reference reference, Reference left, Reference right, Operator op)
+    {
+        return new BinaryExpressionCode(reference, left, right, op);
+    }
+
+    private Fragment GenerateExpression(ExpressionNode expr)
+    {
+        if (expr is BinaryExpressionNode binaryExpr)
+        {
+            return GenerateBinaryExpression(binaryExpr);
+        }
+
+        if (expr is SymbolExpressionNode { SymbolNode: KnownSymbolNode { } symbol }  symbolExpr )
+        {
+            return new Fragment(reference => new AssignCode(symbol.Symbol.Name, reference));
+        }
+        
+        if (expr is ConstantNode constant)
+        {
+            return new Fragment(reference => new AssignConstant(reference, constant));
+        }
+
+        throw new InvalidOperationException();
     }
 
     private IEnumerable<Code> GenerateDeclaration(DeclarationNode decl)
     {
         throw new NotImplementedException();
     }
+}
 
-    //private Fragment Generate(BoundExpressionStatement boundExpressionStatement)
-    //{
-    //    return boundExpressionStatement.Expression switch
-    //    {
-    //        BoundAssignmentExpression boundAssignmentExpression => Generate(boundAssignmentExpression),
-    //        BoundBinaryExpression boundBinaryExpression => Generate(boundBinaryExpression),
-    //        BoundConstantExpression boundConstantExpression => Generate(boundConstantExpression),
-    //        BoundIdentifierExpression boundIdentifierExpression => Generate(boundIdentifierExpression),
-    //        _ => throw new ArgumentOutOfRangeException()
-    //    };
-    //}
+internal class AssignConstant : Code
+{
+    public Reference Reference { get; }
+    public ConstantNode Constant { get; }
+
+    public AssignConstant(Reference reference, ConstantNode constant)
+    {
+        Reference = reference;
+        Constant = constant;
+    }
+}
+
+internal class AssignCode : Code
+{
+    public string SymbolName { get; }
+    public Reference Reference { get; }
+
+    public AssignCode(string symbolName, Reference reference)
+    {
+        SymbolName = symbolName;
+        Reference = reference;
+    }
+}
+
+internal class BinaryExpressionCode : Code
+{
+    public Reference Target { get; }
+    public Reference LeftReference { get; }
+    public Reference RightReference { get; }
+
+    public BinaryExpressionCode(Reference target, Reference leftReference, Reference rightReference, Operator op)
+    {
+        Target = target;
+        LeftReference = leftReference;
+        RightReference = rightReference;
+    }
 }
 
 internal class FunctionCode : Code
 {
+    public FunctionNode Function { get; }
+
     public FunctionCode(FunctionNode function)
     {
-        throw new NotImplementedException();
+        Function = function;
     }
 }
 
@@ -156,13 +221,31 @@ public class Halt : Code
 
 public class Call : Code
 {
+    public FunctionNode Main { get; }
+
     public Call(FunctionNode main)
     {
-        throw new NotImplementedException();
+        Main = main;
     }
 }
 
 public abstract class Code
+{
+}
+
+public abstract class Reference;
+
+class KnownReference : Reference
+{
+    public Symbol Symbol { get; }
+
+    public KnownReference(Symbol symbol)
+    {
+        Symbol = symbol;
+    }
+}
+
+public class PlaceholderReference : Reference
 {
 }
 
