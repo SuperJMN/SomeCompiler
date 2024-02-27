@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SomeCompiler.SemanticAnalys
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SomeCompiler.SemanticAnalysis.Tests", "SomeCompiler.SemanticAnalysis.Tests\SomeCompiler.SemanticAnalysis.Tests.csproj", "{63F53050-072B-4856-9983-9736BBBCDDEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SomeCompiler.Generation.Intermediate", "SomeCompiler.Generation.Intermediate\SomeCompiler.Generation.Intermediate.csproj", "{E2E405ED-3701-440A-A177-5C6D4D3821C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{63F53050-072B-4856-9983-9736BBBCDDEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63F53050-072B-4856-9983-9736BBBCDDEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63F53050-072B-4856-9983-9736BBBCDDEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2E405ED-3701-440A-A177-5C6D4D3821C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2E405ED-3701-440A-A177-5C6D4D3821C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2E405ED-3701-440A-A177-5C6D4D3821C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2E405ED-3701-440A-A177-5C6D4D3821C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
