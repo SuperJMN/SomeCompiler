@@ -74,9 +74,24 @@ public class PrintNodeVisitor : INodeVisitor
 
     public void VisitBinaryExpression(BinaryExpressionNode binaryExpressionNode)
     {
-        binaryExpressionNode.Left.Accept(this);
+        VisitOperand(binaryExpressionNode, binaryExpressionNode.Left);
         resultBuilder.Append(binaryExpressionNode.Operator.Symbol);
-        binaryExpressionNode.Right.Accept(this);
+        VisitOperand(binaryExpressionNode, binaryExpressionNode.Right);
+    }
+    
+    private void VisitOperand(BinaryExpressionNode parent, ExpressionNode child)
+    {
+        if (child is BinaryExpressionNode childBinary)
+        {
+            if (childBinary.Operator.Precedence > parent.Operator.Precedence)
+            {
+                resultBuilder.Append("(");
+                child.Accept(this);
+                resultBuilder.Append(")");
+                return;
+            }
+        }
+        child.Accept(this);
     }
 
     public override string ToString()
