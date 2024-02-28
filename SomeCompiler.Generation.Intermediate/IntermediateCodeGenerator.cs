@@ -150,7 +150,7 @@ public class IntermediateCodeGenerator
 
         if (expr is SymbolExpressionNode { SymbolNode: KnownSymbolNode { } symbol }  symbolExpr )
         {
-            return new Fragment(reference => new AssignCode(symbol.Symbol.Name, reference));
+            return new Fragment(reference => new AssignReference(reference, new KnownReference(symbol.Symbol)));
         }
         
         if (expr is ConstantNode constant)
@@ -158,12 +158,21 @@ public class IntermediateCodeGenerator
             return new Fragment(reference => new AssignConstant(reference, constant));
         }
 
+        if (expr is AssignmentNode assignment)
+        {
+            var reference = new KnownReference(((KnownSymbolNode)assignment.Left).Symbol);
+            var expressionFragment = GenerateExpression(assignment.Right);
+
+            Code code = new AssignReference(reference, expressionFragment.Reference);
+            return new Fragment(reference, expressionFragment.Codes.Concat(new[] { code }));
+        }
+
         throw new InvalidOperationException();
     }
 
     private IEnumerable<Code> GenerateDeclaration(DeclarationNode decl)
     {
-        throw new NotImplementedException();
+        return Enumerable.Empty<Code>();
     }
 }
 
@@ -179,15 +188,15 @@ internal class AssignConstant : Code
     }
 }
 
-internal class AssignCode : Code
+internal class AssignReference : Code
 {
-    public string SymbolName { get; }
-    public Reference Reference { get; }
+    public Reference Target { get; }
+    public Reference Source { get; }
 
-    public AssignCode(string symbolName, Reference reference)
+    public AssignReference(Reference target, Reference source)
     {
-        SymbolName = symbolName;
-        Reference = reference;
+        Target = target;
+        Source = source;
     }
 }
 

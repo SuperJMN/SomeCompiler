@@ -1,24 +1,20 @@
 using SomeCompiler.Core;
+using SomeCompiler.Parser;
 using SomeCompiler.SemanticAnalysis;
 
-namespace SomeCompiler.Generation.Intermediate.Tests
+namespace SomeCompiler.Generation.Intermediate.Tests;
+
+public class UnitTest1
 {
-    public class UnitTest1
+    [Fact]
+    public void Test1()
     {
-        [Fact]
-        public void Test1()
-        {
-            var gen = new IntermediateCodeGenerator();
-            var symbolExpressionNode = new SymbolExpressionNode(new KnownSymbolNode(new Symbol("a", IntType.Instance)));
-            var codes = gen.GenerateFunction(new ProgramNode(new List<FunctionNode>()
-            {
-                new("Hola", new BlockNode(new List<StatementNode>()
-                {
-                    new ExpressionStatementNode(new BinaryExpressionNode(symbolExpressionNode, new ConstantNode(1), Operator.Addition))
-                }))
-            }));
-            
-            
-        }
+        var input = "void main() { int a; int b; a = b + 1; }";
+
+        var parser = new SomeParser();
+        var semanticAnalyzer = new SemanticAnalyzer();
+        var result = semanticAnalyzer.Analyze(parser.Parse(input).Value);
+        var gen = new IntermediateCodeGenerator();
+        var codes = gen.GenerateFunction((ProgramNode) result.Node);
     }
 }
