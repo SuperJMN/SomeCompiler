@@ -1,0 +1,33 @@
+﻿<!-- Template generated code from Antlr4BuildTasks.Template v 8.17 -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputType>Exe</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Antlr4 Include="SomeLanguage.g4">
+			<Package>SomeCompiler.Parser</Package>
+		</Antlr4>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
+		<PackageReference Include="Antlr4BuildTasks" Version="8.17" PrivateAssets="all" />
+		<PackageReference Include="CodingHelmet.EasyParse" Version="1.3.2" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="2.41.0" />
+		<PackageReference Include="Zafiro.Core" Version="3.2.36" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\SomeCompiler.Core\SomeCompiler.Core.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>3021;1701;1702</NoWarn>
+	</PropertyGroup>
+
+</Project>

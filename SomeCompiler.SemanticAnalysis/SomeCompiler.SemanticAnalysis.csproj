@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Zafiro.Core" Version="3.2.36" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SomeCompiler.Core\SomeCompiler.Core.csproj" />
+    <ProjectReference Include="..\SomeCompiler.Parser.Antlr4.v2\SomeCompiler.Parser.csproj" />
+  </ItemGroup>
+
+</Project>

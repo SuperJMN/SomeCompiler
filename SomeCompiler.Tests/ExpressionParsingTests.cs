@@ -27,13 +27,13 @@ public class ExpressionParsingTests
         AssertExpression(input);
     }
 
-    private void AssertExpression(string s)
+    private void AssertExpression(string expressionText)
     {
-        var lexer = new CLexer(CharStreams.fromString(s));
+        var lexer = new CLexer(CharStreams.fromString(expressionText));
         var parser = new CParser(new CommonTokenStream(lexer));
         var expr = parser.expression();
 
         var ret = new ExpressionConverter().ParseExpression(expr);
-        ret.ToString().RemoveWhitespace().Should().Be(s.RemoveWhitespace());
+        ret.ToString().Should().BeEquivalentToIgnoringWhitespace(expressionText);
     }
 }
