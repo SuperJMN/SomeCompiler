@@ -1,20 +1,18 @@
-using CodeGeneration.Model.Classes;
-
 namespace SomeCompiler.Generation.Intermediate.Model.Codes;
 
-public record Multiply(Reference Target, Reference Left, Reference Right) : Code
+public record Multiply(CodeGeneration.Model.Classes.Reference Target, CodeGeneration.Model.Classes.Reference Left, CodeGeneration.Model.Classes.Reference Right) : Code
 {
     public override string ToString()
     {
         return $"{Target} = {Left} + {Right}";
     }
 
-    public override string ToString(Dictionary<Reference, string> map)
+    public override string ToString(Dictionary<CodeGeneration.Model.Classes.Reference, string> map)
     {
         return $"{map[Target]} = {map[Left]} * {map[Right]}";
     }
 
-    public override IEnumerable<Reference> GetReferences()
+    public override IEnumerable<CodeGeneration.Model.Classes.Reference> GetReferences()
     {
         yield return Target;
         yield return Left;

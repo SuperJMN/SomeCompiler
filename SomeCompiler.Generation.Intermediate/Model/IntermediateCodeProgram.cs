@@ -3,9 +3,13 @@ using Zafiro.Core.Mixins;
 
 namespace SomeCompiler.Generation.Intermediate.Model;
 
-public class IntermediateCodeProgram : List<Code>
+public class IntermediateCodeProgram : List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>
 {
-    public IntermediateCodeProgram(IEnumerable<Code> codes) : base(codes)
+    public IntermediateCodeProgram()
+    {
+    }
+
+    public IntermediateCodeProgram(IEnumerable<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) : base(codes)
     {
     }
 

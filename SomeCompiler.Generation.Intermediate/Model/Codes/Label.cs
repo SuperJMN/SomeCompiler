@@ -1,10 +1,8 @@
-using CodeGeneration.Model.Classes;
-
 namespace SomeCompiler.Generation.Intermediate.Model.Codes;
 
 public record Label(string Name) : Code
 {
-    public override string ToString(Dictionary<Reference, string> map)
+    public override string ToString(Dictionary<CodeGeneration.Model.Classes.Reference, string> map)
     {
         return $"label {Name}";
     }

@@ -1,8 +1,6 @@
-using CodeGeneration.Model.Classes;
-
 namespace SomeCompiler.Generation.Intermediate.Model;
 
-public class LabelReference : Reference
+public class LabelReference : CodeGeneration.Model.Classes.Reference
 {
     public LabelReference(string label)
     {

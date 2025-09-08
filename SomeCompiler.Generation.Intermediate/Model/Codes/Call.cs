@@ -1,5 +1,3 @@
-using CodeGeneration.Model.Classes;
-
 namespace SomeCompiler.Generation.Intermediate.Model.Codes;
 
 public record Call(string Name) : Code
@@ -9,7 +7,7 @@ public record Call(string Name) : Code
         return $"{base.ToString()}";
     }
 
-    public override string ToString(Dictionary<Reference, string> map)
+    public override string ToString(Dictionary<CodeGeneration.Model.Classes.Reference, string> map)
     {
         return $"call {Name}";
     }

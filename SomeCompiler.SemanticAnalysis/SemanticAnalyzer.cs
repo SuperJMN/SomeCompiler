@@ -21,21 +21,28 @@ public class SemanticAnalyzer
 
     private AnalyzeResult<FunctionNode> AnalyzeFunction(FunctionSyntax function, Scope parentScope)
     {
-        var analyzeBlockResult = AnalyzeBlock(function.Block, parentScope);
-        return new AnalyzeResult<FunctionNode>(new FunctionNode(function.Name, analyzeBlockResult.Node), analyzeBlockResult.Scope);
+        // Create a child scope for the function body so locals don't leak out
+        var functionScope = new Scope(parentScope);
+        var analyzeBlockResult = AnalyzeBlock(function.Block, functionScope);
+        var node = new FunctionNode(function.Name, analyzeBlockResult.Node);
+        // Return the unchanged parent scope (function-local declarations are not visible outside)
+        return new AnalyzeResult<FunctionNode>(node, parentScope);
     }
 
-    private AnalyzeResult<BlockNode> AnalyzeBlock(BlockSyntax block, Scope scope)
+    private AnalyzeResult<BlockNode> AnalyzeBlock(BlockSyntax block, Scope outerScope)
     {
+        // Each block introduces a new child scope
+        var blockScope = new Scope(outerScope);
         var statements = new List<StatementNode>();
         foreach (var statement in block.Statements)
         {
-            var analyzedStatementResult = AnalyzeStatement(statement, scope);
+            var analyzedStatementResult = AnalyzeStatement(statement, blockScope);
             statements.Add(analyzedStatementResult.Node);
-            scope = analyzedStatementResult.Scope;
+            blockScope = analyzedStatementResult.Scope;
         }
 
-        return new AnalyzeResult<BlockNode>(new BlockNode(statements), scope);
+        // Do not leak the block scope; return to the outer scope
+        return new AnalyzeResult<BlockNode>(new BlockNode(statements), outerScope);
     }
 
     private AnalyzeResult<StatementNode> AnalyzeStatement(StatementSyntax statement, Scope scope)
