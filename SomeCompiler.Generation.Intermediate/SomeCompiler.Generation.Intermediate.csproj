@@ -6,18 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Keep both visitor-based IR (root) and 3-address IR (Model/**), but exclude problematic Binding-dependent mixins -->
   <ItemGroup>
-    <Compile Remove="Model\**" />
-    <EmbeddedResource Remove="Model\**" />
-    <None Remove="Model\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="IntermediateProgramExtensions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="Model\Fragment.cs" />
+    <Compile Remove="Model\OperatorMixin.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,10 +1,8 @@
-using CodeGeneration.Model.Classes;
-
 namespace SomeCompiler.Generation.Intermediate.Model.Codes;
 
 public abstract record Code
 {
-    public virtual IEnumerable<Reference> GetReferences() => Enumerable.Empty<Reference>();
+    public virtual IEnumerable<CodeGeneration.Model.Classes.Reference> GetReferences() => Enumerable.Empty<CodeGeneration.Model.Classes.Reference>();
 
-    public abstract string ToString(Dictionary<Reference, string> map);
+    public abstract string ToString(Dictionary<CodeGeneration.Model.Classes.Reference, string> map);
 }

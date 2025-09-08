@@ -1,8 +1,6 @@
-using CodeGeneration.Model.Classes;
-
 namespace SomeCompiler.Generation.Intermediate.Model;
 
-internal class ConstantReference : Reference
+internal class ConstantReference : CodeGeneration.Model.Classes.Reference
 {
     public ConstantReference(int constant)
     {

@@ -1,7 +1,5 @@
-using CodeGeneration.Model.Classes;
 using CSharpFunctionalExtensions;
 using SomeCompiler.Generation.Intermediate;
-using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Z80.Core;
 using Zafiro.Core.Mixins;
 
@@ -9,7 +7,7 @@ namespace SomeCompiler.Z80;
 
 public class Z80Generator
 {
-    public Result<GeneratedProgram> Generate(IntermediateCodeProgram program)
+    public Result<GeneratedProgram> Generate(SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram program)
     {
         var getNames = GetNames(program);
         var addresses = GetMemAddresses(program);
@@ -17,6 +15,7 @@ public class Z80Generator
         var generator = new Z80AssemblyGenerator(new IntermediateEmitter(new OpCodeEmitter(table)));
 
         var asm = program
+            .Cast<SomeCompiler.Generation.Intermediate.Model.Codes.Code>()
             .Select(c => generator.Generate(c).JoinWithLines())
             .Concat(MultiplyAlgorithm())
             .JoinWithLines();
@@ -24,14 +23,14 @@ public class Z80Generator
         return new GeneratedProgram(asm);
     }
 
-    private static Dictionary<Reference, int> GetMemAddresses(IntermediateCodeProgram program)
+    private static Dictionary<CodeGeneration.Model.Classes.Reference, int> GetMemAddresses(SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram program)
     {
         return program.IndexedReferences().ToDictionary(t => t.Reference, t => t.Index * 2 + 0x70);
     }
 
-    private IEnumerable<(Reference, string)> GetNames(IntermediateCodeProgram program)
+    private IEnumerable<(CodeGeneration.Model.Classes.Reference, string)> GetNames(SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram program)
     {
-        var named = program.NamedReferences().Select(x => ((Reference) x, x.Value));
+        var named = program.NamedReferences().Select(x => ((CodeGeneration.Model.Classes.Reference) x, x.Value));
         var unnamed = program.UnnamedReferences().Select((x, i) => (x, $"T{i+1}"));
         return named.Concat(unnamed);
     }

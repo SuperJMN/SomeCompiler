@@ -1,8 +1,6 @@
-using CodeGeneration.Model.Classes;
-
 namespace SomeCompiler.Generation.Intermediate.Model;
 
-public class NamedReference : Reference
+public class NamedReference : CodeGeneration.Model.Classes.Reference
 {
     public NamedReference(string value)
     {

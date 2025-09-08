@@ -51,7 +51,7 @@ public class IntermediateCodeGenerator
             .Prepend(left);
     }
 
-    private Code GetCodeFromBinaryExpression(Reference reference, Reference left, Reference right, Operator op)
+    private Code GetCodeFromBinaryExpression(Reference reference, Reference left, Reference right, SomeCompiler.Core.Operator op)
     {
         return new BinaryExpressionCode(reference, left, right, op);
     }

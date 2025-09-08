@@ -1,20 +1,18 @@
-using CodeGeneration.Model.Classes;
-
 namespace SomeCompiler.Generation.Intermediate.Model.Codes;
 
-public record AssignConstant(Reference Target, int Source) : Code
+public record AssignConstant(CodeGeneration.Model.Classes.Reference Target, int Source) : Code
 {
     public override string ToString()
     {
         return $"{Target}={Source}";
     }
 
-    public override string ToString(Dictionary<Reference, string> map)
+    public override string ToString(Dictionary<CodeGeneration.Model.Classes.Reference, string> map)
     {
         return $"{map[Target]} = {Source}";
     }
 
-    public override IEnumerable<Reference> GetReferences()
+    public override IEnumerable<CodeGeneration.Model.Classes.Reference> GetReferences()
     {
         yield return Target;
     }

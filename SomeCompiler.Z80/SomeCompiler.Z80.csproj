@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SomeCompiler\SomeCompiler.csproj" />
+    <ProjectReference Include="..\SomeCompiler.Generation.Intermediate\SomeCompiler.Generation.Intermediate.csproj" />
     <PackageReference Include="FluentAssertions.CSharpFunctionalExtensions" Version="1.0.2" />
   </ItemGroup>
 </Project>
