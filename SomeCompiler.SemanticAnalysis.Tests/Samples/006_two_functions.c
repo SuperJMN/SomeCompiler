@@ -1,1 +1,2 @@
-
+void main(){}
+void other(){}

@@ -1,0 +1,7 @@
+﻿void main()
+{
+	int a;
+	int a;
+}
+== Diagnostics ==
+Variable a is already declared

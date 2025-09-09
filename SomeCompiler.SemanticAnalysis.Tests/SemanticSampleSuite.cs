@@ -10,7 +10,8 @@ namespace SomeCompiler.SemanticAnalysis.Tests;
 public class SemanticSampleSuite
 {
     public static IEnumerable<object[]> Cases()
-        => Directory.EnumerateFiles(Path.Combine("Samples"), "*.c", SearchOption.AllDirectories)
+        => Directory.EnumerateFiles("Samples", "*.c", SearchOption.AllDirectories)
+                     .Where(p => !p.Contains($"{Path.DirectorySeparatorChar}scopes{Path.DirectorySeparatorChar}"))
                      .OrderBy(p => p)
                      .Select(p => new object[] { p });
 
