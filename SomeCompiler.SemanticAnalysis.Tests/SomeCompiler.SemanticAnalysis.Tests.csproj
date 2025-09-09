@@ -29,4 +29,10 @@
 	  <ProjectReference Include="..\SomeCompiler.SemanticAnalysis\SomeCompiler.SemanticAnalysis.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Content Include="Samples/**/*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
 </Project>
