@@ -1,0 +1,10 @@
+void main()
+{
+	{
+		int x;
+	}
+	<Unknown 'x'>;
+}
+== Diagnostics ==
+Use of undeclared variable 'x'
+

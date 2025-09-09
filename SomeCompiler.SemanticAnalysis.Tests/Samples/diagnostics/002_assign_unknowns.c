@@ -1,0 +1,1 @@
+void main(){ b = a; }
