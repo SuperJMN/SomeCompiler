@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Generation.Int
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SomeCompiler.Generation.Intermediate.Tests", "SomeCompiler.Generation.Intermediate.Tests\SomeCompiler.Generation.Intermediate.Tests.csproj", "{0F7A80CF-4D16-4373-A984-60D9C5684893}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SomeCompiler.Cli", "SomeCompiler.Cli\SomeCompiler.Cli.csproj", "{08B05AE6-159D-47F5-BCFA-195C048E154D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,10 @@ Global
 		{0F7A80CF-4D16-4373-A984-60D9C5684893}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F7A80CF-4D16-4373-A984-60D9C5684893}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F7A80CF-4D16-4373-A984-60D9C5684893}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08B05AE6-159D-47F5-BCFA-195C048E154D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08B05AE6-159D-47F5-BCFA-195C048E154D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08B05AE6-159D-47F5-BCFA-195C048E154D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08B05AE6-159D-47F5-BCFA-195C048E154D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

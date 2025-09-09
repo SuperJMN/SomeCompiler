@@ -6,7 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SomeCompiler.Z80\SomeCompiler.Z80.csproj" />
-    <ProjectReference Include="..\SomeCompiler\SomeCompiler.csproj" />
+    <ProjectReference Include="..\SomeCompiler.Parser.Antlr4.v2\SomeCompiler.Parser.csproj" />
+    <ProjectReference Include="..\SomeCompiler.SemanticAnalysis\SomeCompiler.SemanticAnalysis.csproj" />
+    <ProjectReference Include="..\SomeCompiler.Generation.Intermediate\SomeCompiler.Generation.Intermediate.csproj" />
   </ItemGroup>
 </Project>

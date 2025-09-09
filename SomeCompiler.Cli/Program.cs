@@ -1,48 +1,53 @@
-﻿void PrintSource(string source)
-{
-    PrintSection("Source code:", source);
-}
-
-void PrintSection(string header, string body)
+﻿void PrintSection(string header, string body)
 {
     Console.WriteLine(header);
     Console.WriteLine(body);
     Console.WriteLine();
 }
 
-string ReadInputFile(string s)
+string ReadInputFile(string s) => File.ReadAllText(s);
+
+void PrintSuccess() => Console.Error.WriteLine("Success");
+void PrintError(string s) => Console.Error.WriteLine(s);
+
+void PrintSource(string source) => PrintSection("Source:", source);
+
+void PrintDiagnostics(IEnumerable<string> diagnostics)
 {
-    return File.ReadAllText(s);
+    var text = diagnostics.Any() ? string.Join("\n", diagnostics) : "None";
+    PrintSection("Diagnostics:", text);
 }
 
-Result<GeneratedProgram> Generate(IntermediateCodeProgram intermediateCodeProgram)
+Result<string> Parse(string source)
 {
-    return new Z80Generator().Generate(intermediateCodeProgram);
+    var parser = new SomeCompiler.Parser.SomeParser();
+    var parsed = parser.Parse(source);
+    return parsed.Map(_ => source).MapError(err => err);
 }
 
-void PrintSuccess()
+Result<SomeCompiler.SemanticAnalysis.AnalyzeResult<SomeCompiler.SemanticAnalysis.SemanticNode>> Analyze(string source)
 {
-    Console.Error.WriteLine("Success");
+    var parser = new SomeCompiler.Parser.SomeParser();
+    var parse = parser.Parse(source);
+    if (parse.IsFailure) return Result.Failure<SomeCompiler.SemanticAnalysis.AnalyzeResult<SomeCompiler.SemanticAnalysis.SemanticNode>>(parse.Error);
+
+    var analyzer = new SomeCompiler.SemanticAnalysis.SemanticAnalyzer();
+    var analyzed = analyzer.Analyze(parse.Value);
+    return Result.Success(analyzed);
 }
 
-void PrintError(string s)
+Result<SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram> GenerateIR(SomeCompiler.SemanticAnalysis.AnalyzeResult<SomeCompiler.SemanticAnalysis.SemanticNode> analyzed)
 {
-    Console.Error.WriteLine(s);
+    var gen = new SomeCompiler.Generation.Intermediate.V2IntermediateCodeGenerator();
+    var programNode = (SomeCompiler.SemanticAnalysis.ProgramNode)analyzed.Node;
+    var ir = gen.Generate(programNode);
+    return Result.Success(ir);
 }
 
-void PrintAssembly(GeneratedProgram generatedProgram)
+void PrintIR(SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram ir)
 {
-    PrintSection("Z80 assembly:", generatedProgram.Assembly);
-}
-
-void PrintIL(IntermediateCodeProgram intermediateCodeProgram)
-{
-    PrintSection("Intermediate code:", intermediateCodeProgram.ToCodeFormatContent().JoinWithLines());
-}
-
-Result<IntermediateCodeProgram> Compile(string s)
-{
-    return new Compiler().Emit(s).MapError(errors => errors.JoinWithLines());
+    var text = string.Join("\n", SomeCompiler.Generation.Intermediate.IntermediateProgramExtensions.ToTextFormatContent(ir));
+    PrintSection("Intermediate code:", text);
 }
 
 if (args.Length < 1)
@@ -56,9 +61,8 @@ var path = args[0];
 Result
     .Try(() => ReadInputFile(path))
     .Tap(PrintSource)
-    .Bind(Compile)
-    .Tap(PrintIL)
-    .Bind(Generate)
-    .Tap(PrintAssembly)
+    .Bind(Analyze)
+    .Tap(result => PrintDiagnostics(result.Node.AllErrors))
+    .Bind(GenerateIR)
+    .Tap(PrintIR)
     .Match(_ => PrintSuccess(), PrintError);
-    
