@@ -10,68 +10,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="68f07500-02c1-4fda-afc1-6ee41cff8537" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.SomeCompiler/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.SomeCompiler/.idea/copilot.data.migration.edit.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SomeCompiler/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SomeCompiler/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Cli/GlobalUsings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Cli/GlobalUsings.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Cli/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Cli/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Cli/SomeCompiler.Cli.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Cli/SomeCompiler.Cli.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/C.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/C.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/C.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/CBaseListener.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/CBaseVisitor.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/CLexer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/CLexer.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/CLexer.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/CListener.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/CParser.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/CVisitor.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/ExpressionConverter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/ParseNodeExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/SomeCompiler.Parser.Antlr4.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/SomeParser.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Parser.Antlr4/ToStringVisitor.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.SemanticAnalysis/SomeCompiler - Backup.SemanticAnalysis.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/CompilerFrontend.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/CompilerTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/ExpressionParsingTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/GlobalUsings.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/IntermediateCodeGeneratorTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/ParserTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/ScopeTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/SemanticAnalysisTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/SomeCompiler.Tests.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.Tests/StringExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler.sln" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Compiler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/IntermediateCodeGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/IntermediateProgramExtensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/CodeFormatter.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Add.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/And.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Assign.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/AssignConstant.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Call.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Code.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Divide.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/EmptyReturn.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Halt.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Label.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Multiply.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Or.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Return.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Codes/Subtract.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/ConstantReference.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/DictionaryMixin.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Fragment.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/IntermediateCodeProgram.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/LabelReference.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/NamedReference.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Operator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/OperatorMixin.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Placeholder.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SomeCompiler/Generation/Intermediate/Model/Reference.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.Generation.Intermediate/Model/Codes/Call.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Generation.Intermediate/Model/Codes/Call.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.Generation.Intermediate/V2IntermediateCodeGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Generation.Intermediate/V2IntermediateCodeGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.SemanticAnalysis.Tests/SemanticSnapshotPrinter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.SemanticAnalysis.Tests/SemanticSnapshotPrinter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.SemanticAnalysis/INodeVisitor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.SemanticAnalysis/INodeVisitor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.SemanticAnalysis/PrintNodeVisitor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.SemanticAnalysis/PrintNodeVisitor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.SemanticAnalysis/SemanticAnalyzer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.SemanticAnalysis/SemanticAnalyzer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.Z80.Tests/Z80GeneratorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Z80.Tests/Z80GeneratorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.Z80.Tests/Z80Runner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Z80.Tests/Z80Runner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.Z80/Core/IntermediateEmitter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Z80/Core/IntermediateEmitter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.Z80/Core/OpCodeEmitter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Z80/Core/OpCodeEmitter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.Z80/Core/Register.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Z80/Core/Register.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.Z80/Core/Z80AssemblyGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Z80/Core/Z80AssemblyGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SomeCompiler.Z80/Z80Generator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SomeCompiler.Z80/Z80Generator.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,7 +45,7 @@
         <entry key="$PROJECT_DIR$" value="chore/semantic-scopes-and-ir-integration" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/6502DotNet" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GithubDefaultAccount">
@@ -116,24 +68,24 @@
     <option name="showLibraryContents" value="true" />
     <option name="showVisibilityIcons" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Project.SomeCompiler.Cli.executor": "Debug",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "CleanCodeAnalysisOptionsPage",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Project.SomeCompiler.Cli.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CleanCodeAnalysisOptionsPage&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Project.SomeCompiler.Cli">
     <configuration name="Sixty502DotNet" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -210,7 +162,8 @@
       <workItem from="1757341487289" duration="616000" />
       <workItem from="1757354364648" duration="340000" />
       <workItem from="1757421637597" duration="9000" />
-      <workItem from="1757421696579" duration="2427000" />
+      <workItem from="1757421696579" duration="6483000" />
+      <workItem from="1757492568122" duration="3579000" />
     </task>
     <servers />
   </component>
@@ -249,19 +202,7 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="chore/semantic-scopes-and-ir-integration" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
+            <State />
           </value>
         </entry>
       </map>

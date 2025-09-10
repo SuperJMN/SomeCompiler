@@ -99,9 +99,33 @@ public class Z80Runner
 
     private Z80State Run(AssemblyData assemblyData)
     {
-        var processor = new Z80Processor();
-        processor.Memory.SetContents(0, assemblyData.ProgramBinary);
-        processor.Start();
-        return new Z80State(processor);
+        // Load assembled program at a fixed address
+        // Load at origin 0 to match assembler default
+        var cpu = new Z80Processor();
+        cpu.Reset();
+        cpu.Memory.SetContents(0, assemblyData.ProgramBinary);
+
+        // Resolve entry offset (origin-relative) and setup a HALT return address on the stack
+        var entryOffset = assemblyData.DebugInfo
+            .Where(d => (d.LineText?.Trim() ?? string.Empty).Equals("main:", StringComparison.Ordinal))
+            .Select(d => d.ProgramCounter)
+            .DefaultIfEmpty(0)
+            .First();
+        const ushort haltAddr = 0xF000;
+        cpu.Memory[haltAddr] = 0x76; // HALT
+        const ushort s0 = 0xFF00;
+        cpu.Memory[s0] = (byte)(haltAddr & 0xFF);
+        cpu.Memory[s0 + 1] = (byte)(haltAddr >> 8);
+        cpu.Registers.SP = unchecked((short)s0);
+        cpu.Registers.PC = (ushort)entryOffset;
+
+        // Step bounded number of instructions until HALT
+        const int MaxSteps = 20000;
+        for (int i = 0; i < MaxSteps; i++)
+        {
+            cpu.ExecuteNextInstruction();
+            if (cpu.IsHalted) break;
+        }
+        return new Z80State(cpu);
     }
 }

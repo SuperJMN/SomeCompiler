@@ -26,6 +26,12 @@ public class Z80AssemblyGenerator
             Return ret => intermediateEmitter.Return(ret),
             Subtract subtract => throw new NotImplementedException(),
             Label label => new[] { $"{label.Name}:"},
+            Param param => intermediateEmitter.Param(param),
+            AssignFromReturn afr => intermediateEmitter.AssignFromReturn(afr),
+            Jump jump => intermediateEmitter.Jump(jump),
+            BranchIfZero brz => intermediateEmitter.BranchIfZero(brz),
+            BranchIfNotZero brnz => intermediateEmitter.BranchIfNotZero(brnz),
+            LocalLabel localLabel => new[] { $"{localLabel.Name}:"},
             _ => throw new ArgumentOutOfRangeException(nameof(code))
         };
     }
