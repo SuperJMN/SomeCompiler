@@ -37,7 +37,7 @@ public static class Z80E2E
         // Semántico
         var analyzed = new SemanticAnalyzer().Analyze(programSyntax);
         var root = (SemanticNode)analyzed.Node;
-        var allErrors = root.AllErrors;
+        var allErrors = root.AllErrors.ToList();
         if (allErrors.Count > 0)
             throw new InvalidOperationException(string.Join("\n", allErrors));
         var programNode = (ProgramNode)analyzed.Node;

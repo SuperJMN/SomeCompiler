@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# JetBrains Rider/IntelliJ project files
+.idea/
+*.iml
+# Specific nested workspace file
+.idea/.idea.SomeCompiler/.idea/workspace.xml
