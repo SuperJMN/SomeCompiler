@@ -16,6 +16,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <!-- Pin ANTLR runtime to match SomeCompiler.Parser.Antlr4.v2 (4.9.3) to avoid MissingMethod issues -->
+<PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\6502DotNet\Sixty502DotNet\Sixty502DotNet.csproj" />
