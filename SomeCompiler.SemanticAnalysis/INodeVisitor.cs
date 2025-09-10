@@ -13,4 +13,7 @@ public interface INodeVisitor
     void VisitUnknownSymbol(UnknownSymbol unknownSymbol);
     void VisitSymbolExpression(SymbolExpressionNode symbolExpressionNode);
     void VisitBinaryExpression(BinaryExpressionNode binaryExpressionNode);
+    void VisitReturn(ReturnNode returnNode);
+    void VisitIfElse(IfElseNode ifElseNode);
+    void VisitFunctionCall(FunctionCallExpressionNode functionCall);
 }

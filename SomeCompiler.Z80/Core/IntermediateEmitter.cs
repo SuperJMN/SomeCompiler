@@ -13,34 +13,30 @@ public class IntermediateEmitter
 
     public IEnumerable<string> AssignConstant(AssignConstant assignConstant)
     {
-        var str = new[]
-        {
-            opCodeEmitter.Set(assignConstant.Source, Register.HL),
-            opCodeEmitter.Set(Register.HL, assignConstant.Target)
-        };
-
-        return str;
+        var lines = new List<string>();
+        lines.Add(opCodeEmitter.Set(assignConstant.Source, Register.HL));
+        lines.AddRange(opCodeEmitter.Set(Register.HL, assignConstant.Target));
+        return lines;
     }
 
-    public string[] Addition(Add add)
+    public IEnumerable<string> Addition(Add add)
     {
-        return new[]
-        {
-            opCodeEmitter.Set(add.Left, Register.HL),
-            opCodeEmitter.Set(Register.L, Register.A),
-            opCodeEmitter.Set(add.Right, Register.HL),
-            opCodeEmitter.Set(Register.L, Register.B),
-            opCodeEmitter.Increment(Register.A, Register.B),
-            opCodeEmitter.Set(Register.A, add.Target)
-        };
+        var lines = new List<string>();
+        lines.AddRange(opCodeEmitter.Set(add.Left, Register.HL));
+        lines.Add(opCodeEmitter.Set(Register.L, Register.A));
+        lines.AddRange(opCodeEmitter.Set(add.Right, Register.HL));
+        lines.Add(opCodeEmitter.Set(Register.L, Register.B));
+        lines.Add(opCodeEmitter.Increment(Register.A, Register.B));
+        lines.AddRange(opCodeEmitter.Set(Register.A, add.Target));
+        return lines;
     }
 
-    public IEnumerable<string> Call(Call call)
+    public IEnumerable<string> Call(SomeCompiler.Generation.Intermediate.Model.Codes.Call call)
     {
-        return new[]
-        {
-            opCodeEmitter.Call(call.Name)
-        };
+        var lines = new List<string>();
+        lines.Add(opCodeEmitter.Call(call.Name));
+        lines.AddRange(opCodeEmitter.AdjustSP(call.ArgCount * 2));
+        return lines;
     }
 
     public IEnumerable<string> Divide(Divide divide)
@@ -50,10 +46,7 @@ public class IntermediateEmitter
 
     public IEnumerable<string> EmptyReturn()
     {
-        return new[]
-        {
-            opCodeEmitter.Return()
-        };
+        return opCodeEmitter.EpilogueAndReturn();
     }
 
     public IEnumerable<string> Halt()
@@ -66,30 +59,68 @@ public class IntermediateEmitter
 
     public IEnumerable<string> Assign(Assign assign)
     {
-        return new[]
-        {
-            opCodeEmitter.Set(assign.Source, Register.HL),
-            opCodeEmitter.Set(Register.HL, assign.Target)
-        };
+        var lines = new List<string>();
+        lines.AddRange(opCodeEmitter.Set(assign.Source, Register.HL));
+        lines.AddRange(opCodeEmitter.Set(Register.HL, assign.Target));
+        return lines;
     }
 
     public IEnumerable<string> Return(Return ret)
     {
-        return new[]
-        {
-            opCodeEmitter.Set(ret.Reference, Register.HL),
-            opCodeEmitter.Return(),
-        };
+        var lines = new List<string>();
+        lines.AddRange(opCodeEmitter.Set(ret.Reference, Register.HL));
+        lines.AddRange(opCodeEmitter.EpilogueAndReturn());
+        return lines;
     }
 
     public IEnumerable<string> Multiply(Multiply multiply)
     {
-        return new[]
-        {
-            opCodeEmitter.Set(multiply.Left, Register.BC),
-            opCodeEmitter.Set(multiply.Right, Register.DE),
-            opCodeEmitter.Call("MUL16"),
-            opCodeEmitter.Set(Register.HL, multiply.Target),
-        };
+        var lines = new List<string>();
+        // Load left into HL, then copy to BC
+        lines.AddRange(opCodeEmitter.Set(multiply.Left, Register.HL));
+        lines.Add(opCodeEmitter.Set(Register.H, Register.B));
+        lines.Add(opCodeEmitter.Set(Register.L, Register.C));
+        // Load right into HL, then copy to DE
+        lines.AddRange(opCodeEmitter.Set(multiply.Right, Register.HL));
+        lines.Add(opCodeEmitter.Set(Register.H, Register.D));
+        lines.Add(opCodeEmitter.Set(Register.L, Register.E));
+        // Call multiply and store result from HL
+        lines.Add(opCodeEmitter.Call("MUL16"));
+        lines.AddRange(opCodeEmitter.Set(Register.HL, multiply.Target));
+        return lines;
+    }
+
+    public IEnumerable<string> Param(Param param)
+    {
+        var lines = new List<string>();
+        lines.AddRange(opCodeEmitter.Set(param.Argument, Register.HL));
+        lines.Add(opCodeEmitter.Push(Register.HL));
+        return lines;
+    }
+
+    public IEnumerable<string> AssignFromReturn(AssignFromReturn afr)
+    {
+        return opCodeEmitter.Set(Register.HL, afr.Target);
+    }
+
+    public IEnumerable<string> Jump(Jump jump)
+    {
+        return new[] { opCodeEmitter.Jump(jump.Label) };
+    }
+
+    public IEnumerable<string> BranchIfZero(BranchIfZero brz)
+    {
+        var lines = new List<string>();
+        lines.AddRange(opCodeEmitter.Set(brz.Condition, Register.HL));
+        lines.AddRange(opCodeEmitter.BranchIfHLZero(brz.Label));
+        return lines;
+    }
+
+    public IEnumerable<string> BranchIfNotZero(BranchIfNotZero brnz)
+    {
+        var lines = new List<string>();
+        lines.AddRange(opCodeEmitter.Set(brnz.Condition, Register.HL));
+        lines.AddRange(opCodeEmitter.BranchIfHLNotZero(brnz.Label));
+        return lines;
     }
 }

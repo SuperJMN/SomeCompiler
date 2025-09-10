@@ -6,6 +6,8 @@ namespace SomeCompiler.Generation.Intermediate;
 
 public class V2IntermediateCodeGenerator
 {
+    private int labelCounter = 0;
+
     public SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram Generate(ProgramNode program)
     {
         var codes = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
@@ -13,10 +15,10 @@ public class V2IntermediateCodeGenerator
         {
             // Function label
             codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Label(function.Name));
-            var body = GenerateBlock(function.Block).ToList();
+            var body = GenerateBlock(function.Name, function.Block).ToList();
             codes.AddRange(body);
 
-            // Ensure a return of some kind
+            // Ensure a return for each function
             if (codes.Count == 0 || codes[^1] is not SomeCompiler.Generation.Intermediate.Model.Codes.Return && codes[^1] is not SomeCompiler.Generation.Intermediate.Model.Codes.EmptyReturn)
             {
                 codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.EmptyReturn());
@@ -26,18 +28,18 @@ public class V2IntermediateCodeGenerator
         return new SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram(codes);
     }
 
-    private IEnumerable<SomeCompiler.Generation.Intermediate.Model.Codes.Code> GenerateBlock(BlockNode block)
+    private IEnumerable<SomeCompiler.Generation.Intermediate.Model.Codes.Code> GenerateBlock(string functionName, BlockNode block)
     {
         foreach (var statement in block.Statements)
         {
-            foreach (var code in GenerateStatement(statement))
+            foreach (var code in GenerateStatement(functionName, statement))
             {
                 yield return code;
             }
         }
     }
 
-    private IEnumerable<SomeCompiler.Generation.Intermediate.Model.Codes.Code> GenerateStatement(StatementNode statement)
+    private IEnumerable<SomeCompiler.Generation.Intermediate.Model.Codes.Code> GenerateStatement(string functionName, StatementNode statement)
     {
         switch (statement)
         {
@@ -45,24 +47,99 @@ public class V2IntermediateCodeGenerator
                 // Declarations don't emit code in this minimal IR
                 return Enumerable.Empty<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
             case ExpressionStatementNode es:
-                return GenerateExpression(es.Expression).codes;
+                return GenerateExpression(functionName, es.Expression).codes;
+            case ReturnNode ret:
+                return EmitReturn(functionName, ret);
+            case IfElseNode ie:
+                return EmitIfElse(functionName, ie);
             default:
                 throw new NotSupportedException($"Statement not supported: {statement.GetType().Name}");
         }
     }
 
-    private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) GenerateExpression(ExpressionNode expr)
+    private IEnumerable<SomeCompiler.Generation.Intermediate.Model.Codes.Code> EmitReturn(string functionName, ReturnNode ret)
+    {
+        if (ret.Expression.HasValue)
+        {
+            var expr = GenerateExpression(functionName, ret.Expression.Value);
+            var codes = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
+            codes.AddRange(expr.codes);
+            codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Return(expr.r));
+            return codes;
+        }
+        else
+        {
+            return new SomeCompiler.Generation.Intermediate.Model.Codes.Code[]
+            {
+                new SomeCompiler.Generation.Intermediate.Model.Codes.EmptyReturn()
+            };
+        }
+    }
+
+    private IEnumerable<SomeCompiler.Generation.Intermediate.Model.Codes.Code> EmitIfElse(string functionName, IfElseNode ie)
+    {
+        var elseLabel = new SomeCompiler.Generation.Intermediate.Model.Codes.LocalLabel($"{functionName}_ELSE_{labelCounter}");
+        var endLabel = new SomeCompiler.Generation.Intermediate.Model.Codes.LocalLabel($"{functionName}_END_{labelCounter}");
+        labelCounter++;
+
+        var codes = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
+
+        if (ie.Condition is BinaryExpressionNode be && (be.Operator.Symbol == "==" || be.Operator.Symbol == "!="))
+        {
+            var left = GenerateExpression(functionName, be.Left);
+            var right = GenerateExpression(functionName, be.Right);
+            var diff = new SomeCompiler.Generation.Intermediate.Model.Placeholder();
+            codes.AddRange(left.codes);
+            codes.AddRange(right.codes);
+            codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Subtract(diff, left.r, right.r));
+            if (be.Operator.Symbol == "==")
+            {
+                // if (left == right) then ... else ...
+                // Branch to else when diff != 0
+                codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.BranchIfNotZero(diff, elseLabel.Name));
+            }
+            else
+            {
+                // if (left != right) then ... else ...
+                // Branch to else when diff == 0
+                codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.BranchIfZero(diff, elseLabel.Name));
+            }
+        }
+        else
+        {
+            var cond = GenerateExpression(functionName, ie.Condition);
+            codes.AddRange(cond.codes);
+            // Generic: zero means false -> branch to else
+            codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.BranchIfZero(cond.r, elseLabel.Name));
+        }
+
+        // then
+        codes.AddRange(GenerateBlock(functionName, ie.Then));
+        codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Jump(endLabel.Name));
+        // else
+        codes.Add(elseLabel);
+        if (ie.Else.HasValue)
+        {
+            codes.AddRange(GenerateBlock(functionName, ie.Else.Value));
+        }
+        codes.Add(endLabel);
+        return codes;
+    }
+
+    private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) GenerateExpression(string functionName, ExpressionNode expr)
     {
         switch (expr)
         {
             case ConstantNode c:
                 return EmitConstant(c);
             case SymbolExpressionNode se:
-                return EmitSymbol(se);
+                return EmitSymbol(functionName, se);
             case BinaryExpressionNode be:
-                return EmitBinary(be);
+                return EmitBinary(functionName, be);
             case AssignmentNode assign:
-                return EmitAssignment(assign);
+                return EmitAssignment(functionName, assign);
+            case FunctionCallExpressionNode fcall:
+                return EmitFunctionCall(functionName, fcall);
             default:
                 throw new NotSupportedException($"Expression not supported: {expr.GetType().Name}");
         }
@@ -75,22 +152,23 @@ public class V2IntermediateCodeGenerator
         return (target, new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> { new SomeCompiler.Generation.Intermediate.Model.Codes.AssignConstant(target, value) });
     }
 
-    private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) EmitSymbol(SymbolExpressionNode se)
+    private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) EmitSymbol(string functionName, SymbolExpressionNode se)
     {
         var target = new SomeCompiler.Generation.Intermediate.Model.Placeholder();
-        var name = se.SymbolNode switch
+        var baseName = se.SymbolNode switch
         {
             KnownSymbolNode ks => ks.Symbol.Name,
             UnknownSymbol us => us.Name,
             _ => se.SymbolNode.ToString()
         };
-        return (target, new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> { new SomeCompiler.Generation.Intermediate.Model.Codes.Assign(target, new SomeCompiler.Generation.Intermediate.Model.NamedReference(name)) });
+        var qualified = $"{functionName}::{baseName}";
+        return (target, new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> { new SomeCompiler.Generation.Intermediate.Model.Codes.Assign(target, new SomeCompiler.Generation.Intermediate.Model.NamedReference(qualified)) });
     }
 
-    private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) EmitBinary(BinaryExpressionNode be)
+    private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) EmitBinary(string functionName, BinaryExpressionNode be)
     {
-        var left = GenerateExpression(be.Left);
-        var right = GenerateExpression(be.Right);
+        var left = GenerateExpression(functionName, be.Left);
+        var right = GenerateExpression(functionName, be.Right);
         var target = new SomeCompiler.Generation.Intermediate.Model.Placeholder();
 
         var op = be.Operator.Symbol; // e.g. +, -, *, /
@@ -110,20 +188,42 @@ public class V2IntermediateCodeGenerator
         return (target, codes);
     }
 
-    private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) EmitAssignment(AssignmentNode a)
+    private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) EmitAssignment(string functionName, AssignmentNode a)
     {
-        var rhs = GenerateExpression(a.Right);
-        var name = a.Left switch
+        var rhs = GenerateExpression(functionName, a.Right);
+        var baseName = a.Left switch
         {
             KnownSymbolNode ks => ks.Symbol.Name,
             UnknownSymbol us => us.Name,
             _ => a.Left.ToString()
         };
-        var to = new SomeCompiler.Generation.Intermediate.Model.NamedReference(name);
+        var qualified = $"{functionName}::{baseName}";
+        var to = new SomeCompiler.Generation.Intermediate.Model.NamedReference(qualified);
         var codes = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
         codes.AddRange(rhs.codes);
         codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Assign(to, rhs.r));
         return (to, codes);
+    }
+
+    private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) EmitFunctionCall(string functionName, FunctionCallExpressionNode fcall)
+    {
+        var codes = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
+        var argRefs = new List<CodeGeneration.Model.Classes.Reference>();
+        foreach (var arg in fcall.Arguments)
+        {
+            var a = GenerateExpression(functionName, arg);
+            codes.AddRange(a.codes);
+            argRefs.Add(a.r);
+        }
+        // push args in order
+        foreach (var r in argRefs)
+        {
+            codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Param(r));
+        }
+        codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Call(fcall.Name, argRefs.Count));
+        var target = new SomeCompiler.Generation.Intermediate.Model.Placeholder();
+        codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.AssignFromReturn(target));
+        return (target, codes);
     }
 
     private static int CoerceInt(object value)

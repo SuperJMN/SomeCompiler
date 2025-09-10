@@ -11,8 +11,12 @@ public class Register
 
     public static Register HL => new("HL");
     public static Register A => new("A");
+    public static Register H => new("H");
     public static Register L => new("L");
     public static Register B => new("B");
+    public static Register C => new("C");
+    public static Register D => new("D");
+    public static Register E => new("E");
     public static Register BC => new("BC");
     public static Register DE => new("DE");
 

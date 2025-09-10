@@ -54,14 +54,12 @@ public class SemanticAnalyzer
             case ExpressionStatementSyntax expressionStatement:
                 return AnalyzeExpressionStatement(expressionStatement, scope);
             case IfElseSyntax ifElseStatement:
-                break;
+                return AnalyzeIfElse(ifElseStatement, scope);
             case ReturnSyntax returnStatement:
-                break;
+                return AnalyzeReturn(returnStatement, scope);
             default:
                 throw new ArgumentOutOfRangeException(nameof(statement));
         }
-
-        throw new InvalidOperationException();
     }
 
     private AnalyzeResult<StatementNode> AnalyzeExpressionStatement(ExpressionStatementSyntax expressionStatement, Scope scope)
@@ -95,6 +93,12 @@ public class SemanticAnalyzer
                 Errors = SymbolError(symbolNode)
             };
             return new AnalyzeResult<ExpressionNode>(symbolExpressionNode, scope);
+        }
+
+        if (expression is FunctionCall functionCall)
+        {
+            var analyzedArgs = functionCall.Parameters.Select(arg => AnalyzeExpression(arg, scope).Node).ToList();
+            return new AnalyzeResult<ExpressionNode>(new FunctionCallExpressionNode(functionCall.Name, analyzedArgs), scope);
         }
 
         throw new InvalidOperationException("Por aquí no vas a ningún sitio");
@@ -152,5 +156,23 @@ public class SemanticAnalyzer
                     Errors = [$"Variable {declarationStatement.Name} is already declared"]
                 }, scope));
         return declaration;
+    }
+
+    private AnalyzeResult<StatementNode> AnalyzeIfElse(IfElseSyntax ifElse, Scope scope)
+    {
+        var cond = AnalyzeExpression(ifElse.Condition, scope).Node;
+        var thenBlock = AnalyzeBlock(ifElse.ThenBlock, scope).Node;
+        var elseBlock = ifElse.ElseBlock.Match(
+            b => AnalyzeBlock(b, scope).Node,
+            () => null as BlockNode
+        );
+        var maybeElse = elseBlock is null ? Maybe<BlockNode>.None : Maybe.From(elseBlock);
+        return new AnalyzeResult<StatementNode>(new IfElseNode(cond, thenBlock, maybeElse), scope);
+    }
+
+    private AnalyzeResult<StatementNode> AnalyzeReturn(ReturnSyntax ret, Scope scope)
+    {
+        var maybeExpr = ret.Expression.Map(expr => AnalyzeExpression(expr, scope).Node);
+        return new AnalyzeResult<StatementNode>(new ReturnNode(maybeExpr), scope);
     }
 }

@@ -94,6 +94,47 @@ public class PrintNodeVisitor : INodeVisitor
         child.Accept(this);
     }
 
+    public void VisitReturn(ReturnNode returnNode)
+    {
+        resultBuilder.Append(new string('\t', indentationLevel));
+        resultBuilder.Append("return");
+        if (returnNode.Expression.HasValue)
+        {
+            resultBuilder.Append(" ");
+            returnNode.Expression.Value.Accept(this);
+        }
+        resultBuilder.AppendLine(";");
+    }
+
+    public void VisitIfElse(IfElseNode ifElseNode)
+    {
+        resultBuilder.Append(new string('\t', indentationLevel));
+        resultBuilder.Append("if (");
+        ifElseNode.Condition.Accept(this);
+        resultBuilder.AppendLine(")");
+        ifElseNode.Then.Accept(this);
+        if (ifElseNode.Else.HasValue)
+        {
+            resultBuilder.Append(new string('\t', indentationLevel));
+            resultBuilder.AppendLine("else");
+            ifElseNode.Else.Value.Accept(this);
+        }
+    }
+
+    public void VisitFunctionCall(FunctionCallExpressionNode functionCall)
+    {
+        resultBuilder.Append(functionCall.Name);
+        resultBuilder.Append("(");
+        var first = true;
+        foreach (var arg in functionCall.Arguments)
+        {
+            if (!first) resultBuilder.Append(", ");
+            first = false;
+            arg.Accept(this);
+        }
+        resultBuilder.Append(")");
+    }
+
     public override string ToString()
     {
         return resultBuilder.ToString();

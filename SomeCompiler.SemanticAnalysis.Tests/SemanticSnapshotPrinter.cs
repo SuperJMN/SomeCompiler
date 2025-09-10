@@ -123,4 +123,46 @@ internal class SemanticSnapshotPrinter : INodeVisitor
             child.Accept(this);
         }
     }
+
+    // New visitors (no-op formatting consistent with existing snapshot style)
+    public void VisitReturn(ReturnNode returnNode)
+    {
+        sb.Append(new string('\t', indent));
+        sb.Append("return");
+        if (returnNode.Expression.HasValue)
+        {
+            sb.Append(" ");
+            returnNode.Expression.Value.Accept(this);
+        }
+        sb.AppendLine(";");
+    }
+
+    public void VisitIfElse(IfElseNode ifElseNode)
+    {
+        sb.Append(new string('\t', indent));
+        sb.Append("if (");
+        ifElseNode.Condition.Accept(this);
+        sb.AppendLine(")");
+        ifElseNode.Then.Accept(this);
+        if (ifElseNode.Else.HasValue)
+        {
+            sb.Append(new string('\t', indent));
+            sb.AppendLine("else");
+            ifElseNode.Else.Value.Accept(this);
+        }
+    }
+
+    public void VisitFunctionCall(FunctionCallExpressionNode functionCall)
+    {
+        sb.Append(functionCall.Name);
+        sb.Append("(");
+        var first = true;
+        foreach (var arg in functionCall.Arguments)
+        {
+            if (!first) sb.Append(", ");
+            first = false;
+            arg.Accept(this);
+        }
+        sb.Append(")");
+    }
 }
