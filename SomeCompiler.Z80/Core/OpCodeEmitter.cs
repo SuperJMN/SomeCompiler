@@ -25,15 +25,14 @@ public class OpCodeEmitter
     public IEnumerable<string> Set(Reference from, Register to)
     {
         var meta = table[from];
-        var off = meta.Address; // Address field repurposed as frame offset (bytes). Negative for locals, positive for params.
         if (to.Name == "HL")
         {
-            yield return Tab + $"LD L, {Disp(off)}\t; L = [{meta.Name}] low";
-            yield return Tab + $"LD H, {Disp(off + 1)}\t; H = [{meta.Name}] high";
+            yield return Tab + $"LD L, {Disp(meta.LowOffset)}\t; L = [{meta.Name}] low";
+            yield return Tab + $"LD H, {Disp(meta.HighOffset)}\t; H = [{meta.Name}] high";
         }
         else
         {
-            yield return Tab + $"LD {to}, {Disp(off)}\t; {to} = [{meta.Name}] low";
+            yield return Tab + $"LD {to}, {Disp(meta.LowOffset)}\t; {to} = [{meta.Name}] low";
         }
     }
 
@@ -44,15 +43,14 @@ public class OpCodeEmitter
     public IEnumerable<string> Set(Register from, Reference to)
     {
         var meta = table[to];
-        var off = meta.Address; // offset
         if (from.Name == "HL")
         {
-            yield return Tab + $"LD {Disp(off)}, L\t; [{meta.Name}] low = L";
-            yield return Tab + $"LD {Disp(off + 1)}, H\t; [{meta.Name}] high = H";
+            yield return Tab + $"LD {Disp(meta.LowOffset)}, L\t; [{meta.Name}] low = L";
+            yield return Tab + $"LD {Disp(meta.HighOffset)}, H\t; [{meta.Name}] high = H";
         }
         else
         {
-            yield return Tab + $"LD {Disp(off)}, {from}\t; [{meta.Name}] low = {from}";
+            yield return Tab + $"LD {Disp(meta.LowOffset)}, {from}\t; [{meta.Name}] low = {from}";
         }
     }
 
@@ -73,9 +71,41 @@ public class OpCodeEmitter
         yield return Tab + "RET";
     }
 
+    public IEnumerable<string> AcademicEpilogueAndReturn(int frameSize)
+    {
+        // Academic convention: callee with parameters didn't modify IX
+        // Just restore SP and return (no IX manipulation)
+        if (frameSize > 0)
+        {
+            yield return Tab + $"LD HL, {frameSize}";
+            yield return Tab + "ADD HL, SP";
+            yield return Tab + "LD SP, HL";
+        }
+        yield return Tab + "RET";
+    }
+
+    public IEnumerable<string> EpilogueAndReturnWithParamCleanup(int paramCount)
+    {
+        yield return Tab + "LD SP, IX";
+        yield return Tab + "POP IX";
+        // Clean parameters from stack (each parameter is 2 bytes)
+        if (paramCount > 0)
+        {
+            yield return Tab + $"LD HL, {paramCount * 2}";
+            yield return Tab + "ADD HL, SP";
+            yield return Tab + "LD SP, HL";
+        }
+        yield return Tab + "RET";
+    }
+
     public string Set(int from, Register to)
     {
         return Tab + $"LD {to}, {from}\t; {to} = {from}";
+    }
+
+    public bool HasReference(CodeGeneration.Model.Classes.Reference reference)
+    {
+        return table.ContainsKey(reference);
     }
 
     public string Call(string label)
@@ -89,6 +119,18 @@ public class OpCodeEmitter
         yield return Tab + $"LD HL, {bytes}";
         yield return Tab + "ADD HL, SP";
         yield return Tab + "LD SP, HL";
+    }
+
+    public IEnumerable<string> AdjustSPPreserveHL(int bytes)
+    {
+        if (bytes == 0) yield break;
+        yield return Tab + "LD D, H";
+        yield return Tab + "LD E, L";
+        yield return Tab + $"LD HL, {bytes}";
+        yield return Tab + "ADD HL, SP";
+        yield return Tab + "LD SP, HL";
+        yield return Tab + "LD H, D";
+        yield return Tab + "LD L, E";
     }
 
     public string Push(Register reg)
@@ -115,5 +157,17 @@ public class OpCodeEmitter
     public string Halt()
     {
         return Tab + "HALT";
+    }
+
+    // Clears carry flag (and A=0). Useful before 16-bit SBC/ADC.
+    public string XorA()
+    {
+        return Tab + "XOR A";
+    }
+
+    // 16-bit subtract: HL = HL - DE - Carry
+    public string SbcHlDe()
+    {
+        return Tab + "SBC HL, DE";
     }
 }

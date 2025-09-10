@@ -23,8 +23,28 @@ public class SemanticAnalyzer
     {
         // Create a child scope for the function body so locals don't leak out
         var functionScope = new Scope(parentScope);
+
+        // Declare parameters in the function scope so they can be referenced in the body
+        var errors = new List<string>();
+        foreach (var p in function.Parameters)
+        {
+            var result = functionScope.TryDeclare(new Symbol(p.Name, IntType.Instance));
+            if (result.IsSuccess)
+            {
+                functionScope = result.Value;
+            }
+            else
+            {
+                errors.Add($"Parameter '{p.Name}' is already declared");
+            }
+        }
+
         var analyzeBlockResult = AnalyzeBlock(function.Block, functionScope);
-        var node = new FunctionNode(function.Name, analyzeBlockResult.Node);
+        var paramNames = function.Parameters.Select(p => p.Name).ToList();
+        var node = new FunctionNode(function.Name, analyzeBlockResult.Node, paramNames)
+        {
+            Errors = errors
+        };
         // Return the unchanged parent scope (function-local declarations are not visible outside)
         return new AnalyzeResult<FunctionNode>(node, parentScope);
     }

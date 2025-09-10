@@ -5,17 +5,26 @@ namespace SomeCompiler.Z80.Core;
 public class IntermediateEmitter
 {
     private readonly OpCodeEmitter opCodeEmitter;
+    private int parameterCount;
+    private int frameSize;
 
-    public IntermediateEmitter(OpCodeEmitter opCodeEmitter)
+    public IntermediateEmitter(OpCodeEmitter opCodeEmitter, int parameterCount = 0, int frameSize = 0)
     {
         this.opCodeEmitter = opCodeEmitter;
+        this.parameterCount = parameterCount;
+        this.frameSize = frameSize;
     }
 
     public IEnumerable<string> AssignConstant(AssignConstant assignConstant)
     {
         var lines = new List<string>();
         lines.Add(opCodeEmitter.Set(assignConstant.Source, Register.HL));
-        lines.AddRange(opCodeEmitter.Set(Register.HL, assignConstant.Target));
+        // If target is a Placeholder used to load first arg into HL, we don't need to store back.
+        // Detect by absence in table: in that case, just leave HL loaded.
+        if (opCodeEmitter.HasReference(assignConstant.Target))
+        {
+            lines.AddRange(opCodeEmitter.Set(Register.HL, assignConstant.Target));
+        }
         return lines;
     }
 
@@ -33,10 +42,13 @@ public class IntermediateEmitter
 
     public IEnumerable<string> Call(SomeCompiler.Generation.Intermediate.Model.Codes.Call call)
     {
-        var lines = new List<string>();
-        lines.Add(opCodeEmitter.Call(call.Name));
-        lines.AddRange(opCodeEmitter.AdjustSP(call.ArgCount * 2));
-        return lines;
+        // Only issue the call; stack cleanup is handled separately after capturing the return value.
+        return new[] { opCodeEmitter.Call(call.Name) };
+    }
+
+    public IEnumerable<string> CleanArgs(SomeCompiler.Generation.Intermediate.Model.Codes.CleanArgs clean)
+    {
+        return opCodeEmitter.AdjustSPPreserveHL(clean.ArgCount * 2);
     }
 
     public IEnumerable<string> Divide(Divide divide)
@@ -46,7 +58,11 @@ public class IntermediateEmitter
 
     public IEnumerable<string> EmptyReturn()
     {
-        return opCodeEmitter.EpilogueAndReturn();
+        // Use academic epilogue if this function has parameters
+        if (parameterCount > 0)
+            return opCodeEmitter.AcademicEpilogueAndReturn(frameSize);
+        else
+            return opCodeEmitter.EpilogueAndReturn();
     }
 
     public IEnumerable<string> Halt()
@@ -57,11 +73,24 @@ public class IntermediateEmitter
         };
     }
 
+    public IEnumerable<string> LoadHLImm(LoadHLImm op)
+    {
+        return new[] { opCodeEmitter.Set(op.Value, Register.HL) };
+    }
+
+    public IEnumerable<string> LoadHLRef(LoadHLRef op)
+    {
+        return opCodeEmitter.Set(op.From, Register.HL);
+    }
+
     public IEnumerable<string> Assign(Assign assign)
     {
         var lines = new List<string>();
         lines.AddRange(opCodeEmitter.Set(assign.Source, Register.HL));
-        lines.AddRange(opCodeEmitter.Set(Register.HL, assign.Target));
+        if (opCodeEmitter.HasReference(assign.Target))
+        {
+            lines.AddRange(opCodeEmitter.Set(Register.HL, assign.Target));
+        }
         return lines;
     }
 
@@ -69,21 +98,25 @@ public class IntermediateEmitter
     {
         var lines = new List<string>();
         lines.AddRange(opCodeEmitter.Set(ret.Reference, Register.HL));
-        lines.AddRange(opCodeEmitter.EpilogueAndReturn());
+        // Use academic epilogue if this function has parameters
+        if (parameterCount > 0)
+            lines.AddRange(opCodeEmitter.AcademicEpilogueAndReturn(frameSize));
+        else
+            lines.AddRange(opCodeEmitter.EpilogueAndReturn());
         return lines;
     }
 
     public IEnumerable<string> Multiply(Multiply multiply)
     {
         var lines = new List<string>();
-        // Load left into HL, then copy to BC
+        // Load left into HL, then copy to DE (multiplicand)
         lines.AddRange(opCodeEmitter.Set(multiply.Left, Register.HL));
-        lines.Add(opCodeEmitter.Set(Register.H, Register.B));
-        lines.Add(opCodeEmitter.Set(Register.L, Register.C));
-        // Load right into HL, then copy to DE
-        lines.AddRange(opCodeEmitter.Set(multiply.Right, Register.HL));
         lines.Add(opCodeEmitter.Set(Register.H, Register.D));
         lines.Add(opCodeEmitter.Set(Register.L, Register.E));
+        // Load right into HL, then copy to BC (multiplier)
+        lines.AddRange(opCodeEmitter.Set(multiply.Right, Register.HL));
+        lines.Add(opCodeEmitter.Set(Register.H, Register.B));
+        lines.Add(opCodeEmitter.Set(Register.L, Register.C));
         // Call multiply and store result from HL
         lines.Add(opCodeEmitter.Call("MUL16"));
         lines.AddRange(opCodeEmitter.Set(Register.HL, multiply.Target));
@@ -98,9 +131,35 @@ public class IntermediateEmitter
         return lines;
     }
 
+    public IEnumerable<string> ParamConst(ParamConst param)
+    {
+        return new[]
+        {
+            opCodeEmitter.Set(param.Value, Register.HL),
+            opCodeEmitter.Push(Register.HL),
+        };
+    }
+
     public IEnumerable<string> AssignFromReturn(AssignFromReturn afr)
     {
         return opCodeEmitter.Set(Register.HL, afr.Target);
+    }
+
+    public IEnumerable<string> Subtraction(Subtract sub)
+    {
+        var lines = new List<string>();
+        // right -> HL -> DE
+        lines.AddRange(opCodeEmitter.Set(sub.Right, Register.HL));
+        lines.Add(opCodeEmitter.Set(Register.H, Register.D));
+        lines.Add(opCodeEmitter.Set(Register.L, Register.E));
+        // left -> HL
+        lines.AddRange(opCodeEmitter.Set(sub.Left, Register.HL));
+        // HL = HL - DE (clear carry then SBC HL,DE)
+        lines.Add(opCodeEmitter.XorA());
+        lines.Add(opCodeEmitter.SbcHlDe());
+        // store to target
+        lines.AddRange(opCodeEmitter.Set(Register.HL, sub.Target));
+        return lines;
     }
 
     public IEnumerable<string> Jump(Jump jump)

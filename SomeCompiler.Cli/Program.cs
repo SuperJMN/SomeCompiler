@@ -9,6 +9,7 @@ string ReadInputFile(string s) => File.ReadAllText(s);
 
 void PrintSuccess() => Console.Error.WriteLine("Success");
 void PrintError(string s) => Console.Error.WriteLine(s);
+void PrintAsm(SomeCompiler.Z80.Core.GeneratedProgram gp) => PrintSection("Assembly:", gp.Assembly);
 
 void PrintSource(string source) => PrintSection("Source:", source);
 
@@ -44,6 +45,12 @@ Result<SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram> Gener
     return Result.Success(ir);
 }
 
+Result<SomeCompiler.Z80.Core.GeneratedProgram> GenerateAsm(SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram ir)
+{
+    var z80 = new SomeCompiler.Z80.Z80Generator();
+    return z80.Generate(ir);
+}
+
 void PrintIR(SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram ir)
 {
     var text = string.Join("\n", SomeCompiler.Generation.Intermediate.IntermediateProgramExtensions.ToTextFormatContent(ir));
@@ -65,4 +72,6 @@ Result
     .Tap(result => PrintDiagnostics(result.Node.AllErrors))
     .Bind(GenerateIR)
     .Tap(PrintIR)
+    .Bind(GenerateAsm)
+    .Tap(PrintAsm)
     .Match(_ => PrintSuccess(), PrintError);

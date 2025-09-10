@@ -15,6 +15,12 @@ public class V2IntermediateCodeGenerator
         {
             // Function label
             codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Label(function.Name));
+            // Encode parameter names for backend layout
+            if (function.Parameters.Count > 0)
+            {
+                var tag = $"{function.Name}::__params__:{string.Join(",", function.Parameters)}";
+                codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.LocalLabel(tag));
+            }
             var body = GenerateBlock(function.Name, function.Block).ToList();
             codes.AddRange(body);
 
@@ -208,19 +214,42 @@ public class V2IntermediateCodeGenerator
     private (CodeGeneration.Model.Classes.Reference r, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> codes) EmitFunctionCall(string functionName, FunctionCallExpressionNode fcall)
     {
         var codes = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
-        var argRefs = new List<CodeGeneration.Model.Classes.Reference>();
+        var argOps = new List<object>(); // either int (immediate) or Reference
+
         foreach (var arg in fcall.Arguments)
         {
-            var a = GenerateExpression(functionName, arg);
-            codes.AddRange(a.codes);
-            argRefs.Add(a.r);
+            if (arg is ConstantNode c)
+            {
+                var imm = CoerceInt(c.Value);
+                argOps.Add(imm);
+            }
+            else
+            {
+                var a = GenerateExpression(functionName, arg);
+                codes.AddRange(a.codes);
+                argOps.Add(a.r);
+            }
         }
-        // push args in order
-        foreach (var r in argRefs)
+        // push all args to stack in order (no more special HL handling for first param)
+        for (int i = 0; i < argOps.Count; i++)
         {
-            codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Param(r));
+            var op = argOps[i];
+            if (op is int imm)
+            {
+                codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.ParamConst(imm));
+            }
+            else
+            {
+                codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Param((CodeGeneration.Model.Classes.Reference)op));
+            }
         }
-        codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Call(fcall.Name, argRefs.Count));
+        codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.Call(fcall.Name, argOps.Count));
+        // Clean pushed args (all args are now pushed)
+        var pushed = argOps.Count;
+        if (pushed > 0)
+        {
+            codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.CleanArgs(pushed));
+        }
         var target = new SomeCompiler.Generation.Intermediate.Model.Placeholder();
         codes.Add(new SomeCompiler.Generation.Intermediate.Model.Codes.AssignFromReturn(target));
         return (target, codes);

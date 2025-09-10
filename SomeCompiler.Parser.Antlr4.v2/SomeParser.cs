@@ -116,7 +116,7 @@ public class SomeParser
     private ExpressionSyntax ParseFunctionCall(FunctionCallContext functionCall)
     {
         var name = functionCall.IDENTIFIER().ToString()!;
-        var arguments = functionCall.arguments().expression().Select(ParseExpression);
+        var arguments = functionCall.arguments()?.expression()?.Select(ParseExpression) ?? Enumerable.Empty<ExpressionSyntax>();
         
         return new FunctionCall(name, arguments);
     }
@@ -209,7 +209,10 @@ public class SomeParser
         {
             var left = ParseAddExpression(addExpr);
             var right = ParseMultExpression(addExpression.mulExpression());
-            return new BinaryExpressionSyntax(left, right, Operator.Addition);
+            // children[1] should be '+' or '-'
+            var opText = addExpression.children[1].GetText();
+            var op = Operator.Get(opText);
+            return new BinaryExpressionSyntax(left, right, op);
         }
 
         return ParseMultExpression(addExpression.mulExpression());
@@ -221,7 +224,10 @@ public class SomeParser
         {
             var left = ParseMultExpression(multExpr);
             var right = ParseUnary(mulExpression.unaryExpression());
-            return new BinaryExpressionSyntax(left, right, Operator.Multiplication);
+            // children[1] should be '*' or '/'
+            var opText = mulExpression.children[1].GetText();
+            var op = Operator.Get(opText);
+            return new BinaryExpressionSyntax(left, right, op);
         }
         
         if (mulExpression.unaryExpression() is { } unary)
@@ -231,7 +237,9 @@ public class SomeParser
 
         var l = ParseExpression((ExpressionContext)mulExpression.children[0]);
         var r = ParseExpression((ExpressionContext)mulExpression.children[1]);
-        return new BinaryExpressionSyntax(l, r, Operator.Multiplication);
+        var opTail = mulExpression.children.Count > 2 ? mulExpression.children[2].GetText() : "*";
+        var op2 = Operator.Get(opTail);
+        return new BinaryExpressionSyntax(l, r, op2);
     }
 
     private ExpressionSyntax ParseUnary(UnaryExpressionContext unaryExpression)

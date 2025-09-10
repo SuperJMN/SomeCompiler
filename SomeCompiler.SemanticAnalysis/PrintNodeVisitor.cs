@@ -26,7 +26,8 @@ public class PrintNodeVisitor : INodeVisitor
 
     public void VisitFunctionNode(FunctionNode node)
     {
-        resultBuilder.AppendLine($"void {node.Name}()");
+        var ps = string.Join(", ", node.Parameters);
+        resultBuilder.AppendLine($"void {node.Name}({ps})");
         node.Block.Accept(this);
     }
 

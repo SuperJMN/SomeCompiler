@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../6502DotNet/Sixty502DotNet/Sixty502DotNet.csproj" />
+    <ProjectReference Include="../Z80DotNet/Main/Main.csproj" />
+    <ProjectReference Include="../SomeCompiler.Z80.Tests/SomeCompiler.Z80.Tests.csproj" />
+  </ItemGroup>
+
+</Project>

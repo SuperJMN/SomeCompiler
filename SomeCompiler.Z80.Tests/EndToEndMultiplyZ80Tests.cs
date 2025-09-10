@@ -21,7 +21,7 @@ public class EndToEndMultiplyZ80Tests
         var mul = new BinaryExpressionNode(two, three, SomeCompiler.Core.Operator.Get("*"));
         var ret = new ReturnNode(Maybe.From<ExpressionNode>(mul));
         var block = new BlockNode(new System.Collections.Generic.List<StatementNode> { ret });
-        var main = new FunctionNode("main", block);
+        var main = new FunctionNode("main", block, new System.Collections.Generic.List<string>());
         var program = new ProgramNode(new System.Collections.Generic.List<FunctionNode> { main });
 
         // Generate IR
@@ -73,6 +73,38 @@ public class EndToEndMultiplyZ80Tests
         // Assert HL == 6
         var hl = (cpu.Registers.H << 8) | cpu.Registers.L;
         Assert.Equal(6, hl);
+    }
+
+    [Fact]
+    public void Parser_pipeline_main_returns_three_times_two_sets_HL_to_6()
+    {
+        var src = @"int main() { return 3 * 2; }";
+        var hl = Z80.Tests.Support.Z80E2E.RunHL(src, maxSteps: 20000);
+        Assert.Equal(6, hl);
+    }
+
+    [Fact]
+    public void Parser_pipeline_function_returns_n_times_n_minus_1_for_3_is_6()
+    {
+        var src = @"int f(int n){ return n * (n - 1); } int main(){ return f(3); }";
+        var hl = Z80.Tests.Support.Z80E2E.RunHL(src, maxSteps: 20000);
+        Assert.Equal(6, hl);
+    }
+
+    [Fact]
+    public void Parser_pipeline_function_returns_n_minus_1_for_3_is_2()
+    {
+        var src = @"int f(int n){ return n - 1; } int main(){ return f(3); }";
+        var hl = Z80.Tests.Support.Z80E2E.RunHL(src, maxSteps: 20000);
+        Assert.Equal(2, hl);
+    }
+
+    [Fact]
+    public void Parser_pipeline_function_returns_n_for_3_is_3()
+    {
+        var src = @"int f(int n){ return n; } int main(){ return f(3); }";
+        var hl = Z80.Tests.Support.Z80E2E.RunHL(src, maxSteps: 20000);
+        Assert.Equal(3, hl);
     }
 }
 

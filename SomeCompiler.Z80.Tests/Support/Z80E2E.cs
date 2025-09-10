@@ -50,6 +50,8 @@ public static class Z80E2E
         if (asmResult.IsFailure)
             throw new InvalidOperationException(asmResult.Error);
         var asm = asmResult.Value.Assembly;
+        Console.WriteLine("==== ASM ====");
+        Console.WriteLine(asm);
 
         // Ensamblar
         var assembler = new Z80Assembler();

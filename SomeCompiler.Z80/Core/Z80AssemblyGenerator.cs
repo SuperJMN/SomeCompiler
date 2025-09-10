@@ -24,13 +24,17 @@ public class Z80AssemblyGenerator
             Halt halt => intermediateEmitter.Halt(),
             Multiply multiply => intermediateEmitter.Multiply(multiply),
             Return ret => intermediateEmitter.Return(ret),
-            Subtract subtract => throw new NotImplementedException(),
+            Subtract subtract => intermediateEmitter.Subtraction(subtract),
             Label label => new[] { $"{label.Name}:"},
             Param param => intermediateEmitter.Param(param),
+            ParamConst pconst => intermediateEmitter.ParamConst(pconst),
+            LoadHLImm lhi => intermediateEmitter.LoadHLImm(lhi),
+            LoadHLRef lhr => intermediateEmitter.LoadHLRef(lhr),
             AssignFromReturn afr => intermediateEmitter.AssignFromReturn(afr),
             Jump jump => intermediateEmitter.Jump(jump),
             BranchIfZero brz => intermediateEmitter.BranchIfZero(brz),
             BranchIfNotZero brnz => intermediateEmitter.BranchIfNotZero(brnz),
+            SomeCompiler.Generation.Intermediate.Model.Codes.CleanArgs clean => intermediateEmitter.CleanArgs(clean),
             LocalLabel localLabel => new[] { $"{localLabel.Name}:"},
             _ => throw new ArgumentOutOfRangeException(nameof(code))
         };

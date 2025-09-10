@@ -9,5 +9,6 @@
     <ProjectReference Include="..\SomeCompiler.Parser.Antlr4.v2\SomeCompiler.Parser.csproj" />
     <ProjectReference Include="..\SomeCompiler.SemanticAnalysis\SomeCompiler.SemanticAnalysis.csproj" />
     <ProjectReference Include="..\SomeCompiler.Generation.Intermediate\SomeCompiler.Generation.Intermediate.csproj" />
+    <ProjectReference Include="..\SomeCompiler.Z80\SomeCompiler.Z80.csproj" />
   </ItemGroup>
 </Project>
