@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Zafiro.Core" Version="3.2.36" />
+    <PackageReference Include="Zafiro.Core" />
   </ItemGroup>
 
   <ItemGroup>
