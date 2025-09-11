@@ -68,31 +68,42 @@ public static class Z80E2E
             .DefaultIfEmpty(0)
             .First();
             
-        // The debug info from Z80Assembler doesn't include labels, only instructions
-        // For single-function programs (main only), main starts at PC 0
-        // For multi-function programs, we need a different approach
+        // If not found in debug info, look for main: in assembly and find correct PC
         if (entryPc == 0)
         {
-            // Check if this looks like a multi-function program by looking for multiple RET instructions
-            var retCount = bin.Count(b => b == 0xC9);
-            
-            if (retCount <= 1)
+            var lines = asm.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
             {
-                // Single function program - main starts at 0
-                entryPc = 0;
-            }
-            else
-            {
-                // Multi-function program - look for the second function (main after first function)
-                // Find first RET, then main should start right after
-                for (int pc = 0; pc < bin.Length - 1; pc++)
+                if (lines[i].Trim() == "main:")
                 {
-                    if (bin[pc] == 0xC9) // RET instruction
+                    // Found main: label, now find the first instruction after it in debug info
+                    // Look for the first actual instruction (not a label) after the main: line
+                    for (int j = i + 1; j < lines.Length; j++)
                     {
-                        // Next instruction after RET should be start of next function (main)
-                        entryPc = (ushort)(pc + 1);
-                        break;
+                        var nextLine = lines[j].Trim();
+                        if (!string.IsNullOrEmpty(nextLine) && !nextLine.EndsWith(':'))
+                        {
+                            // This should be the first instruction of main
+                            // Find it in debug info to get the correct PC, but search only after 
+                            // the previous function to avoid matching the same instruction in other functions
+                            var instruction = nextLine.Split('\t')[0];
+                            
+                            // Find all debug entries that match this instruction
+                            var matchingEntries = assembled.Value.DebugInfo
+                                .Where(d => d.LineText?.Trim().StartsWith(instruction) == true)
+                                .OrderBy(d => d.ProgramCounter)
+                                .ToList();
+                            
+                            // Take the last matching entry (should be main's version)
+                            // Or find the one with the highest PC address
+                            if (matchingEntries.Any())
+                            {
+                                entryPc = (ushort)matchingEntries.Last().ProgramCounter;
+                                break;
+                            }
+                        }
                     }
+                    break;
                 }
             }
         }

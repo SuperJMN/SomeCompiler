@@ -152,51 +152,14 @@ public class Z80Generator
         var prePrologue = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
         var mainBody = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
         
-        // Debug output removed
+        // TEMPORARILY DISABLE parameter extraction to fix factorial bug
+        // The issue is that param instructions often depend on calculations in the function body,
+        // but ExtractParameterInstructions moves them to pre-prologue where those calculations
+        // haven't happened yet, causing wrong values to be pushed.
+        // TODO: Make this smarter to only extract truly independent parameter instructions
         
-        var i = 0;
-        while (i < body.Count)
-        {
-            // Look for sequences of Param/ParamConst followed by Call
-            if (IsParameterInstruction(body[i]))
-            {
-                var paramStart = i;
-                // Collect consecutive parameter instructions
-                while (i < body.Count && IsParameterInstruction(body[i]))
-                {
-                    i++;
-                }
-                
-                // Check if followed by Call
-                if (i < body.Count && body[i] is SomeCompiler.Generation.Intermediate.Model.Codes.Call)
-                {
-                    // Move param instructions to pre-prologue
-                    for (var j = paramStart; j < i; j++)
-                    {
-                        prePrologue.Add(body[j]);
-                    }
-                    // Continue with Call and subsequent instructions in main body
-                    while (i < body.Count)
-                    {
-                        mainBody.Add(body[i]);
-                        i++;
-                    }
-                }
-                else
-                {
-                    // No Call follows, keep in main body
-                    for (var j = paramStart; j < i; j++)
-                    {
-                        mainBody.Add(body[j]);
-                    }
-                }
-            }
-            else
-            {
-                mainBody.Add(body[i]);
-                i++;
-            }
-        }
+        // For now, keep everything in main body
+        mainBody.AddRange(body);
         
         return (prePrologue, mainBody);
     }
