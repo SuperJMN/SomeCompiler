@@ -1,4 +1,4 @@
-﻿using SomeCompiler.Generation.Intermediate.Model;
+using SomeCompiler.Generation.Intermediate.Model;
 using SomeCompiler.Generation.Intermediate.Model.Codes;
 
 namespace SomeCompiler.Generation.Intermediate;
