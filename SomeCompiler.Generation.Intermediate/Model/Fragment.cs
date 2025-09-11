@@ -1,25 +1,28 @@
 namespace SomeCompiler.Generation.Intermediate.Model;
 
+using ModelCode = SomeCompiler.Generation.Intermediate.Model.Codes.Code;
+using Ref = CodeGeneration.Model.Classes.Reference;
+
 public class Fragment
 {
-    public Fragment(Func<Reference, Code> codeFactory) : this(codeFactory, Enumerable.Empty<Code>())
+    public Fragment(Func<Ref, ModelCode> codeFactory) : this(codeFactory, Enumerable.Empty<ModelCode>())
     {
     }
 
-    public Fragment(Func<Reference, Code> codeFactory, IEnumerable<Code> codes)
+    public Fragment(Func<Ref, ModelCode> codeFactory, IEnumerable<ModelCode> codes)
     {
-        Reference = new PlaceholderReference();
+        Reference = new Placeholder();
         Codes = codes.Concat(new[] { codeFactory(Reference) });
     }
 
-    public Fragment(Reference reference, IEnumerable<Code> codes)
+    public Fragment(Ref reference, IEnumerable<ModelCode> codes)
     {
         Reference = reference;
         Codes = codes;
     }
 
-    public Reference Reference { get; }
-    public IEnumerable<Code> Codes { get; }
+    public Ref Reference { get; }
+    public IEnumerable<ModelCode> Codes { get; }
 
     public Fragment Prepend(Fragment fragment)
     {
