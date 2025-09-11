@@ -133,7 +133,7 @@ public class SomeParser
 
     private ExpressionSyntax ParseAssignment(AssignmentContext assignment)
     {
-        var lvalue = ParseLValue(assignment.IDENTIFIER().GetText());
+        var lvalue = ParseLValue(assignment.lvalue());
         return new AssignmentSyntax(lvalue, ParseExpression(assignment.expression()));
     }
 
@@ -193,15 +193,34 @@ public class SomeParser
         if (relationalExpression.relationalExpression() is { } relational)
         {
             var left = ParseConditionalRelational(relational);
-            var right = ParseAddExpression(relationalExpression.addExpression());
+            var right = ParseShiftExpression(relationalExpression.shiftExpression());
             var @operator = relationalExpression.children[1].GetText();
             return new BinaryExpressionSyntax(left, right, Operator.Get(@operator));
         }
         
-        return ParseAddExpression(relationalExpression.addExpression());
+        return ParseShiftExpression(relationalExpression.shiftExpression());
     }
 
-    private LValue ParseLValue(string identifier) => new IdentifierLValue(identifier);
+    private LValue ParseLValue(LvalueContext ctx)
+    {
+        if (ctx.IDENTIFIER() != null && ctx.children.Count == 1)
+        {
+            return new IdentifierLValue(ctx.IDENTIFIER().GetText());
+        }
+        if (ctx.children[0].GetText() == "*")
+        {
+            // For now, treat *expr lvalue as unsupported in semantic, but keep syntax node
+            var inner = ParseExpression((ExpressionContext)ctx.children[1]);
+            return new PointerDerefLValue(inner);
+        }
+        if (ctx.IDENTIFIER() != null && ctx.children.Count >= 4 && ctx.children[1].GetText() == "[")
+        {
+            var baseIdent = ctx.IDENTIFIER().GetText();
+            var indexExpr = ParseExpression((ExpressionContext)ctx.children[2]);
+            return new IndexLValue(baseIdent, indexExpr);
+        }
+        throw new NotImplementedException("Unsupported lvalue form");
+    }
 
     private ExpressionSyntax ParseAddExpression(AddExpressionContext addExpression)
     {
@@ -209,13 +228,26 @@ public class SomeParser
         {
             var left = ParseAddExpression(addExpr);
             var right = ParseMultExpression(addExpression.mulExpression());
-            // children[1] should be '+' or '-'
             var opText = addExpression.children[1].GetText();
             var op = Operator.Get(opText);
             return new BinaryExpressionSyntax(left, right, op);
         }
 
         return ParseMultExpression(addExpression.mulExpression());
+    }
+
+    private ExpressionSyntax ParseShiftExpression(ShiftExpressionContext shiftExpression)
+    {
+        if (shiftExpression.shiftExpression() is { } shiftExpr)
+        {
+            var left = ParseShiftExpression(shiftExpr);
+            var right = ParseAddExpression(shiftExpression.addExpression());
+            var opText = shiftExpression.children[1].GetText();
+            var op = Operator.Get(opText);
+            return new BinaryExpressionSyntax(left, right, op);
+        }
+
+        return ParseAddExpression(shiftExpression.addExpression());
     }
 
     private ExpressionSyntax ParseMultExpression(MulExpressionContext mulExpression)

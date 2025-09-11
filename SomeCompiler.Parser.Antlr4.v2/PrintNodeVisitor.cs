@@ -49,6 +49,20 @@ public class PrintNodeVisitor : ISyntaxVisitor
         resultBuilder.Append(identifierLValue.Identifier);
     }
 
+    public void VisitPointerDerefLValue(PointerDerefLValue pointerDerefLValue)
+    {
+        resultBuilder.Append("*");
+        pointerDerefLValue.Expression.Accept(this);
+    }
+
+    public void VisitIndexLValue(IndexLValue indexLValue)
+    {
+        resultBuilder.Append(indexLValue.BaseIdentifier);
+        resultBuilder.Append("[");
+        indexLValue.Index.Accept(this);
+        resultBuilder.Append("]");
+    }
+
     public void VisitAssignment(AssignmentSyntax assignmentSyntax)
     {
         assignmentSyntax.Left.Accept(this);

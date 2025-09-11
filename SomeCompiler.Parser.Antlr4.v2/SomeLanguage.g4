@@ -1,7 +1,7 @@
 ﻿grammar SomeLanguage;
 
 // We define the main rule that starts parsing the file
-program: (variableDeclaration | function | statement)* EOF;
+program: (variableDeclaration | externFunction | function | statement)* EOF;
 
 // Variable declaration with optional inline initialization
 variableDeclaration: type IDENTIFIER ('=' expression)? ';';
@@ -14,8 +14,14 @@ type: 'void' | 'int' | 'char' | 'string' | 'byte'
     | 'ptr' '<' type '>'
     ;
 
-// Function definition
-function: type IDENTIFIER '(' parameters? ')' block;
+// Attributes (zero-cost hints; currently ignored by semantics)
+attrs: ('[' IDENTIFIER ('(' arguments? ')')? ']')* ;
+
+// Extern function declaration (prototype only)
+externFunction: attrs? 'extern' type IDENTIFIER '(' parameters? ')' ';' ;
+
+// Function definition (now supports optional attributes before the signature)
+function: attrs? type IDENTIFIER '(' parameters? ')' block;
 
 // Function parameters, separated by commas
 parameters: parameter (',' parameter)*;
@@ -29,6 +35,7 @@ statement: variableDeclaration
           | expression ';'
           | conditional
           | whileLoop
+          | forLoop
           | block // Allows nested blocks
           | returnStatement
           ;
@@ -36,7 +43,7 @@ statement: variableDeclaration
 // Expressions
 expression: assignment | conditionalOrExpression ;
 
-assignment: IDENTIFIER '=' expression ;
+assignment: lvalue '=' expression ;
 
 conditionalOrExpression: conditionalOrExpression '||' conditionalAndExpression
                        | conditionalAndExpression ;
@@ -47,22 +54,31 @@ conditionalAndExpression: conditionalAndExpression '&&' equalityExpression
 equalityExpression: equalityExpression ('==' | '!=') relationalExpression
                   | relationalExpression ;
 
-relationalExpression: relationalExpression ('<' | '<=' | '>' | '>=') addExpression
-                    | addExpression ;
+relationalExpression: relationalExpression ('<' | '<=' | '>' | '>=') shiftExpression
+                    | shiftExpression ;
+
+// Shift operations (new level between relational and additive)
+shiftExpression: shiftExpression ('<<' | '>>') addExpression
+               | addExpression ;
 
 addExpression: addExpression ('+' | '-') mulExpression
              | mulExpression ;
 
-mulExpression: mulExpression ('*' | '/') unaryExpression
+mulExpression: mulExpression ('*' | '/' | '%') unaryExpression
              | unaryExpression ;
 
-unaryExpression: ('+' | '-' | '!') unaryExpression
+unaryExpression: ('+' | '-' | '!' | '~') unaryExpression
                | primary ;
 
 primary: '(' expression ')'
        | IDENTIFIER
        | functionCall
        | LITERAL ;
+
+// LValue forms for assignments (parser-only for now)
+lvalue: IDENTIFIER
+      | '*' expression
+      | IDENTIFIER '[' expression ']' ;
 
 // Function call
 functionCall: IDENTIFIER '(' arguments? ')';
@@ -73,6 +89,7 @@ arguments: expression (',' expression)*;
 // Control structures
 conditional: 'if' '(' expression ')' block ('else' block)?;
 whileLoop: 'while' '(' expression ')' block;
+forLoop: 'for' '(' (variableDeclaration | assignment)? ';' expression? ';' assignment? ')' block;
 
 // Return statement
 returnStatement: 'return' expression? ';';

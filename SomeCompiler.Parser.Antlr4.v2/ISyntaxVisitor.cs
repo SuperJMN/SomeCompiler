@@ -6,6 +6,8 @@ public interface ISyntaxVisitor
     void VisitProgram(ProgramSyntax programSyntax);
     void VisitFunctionCall(FunctionCall functionCall);
     void VisitIdentifierLValue(IdentifierLValue identifierLValue);
+    void VisitPointerDerefLValue(PointerDerefLValue pointerDerefLValue);
+    void VisitIndexLValue(IndexLValue indexLValue);
     void VisitAssignment(AssignmentSyntax assignmentSyntax);
     void VisitExpressionStatement(ExpressionStatementSyntax expressionStatementSyntax);
     void VisitFunction(FunctionSyntax function);
