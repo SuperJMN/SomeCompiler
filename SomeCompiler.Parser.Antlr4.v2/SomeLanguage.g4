@@ -7,7 +7,12 @@ program: (variableDeclaration | function | statement)* EOF;
 variableDeclaration: type IDENTIFIER ('=' expression)? ';';
 
 // Data types
-type: 'void' | 'int' | 'char' | 'string' | 'byte';
+// Extended to accept TinyCSharp-8bit core types and ptr<T> without changing semantics yet
+// Existing code still treats type as text; we only broaden accepted syntax.
+type: 'void' | 'int' | 'char' | 'string' | 'byte'
+    | 'u8' | 'i8' | 'u16' | 'i16' | 'bool'
+    | 'ptr' '<' type '>'
+    ;
 
 // Function definition
 function: type IDENTIFIER '(' parameters? ')' block;
