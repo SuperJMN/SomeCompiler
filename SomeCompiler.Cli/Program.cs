@@ -59,7 +59,7 @@ Result<SomeCompiler.Z80.Core.GeneratedProgram> GenerateAsm(SomeCompiler.Generati
 
 void PrintIR(SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram ir)
 {
-    var text = string.Join("\n", SomeCompiler.Generation.Intermediate.IntermediateProgramExtensions.ToTextFormatContent(ir));
+    var text = SomeCompiler.Generation.Intermediate.Model.Visitors.PrettyPrinterVisitor.Print(ir);
     PrintSection("Intermediate code:", text);
 }
 
