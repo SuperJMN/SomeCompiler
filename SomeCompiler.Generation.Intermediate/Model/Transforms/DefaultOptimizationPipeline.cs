@@ -11,8 +11,10 @@ public static Result<IntermediateCodeProgram> Apply(IntermediateCodeProgram prog
     var copyProp = new CopyPropagationVisitor();
     var dce = new DeadCodeEliminationVisitor();
 
-    return folding.Run(program)
+return folding.Run(program)
         .Bind(copyProp.Run)
+        .Bind(new BranchFoldingTransform().Run)
+        .Bind(new StrengthReductionTransform().Run)
         .Bind(dce.Run);
 }
 }
