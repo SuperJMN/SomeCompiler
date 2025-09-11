@@ -99,32 +99,12 @@ public class Z80Generator
                 // Emit label
                 lines.Add($"{lbl.Name}:");
 
-                // Get first parameter reference for prologue
-                CodeGeneration.Model.Classes.Reference? firstParamRef = null;
-                if (paramNames.Count >= 1)
-                {
-                    var firstParamName = paramNames[0];
-                    var fullName = $"{lbl.Name}::{firstParamName}";
-                    firstParamRef = refs.FirstOrDefault(r => r is SomeCompiler.Generation.Intermediate.Model.NamedReference nr && nr.Value == fullName);
-                }
 
-                // Extract parameter passing instructions that come before CALL instructions
-                var (prePrologueInstructions, mainBody) = ExtractParameterInstructions(body);
+                // Generate prologue
+                lines.AddRange(FunctionPrologue(frameSize, paramNames.Count, op));
                 
-                // Prologue: different strategy based on parameters and whether we're a caller
-                bool isCaller = prePrologueInstructions.Count > 0;
-                lines.AddRange(FunctionPrologue(frameSize, paramNames.Count, op, isCaller));
-                
-                // Emit pre-prologue parameter instructions (after setting up the frame)
-                foreach (var c in prePrologueInstructions)
-                {
-                    lines.AddRange(gen.Generate(c));
-                }
-
-                // The callee will set up its own frame in the standard prologue
-
-                // Emit remaining body
-                foreach (var c in mainBody)
+                // Emit function body
+                foreach (var c in body)
                 {
                     lines.AddRange(gen.Generate(c));
                 }
@@ -147,28 +127,11 @@ public class Z80Generator
         return new GeneratedProgram(asm);
     }
 
-    private static (List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> prePrologue, List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> mainBody) ExtractParameterInstructions(List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> body)
-    {
-        var prePrologue = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
-        var mainBody = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
-        
-        // TEMPORARILY DISABLE parameter extraction to fix factorial bug
-        // The issue is that param instructions often depend on calculations in the function body,
-        // but ExtractParameterInstructions moves them to pre-prologue where those calculations
-        // haven't happened yet, causing wrong values to be pushed.
-        // TODO: Make this smarter to only extract truly independent parameter instructions
-        
-        // For now, keep everything in main body
-        mainBody.AddRange(body);
-        
-        return (prePrologue, mainBody);
-    }
     
-    private static bool IsParameterInstruction(SomeCompiler.Generation.Intermediate.Model.Codes.Code code)
-    {
-        return code is SomeCompiler.Generation.Intermediate.Model.Codes.Param or SomeCompiler.Generation.Intermediate.Model.Codes.ParamConst;
-    }
-    
+    /// <summary>
+    /// Optimization: Filter out temporaries that are only used for "assign constant; return temp" patterns.
+    /// This avoids materializing values that can stay in HL register.
+    /// </summary>
     private static List<CodeGeneration.Model.Classes.Reference> FilterOutSingleUseReturnTemporaries(
         List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> body, 
         List<CodeGeneration.Model.Classes.Reference> allRefs)
@@ -177,44 +140,22 @@ public class Z80Generator
         
         foreach (var reference in allRefs)
         {
-            // Count how many times this reference is used across all instructions
-            var usageCount = 0;
-            var isOnlyUsedInReturn = false;
+            // Simple optimization: if a reference is used exactly twice - once in AssignConstant as target,
+            // once in Return as source - then we can keep the value in HL and skip stack materialization
+            var assignConstantUsage = body.OfType<SomeCompiler.Generation.Intermediate.Model.Codes.AssignConstant>()
+                .FirstOrDefault(ac => ac.Target.Equals(reference));
             
-            foreach (var code in body)
+            var returnUsage = body.OfType<SomeCompiler.Generation.Intermediate.Model.Codes.Return>()
+                .FirstOrDefault(ret => ret.Reference.Equals(reference));
+            
+            var totalUsages = body.SelectMany(c => c.GetReferences()).Count(r => r.Equals(reference));
+            
+            // Skip materialization if: exactly 2 usages, one assign constant, one return
+            if (totalUsages == 2 && assignConstantUsage != null && returnUsage != null)
             {
-                var codeRefs = code.GetReferences();
-                if (codeRefs.Contains(reference))
-                {
-                    usageCount++;
-                    // Check if this usage is in a return statement
-                    if (code is SomeCompiler.Generation.Intermediate.Model.Codes.Return ret && ret.Reference.Equals(reference))
-                    {
-                        isOnlyUsedInReturn = true;
-                    }
-                    else
-                    {
-                        isOnlyUsedInReturn = false;
-                    }
-                }
+                continue; // Don't materialize this reference
             }
             
-            // If reference is used exactly twice (once in assign, once in return), and the return is the only non-assign usage,
-            // then we can optimize it out
-            if (usageCount == 2 && isOnlyUsedInReturn)
-            {
-                // Check if the other usage is an AssignConstant where this reference is the target
-                bool hasAssignConstantUsage = body.OfType<SomeCompiler.Generation.Intermediate.Model.Codes.AssignConstant>()
-                    .Any(ac => ac.Target.Equals(reference));
-                
-                if (hasAssignConstantUsage)
-                {
-                    // Skip this reference - don't materialize it
-                    continue;
-                }
-            }
-            
-            // Keep this reference
             filteredRefs.Add(reference);
         }
         
@@ -241,12 +182,14 @@ public class Z80Generator
     }
 
 
-    private static IEnumerable<string> FunctionPrologue(int frameSize, int paramCount, OpCodeEmitter op, bool isCaller = false)
+    private static IEnumerable<string> FunctionPrologue(int frameSize, int paramCount, OpCodeEmitter op)
     {
-        if (paramCount > 0)
+        bool needsFrame = paramCount > 0 || frameSize > 0 || op.HasAnyReferences();
+        
+        if (needsFrame)
         {
-            // Standard Z80 calling convention prologue for functions with parameters
-            // On entry: [old_stack, arg0, arg1, ..., return_addr] <- SP
+            // Standard Z80 calling convention prologue
+            // On entry: [old_stack, arg0, arg1, ..., return_addr] <- SP (for functions with parameters)
             yield return "\tPUSH IX";          // Save old frame pointer
             yield return "\tLD HL, 0";
             yield return "\tADD HL, SP";       // HL = current SP
@@ -260,37 +203,13 @@ public class Z80Generator
                 yield return "\tADD HL, SP";
                 yield return "\tLD SP, HL";
             }
-            // Now IX points to the frame:
+            
+            // IX frame layout:
             // (ix+0,ix+1) : old IX
             // (ix+2,ix+3) : return address  
-            // (ix+4,...)  : arguments
+            // (ix+4,...)  : arguments (if any)
         }
-        else if (frameSize > 0 || op.HasAnyReferences())
-        {
-            // Standard prologue for functions that need IX frame (have locals or use IX)
-            yield return "\tPUSH IX";         // Save old IX
-            yield return "\tLD HL, 0";
-            yield return "\tADD HL, SP";      // HL = current SP
-            yield return "\tPUSH HL";         // Push HL onto stack
-            yield return "\tPOP IX";          // IX = value from stack = HL
-            
-            if (frameSize > 0)
-            {
-                yield return $"\tLD HL, {-frameSize}";
-                yield return "\tADD HL, SP";
-                yield return "\tLD SP, HL";
-            }
-        }
-        else
-        {
-            // Simple functions with no locals and no IX usage: minimal prologue
-            if (frameSize > 0)
-            {
-                yield return $"\tLD HL, {-frameSize}";
-                yield return "\tADD HL, SP";
-                yield return "\tLD SP, HL";
-            }
-        }
+        // Simple functions with no frame needs get no prologue
     }
     public static IEnumerable<string> MultiplyAlgorithm()
     {
