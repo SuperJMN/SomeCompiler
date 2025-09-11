@@ -45,6 +45,12 @@ Result<SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram> Gener
     return Result.Success(ir);
 }
 
+Result<SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram> OptimizeIR(SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram ir)
+{
+    return SomeCompiler.Generation.Intermediate.Model.Transforms.DefaultOptimizationPipeline
+        .Apply(ir);
+}
+
 Result<SomeCompiler.Z80.Core.GeneratedProgram> GenerateAsm(SomeCompiler.Generation.Intermediate.Model.IntermediateCodeProgram ir)
 {
     var z80 = new SomeCompiler.Z80.Z80Generator();
@@ -70,7 +76,8 @@ Result
     .Tap(PrintSource)
     .Bind(Analyze)
     .Tap(result => PrintDiagnostics(result.Node.AllErrors))
-    .Bind(GenerateIR)
+.Bind(GenerateIR)
+    .Bind(OptimizeIR)
     .Tap(PrintIR)
     .Bind(GenerateAsm)
     .Tap(PrintAsm)
