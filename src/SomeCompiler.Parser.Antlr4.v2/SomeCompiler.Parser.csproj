@@ -19,6 +19,7 @@
 		<PackageReference Include="Antlr4BuildTasks" PrivateAssets="all" />
 		<PackageReference Include="CSharpFunctionalExtensions" />
 		<PackageReference Include="Zafiro.Core" />
+		<PackageReference Include="System.Drawing.Common" />
 	</ItemGroup>
 
 	<ItemGroup>
