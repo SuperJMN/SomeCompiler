@@ -11,7 +11,7 @@ Common commands
 - Run all tests (xUnit)
   - dotnet test SomeCompiler.sln -c Debug --no-build
 - Run tests for a single project
-  - dotnet test SomeCompiler.Parser.Tests/SomeCompiler.Parser.Tests.csproj -c Debug --no-build
+  - dotnet test src/SomeCompiler.Parser.Tests/SomeCompiler.Parser.Tests.csproj -c Debug --no-build
 - Run a single test
   - By fully-qualified name: dotnet test --filter "FullyQualifiedName~Namespace.ClassName.MethodName"
   - By class: dotnet test --filter "ClassName=Namespace.ClassName"
@@ -19,12 +19,16 @@ Common commands
   - Fix: dotnet format SomeCompiler.sln
   - Check only (CI-friendly): dotnet format SomeCompiler.sln --verify-no-changes
 - Run the CLI (compile a source file and print IL and Z80 assembly)
-  - dotnet run --project SomeCompiler.Cli -- path/to/source.c
+  - dotnet run --project src/SomeCompiler.Cli/SomeCompiler.Cli.csproj -- path/to/source.c
 - Optional: collect coverage (coverlet collector is referenced in test projects)
   - dotnet test SomeCompiler.sln --collect "XPlat Code Coverage"
 
 Prerequisites
 - .NET SDK 8.x installed and available on PATH
+
+Repository layout
+- src/: All repository-owned projects (apps, libraries, tests)
+- libs/: Git submodules and third-party code used by the solution
 
 High-level architecture
 The solution is structured as a classic compiler pipeline with clear stage separation and an additional VM and backend for Z80.
@@ -52,8 +56,8 @@ The solution is structured as a classic compiler pipeline with clear stage separ
   - SomeCompiler.Cli: Thin command-line app that ties the pipeline together: reads a C-like source file, compiles to IR, prints IR, generates Z80 assembly, and prints it. Exit reporting is via stderr for success/error messages.
 
 - External projects included in the solution
-  - Z80DotNet/*: Z80 processor simulator and tests (e.g., Zexall). Used as a real-world Z80 reference/executor for validation.
-  - 6502DotNet/Sixty502DotNet/*: Separate external assembler/runtime referenced by the solution (not part of the compiler pipeline itself).
+  - libs/Z80DotNet/*: Z80 processor simulator and tests (e.g., Zexall). Used as a real-world Z80 reference/executor for validation.
+  - libs/6502DotNet/Sixty502DotNet/*: Separate external assembler/runtime referenced by the solution (not part of the compiler pipeline itself).
 
 Development notes
 - Grammar changes: Building SomeCompiler.Parser.Antlr4.v2 will regenerate parser sources via Antlr4BuildTasks. A full solution build will handle this automatically; you can also build that project directly if iterating on the grammar.
