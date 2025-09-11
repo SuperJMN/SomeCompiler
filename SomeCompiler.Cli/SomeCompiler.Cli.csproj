@@ -10,5 +10,7 @@
     <ProjectReference Include="..\SomeCompiler.SemanticAnalysis\SomeCompiler.SemanticAnalysis.csproj" />
     <ProjectReference Include="..\SomeCompiler.Generation.Intermediate\SomeCompiler.Generation.Intermediate.csproj" />
     <ProjectReference Include="..\SomeCompiler.Z80\SomeCompiler.Z80.csproj" />
+    <ProjectReference Include="..\Z80DotNet\Main\Main.csproj" />
+    <ProjectReference Include="..\6502DotNet\Sixty502DotNet\Sixty502DotNet.csproj" />
   </ItemGroup>
 </Project>
