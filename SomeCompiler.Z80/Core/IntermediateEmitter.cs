@@ -61,8 +61,10 @@ public class IntermediateEmitter
         // Use academic epilogue if this function has parameters
         if (parameterCount > 0)
             return opCodeEmitter.AcademicEpilogueAndReturn(frameSize);
-        else
+        else if (frameSize > 0 || opCodeEmitter.HasAnyReferences())
             return opCodeEmitter.EpilogueAndReturn();
+        else
+            return new[] { "\tRET" };
     }
 
     public IEnumerable<string> Halt()
@@ -97,12 +99,19 @@ public class IntermediateEmitter
     public IEnumerable<string> Return(Return ret)
     {
         var lines = new List<string>();
-        lines.AddRange(opCodeEmitter.Set(ret.Reference, Register.HL));
+        // Only load from reference if it was materialized (exists in table)
+        // If not materialized, assume the value is already in HL
+        if (opCodeEmitter.HasReference(ret.Reference))
+        {
+            lines.AddRange(opCodeEmitter.Set(ret.Reference, Register.HL));
+        }
         // Use academic epilogue if this function has parameters
         if (parameterCount > 0)
             lines.AddRange(opCodeEmitter.AcademicEpilogueAndReturn(frameSize));
-        else
+        else if (frameSize > 0 || opCodeEmitter.HasAnyReferences())
             lines.AddRange(opCodeEmitter.EpilogueAndReturn());
+        else
+            lines.Add("\tRET");
         return lines;
     }
 

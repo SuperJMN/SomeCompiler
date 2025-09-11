@@ -6,4 +6,9 @@ public record Return(CodeGeneration.Model.Classes.Reference Reference) : Code
     {
         return $"return {map[Reference]}";
     }
+
+    public override IEnumerable<CodeGeneration.Model.Classes.Reference> GetReferences()
+    {
+        yield return Reference;
+    }
 }

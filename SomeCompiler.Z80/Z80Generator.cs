@@ -47,7 +47,11 @@ public class Z80Generator
                 }
 
                 // Build per-function reference set
-                var refs = body.SelectMany(c => c.GetReferences()).Distinct().ToList();
+                var allRefs = body.SelectMany(c => c.GetReferences()).Distinct().ToList();
+                
+                // Optimization: Filter out single-use temporaries that are only used in return statements
+                var refs = FilterOutSingleUseReturnTemporaries(body, allRefs);
+                
                 var mapNames = BuildNames(refs);
 
                 // Assign offsets: parameters on stack at positive IX offsets, locals at negative IX offsets
@@ -65,10 +69,13 @@ public class Z80Generator
                             var pIndex = paramNames.FindIndex(p => p == shortName);
                             if (pIndex >= 0)
                             {
-                                // EXPERIMENTAL: Try IX+2 - maybe params are right after caller_old_IX
-                                var paramBaseOffset = 2 + (pIndex * 2);
-                                var lowOffset = paramBaseOffset;
-                                var highOffset = paramBaseOffset + 1;
+                                // Standard Z80 frame layout:
+                                // (ix+0,ix+1) : old IX
+                                // (ix+2,ix+3) : return address  
+                                // (ix+4,...)  : arguments (param0 at ix+4, param1 at ix+6, etc)
+                                var paramBaseOffset = 4 + (pIndex * 2);
+                                var lowOffset = paramBaseOffset;     // Low byte
+                                var highOffset = paramBaseOffset + 1; // High byte
                                 table[r] = new MetaData(name, lowOffset, highOffset);
                                 continue;
                             }
@@ -83,6 +90,9 @@ public class Z80Generator
                 var frameSize = localIndex * 2;
 
                 var op = new OpCodeEmitter(table);
+                
+                // Parameter detection completed
+                
                 var emitter = new IntermediateEmitter(op, paramNames.Count, frameSize);
                 var gen = new Z80AssemblyGenerator(emitter);
 
@@ -101,14 +111,17 @@ public class Z80Generator
                 // Extract parameter passing instructions that come before CALL instructions
                 var (prePrologueInstructions, mainBody) = ExtractParameterInstructions(body);
                 
-                // Emit pre-prologue parameter instructions (before HL is modified)
+                // Prologue: different strategy based on parameters and whether we're a caller
+                bool isCaller = prePrologueInstructions.Count > 0;
+                lines.AddRange(FunctionPrologue(frameSize, paramNames.Count, op, isCaller));
+                
+                // Emit pre-prologue parameter instructions (after setting up the frame)
                 foreach (var c in prePrologueInstructions)
                 {
                     lines.AddRange(gen.Generate(c));
                 }
 
-                // Prologue: different strategy based on parameters
-                lines.AddRange(FunctionPrologue(frameSize, paramNames.Count, op));
+                // The callee will set up its own frame in the standard prologue
 
                 // Emit remaining body
                 foreach (var c in mainBody)
@@ -123,8 +136,12 @@ public class Z80Generator
             }
         }
 
-        // Append shared algorithms
-        lines.AddRange(MultiplyAlgorithm());
+        // Only append shared algorithms if they are used
+        bool hasMultiplication = codes.OfType<SomeCompiler.Generation.Intermediate.Model.Codes.Multiply>().Any();
+        if (hasMultiplication)
+        {
+            lines.AddRange(MultiplyAlgorithm());
+        }
 
         var asm = lines.JoinWithLines();
         return new GeneratedProgram(asm);
@@ -134,6 +151,8 @@ public class Z80Generator
     {
         var prePrologue = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
         var mainBody = new List<SomeCompiler.Generation.Intermediate.Model.Codes.Code>();
+        
+        // Debug output removed
         
         var i = 0;
         while (i < body.Count)
@@ -186,6 +205,58 @@ public class Z80Generator
     {
         return code is SomeCompiler.Generation.Intermediate.Model.Codes.Param or SomeCompiler.Generation.Intermediate.Model.Codes.ParamConst;
     }
+    
+    private static List<CodeGeneration.Model.Classes.Reference> FilterOutSingleUseReturnTemporaries(
+        List<SomeCompiler.Generation.Intermediate.Model.Codes.Code> body, 
+        List<CodeGeneration.Model.Classes.Reference> allRefs)
+    {
+        var filteredRefs = new List<CodeGeneration.Model.Classes.Reference>();
+        
+        foreach (var reference in allRefs)
+        {
+            // Count how many times this reference is used across all instructions
+            var usageCount = 0;
+            var isOnlyUsedInReturn = false;
+            
+            foreach (var code in body)
+            {
+                var codeRefs = code.GetReferences();
+                if (codeRefs.Contains(reference))
+                {
+                    usageCount++;
+                    // Check if this usage is in a return statement
+                    if (code is SomeCompiler.Generation.Intermediate.Model.Codes.Return ret && ret.Reference.Equals(reference))
+                    {
+                        isOnlyUsedInReturn = true;
+                    }
+                    else
+                    {
+                        isOnlyUsedInReturn = false;
+                    }
+                }
+            }
+            
+            // If reference is used exactly twice (once in assign, once in return), and the return is the only non-assign usage,
+            // then we can optimize it out
+            if (usageCount == 2 && isOnlyUsedInReturn)
+            {
+                // Check if the other usage is an AssignConstant where this reference is the target
+                bool hasAssignConstantUsage = body.OfType<SomeCompiler.Generation.Intermediate.Model.Codes.AssignConstant>()
+                    .Any(ac => ac.Target.Equals(reference));
+                
+                if (hasAssignConstantUsage)
+                {
+                    // Skip this reference - don't materialize it
+                    continue;
+                }
+            }
+            
+            // Keep this reference
+            filteredRefs.Add(reference);
+        }
+        
+        return filteredRefs;
+    }
 
     private static Dictionary<CodeGeneration.Model.Classes.Reference, string> BuildNames(List<CodeGeneration.Model.Classes.Reference> refs)
     {
@@ -206,32 +277,50 @@ public class Z80Generator
         return dict;
     }
 
-    private static IEnumerable<string> FunctionPrologue(int frameSize, int paramCount, OpCodeEmitter op)
+
+    private static IEnumerable<string> FunctionPrologue(int frameSize, int paramCount, OpCodeEmitter op, bool isCaller = false)
     {
         if (paramCount > 0)
         {
-            // ACADEMIC CONVENTION: Callee with parameters does NOT touch IX
-            // Use caller's IX directly to access parameters at IX+4, IX+6, etc.
-            // Only adjust SP for local variables if needed
+            // Standard Z80 calling convention prologue for functions with parameters
+            // On entry: [old_stack, arg0, arg1, ..., return_addr] <- SP
+            yield return "\tPUSH IX";          // Save old frame pointer
+            yield return "\tLD HL, 0";
+            yield return "\tADD HL, SP";       // HL = current SP
+            yield return "\tPUSH HL";          // Push HL onto stack
+            yield return "\tPOP IX";           // IX = value from stack = HL
+            
+            // Reserve space for locals if needed
             if (frameSize > 0)
             {
                 yield return $"\tLD HL, {-frameSize}";
                 yield return "\tADD HL, SP";
                 yield return "\tLD SP, HL";
             }
-            // IX remains pointing to caller's frame
-            // Layout: IX+0..1 -> [caller_old_IX], IX+2..3 -> [ret_addr], IX+4+ -> [params]
+            // Now IX points to the frame:
+            // (ix+0,ix+1) : old IX
+            // (ix+2,ix+3) : return address  
+            // (ix+4,...)  : arguments
+        }
+        else if (frameSize > 0 || op.HasAnyReferences())
+        {
+            // Standard prologue for functions that need IX frame (have locals or use IX)
+            yield return "\tPUSH IX";         // Save old IX
+            yield return "\tLD HL, 0";
+            yield return "\tADD HL, SP";      // HL = current SP
+            yield return "\tPUSH HL";         // Push HL onto stack
+            yield return "\tPOP IX";          // IX = value from stack = HL
+            
+            if (frameSize > 0)
+            {
+                yield return $"\tLD HL, {-frameSize}";
+                yield return "\tADD HL, SP";
+                yield return "\tLD SP, HL";
+            }
         }
         else
         {
-            // Standard prologue for functions without parameters
-            // Fixed: IX should point to where SP was BEFORE the setup  
-            yield return "\tPUSH IX";     // [1] Save old IX
-            yield return "\tLD HL, 2";   // [2] Account for PUSH IX (2 bytes)
-            yield return "\tADD HL, SP";  // [3] HL = SP + 2 (before PUSH IX)
-            yield return "\tPUSH HL";     // [4] Push corrected SP
-            yield return "\tPOP IX";      // [5] IX = corrected SP
-            
+            // Simple functions with no locals and no IX usage: minimal prologue
             if (frameSize > 0)
             {
                 yield return $"\tLD HL, {-frameSize}";

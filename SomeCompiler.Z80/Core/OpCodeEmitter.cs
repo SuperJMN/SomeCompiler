@@ -73,30 +73,21 @@ public class OpCodeEmitter
 
     public IEnumerable<string> AcademicEpilogueAndReturn(int frameSize)
     {
-        // Academic convention: callee with parameters didn't modify IX
-        // Just restore SP and return (no IX manipulation)
-        if (frameSize > 0)
-        {
-            yield return Tab + $"LD HL, {frameSize}";
-            yield return Tab + "ADD HL, SP";
-            yield return Tab + "LD SP, HL";
-        }
+        // Standard Z80 calling convention epilogue
+        // Restore frame and return, preserving HL return value
+        
+        // Free local variables by restoring SP to IX
+        yield return Tab + "LD SP, IX";
+        
+        // Restore old IX (was saved at (IX+0))
+        yield return Tab + "POP IX";
+        
+        // Return to caller (return address is at top of stack)
         yield return Tab + "RET";
+        
+        // Note: HL is naturally preserved since we don't touch it
     }
 
-    public IEnumerable<string> EpilogueAndReturnWithParamCleanup(int paramCount)
-    {
-        yield return Tab + "LD SP, IX";
-        yield return Tab + "POP IX";
-        // Clean parameters from stack (each parameter is 2 bytes)
-        if (paramCount > 0)
-        {
-            yield return Tab + $"LD HL, {paramCount * 2}";
-            yield return Tab + "ADD HL, SP";
-            yield return Tab + "LD SP, HL";
-        }
-        yield return Tab + "RET";
-    }
 
     public string Set(int from, Register to)
     {
@@ -107,19 +98,17 @@ public class OpCodeEmitter
     {
         return table.ContainsKey(reference);
     }
+    
+    public bool HasAnyReferences()
+    {
+        return table.Count > 0;
+    }
 
     public string Call(string label)
     {
         return Tab + $"CALL {label}";
     }
 
-    public IEnumerable<string> AdjustSP(int bytes)
-    {
-        if (bytes == 0) yield break;
-        yield return Tab + $"LD HL, {bytes}";
-        yield return Tab + "ADD HL, SP";
-        yield return Tab + "LD SP, HL";
-    }
 
     public IEnumerable<string> AdjustSPPreserveHL(int bytes)
     {

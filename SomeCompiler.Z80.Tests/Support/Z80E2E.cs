@@ -67,6 +67,35 @@ public static class Z80E2E
             .Select(d => d.ProgramCounter)
             .DefaultIfEmpty(0)
             .First();
+            
+        // The debug info from Z80Assembler doesn't include labels, only instructions
+        // For single-function programs (main only), main starts at PC 0
+        // For multi-function programs, we need a different approach
+        if (entryPc == 0)
+        {
+            // Check if this looks like a multi-function program by looking for multiple RET instructions
+            var retCount = bin.Count(b => b == 0xC9);
+            
+            if (retCount <= 1)
+            {
+                // Single function program - main starts at 0
+                entryPc = 0;
+            }
+            else
+            {
+                // Multi-function program - look for the second function (main after first function)
+                // Find first RET, then main should start right after
+                for (int pc = 0; pc < bin.Length - 1; pc++)
+                {
+                    if (bin[pc] == 0xC9) // RET instruction
+                    {
+                        // Next instruction after RET should be start of next function (main)
+                        entryPc = (ushort)(pc + 1);
+                        break;
+                    }
+                }
+            }
+        }
 
         return (bin, entryPc);
     }
