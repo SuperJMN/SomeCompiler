@@ -1,188 +1,23 @@
-# Azure Pipeline for RetroSharp
-# A modern C#-like language that compiles to 8-bit architectures (Z80)
-
-trigger:
-- main
-- develop
-- release/*
-- hotfix/*
-
-pr:
-- main
-- develop
-
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
 - group: api-keys
 - name: Agent.Source.Git.ShallowFetchDepth
   value: 0
-- name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
-  value: 'true'
-- name: DOTNET_CLI_TELEMETRY_OPTOUT
-  value: 'true'
 
-stages:
-- stage: Build
-  displayName: 'Build and Test'
-  jobs:
-  - job: BuildTest
-    displayName: 'Build and Test RetroSharp'
-    steps:
-    - checkout: self
-      fetchDepth: 0
-      displayName: 'Checkout source code'
+steps:
+- checkout: self
+  fetchDepth: 0
 
-    - task: UseDotNet@2
-      displayName: 'Use .NET 8'
-      inputs:
-        packageType: 'sdk'
-        version: '8.x'
+- pwsh: dotnet tool install --global DotnetDeployer.Tool
+  displayName: Install DotnetDeployer
 
-    - pwsh: dotnet --info
-      displayName: 'Display .NET info'
+- pwsh: dotnetdeployer nuget --api-key $env:NUGET_API_KEY
+  displayName: Publish NuGet packages
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  env:
+    NUGET_API_KEY: $(NuGetApiKey)
 
-    - pwsh: dotnet restore RetroSharp.sln
-      displayName: 'Restore dependencies'
-
-    - pwsh: dotnet build RetroSharp.sln --configuration Release --no-restore
-      displayName: 'Build solution'
-
-    - pwsh: dotnet test RetroSharp.sln --configuration Release --no-build --verbosity normal --logger trx --collect:"XPlat Code Coverage"
-      displayName: 'Run tests'
-
-    - task: PublishTestResults@2
-      displayName: 'Publish test results'
-      condition: succeededOrFailed()
-      inputs:
-        testResultsFormat: 'VSTest'
-        testResultsFiles: '**/*.trx'
-        failTaskOnFailedTests: true
-
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage'
-      condition: succeededOrFailed()
-      inputs:
-        codeCoverageTool: 'Cobertura'
-        summaryFileLocation: '**/coverage.cobertura.xml'
-
-- stage: Package
-  displayName: 'Package and Publish'
-  condition: succeeded()
-  dependsOn: Build
-  jobs:
-  - job: PackageJob
-    displayName: 'Package RetroSharp Tool'
-    steps:
-    - checkout: self
-      fetchDepth: 0
-      displayName: 'Checkout source code'
-
-    - task: UseDotNet@2
-      displayName: 'Use .NET 8'
-      inputs:
-        packageType: 'sdk'
-        version: '8.x'
-
-    - pwsh: dotnet tool install --global DotnetDeployer.Tool
-      displayName: 'Install DotnetDeployer'
-
-    - pwsh: dotnet tool install --global GitVersion.Tool
-      displayName: 'Install GitVersion'
-
-    - pwsh: dotnet-gitversion /output buildserver
-      displayName: 'Calculate version with GitVersion'
-
-    - pwsh: |
-        $version = dotnet-gitversion | ConvertFrom-Json
-        Write-Host "Version: $($version.FullSemVer)"
-        Write-Host "##vso[task.setvariable variable=Version]$($version.FullSemVer)"
-        Write-Host "##vso[task.setvariable variable=AssemblySemVer]$($version.AssemblySemVer)"
-        Write-Host "##vso[task.setvariable variable=InformationalVersion]$($version.InformationalVersion)"
-      displayName: 'Set version variables'
-
-    - pwsh: |
-        # Update version in project file
-        $projectFile = "src/RetroSharp.Cli/RetroSharp.Cli.csproj"
-        $content = Get-Content $projectFile -Raw
-        $content = $content -replace '<Version>.*</Version>', "<Version>$(Version)</Version>"
-        $content = $content -replace '<AssemblyVersion>.*</AssemblyVersion>', "<AssemblyVersion>$(AssemblySemVer)</AssemblyVersion>"
-        $content = $content -replace '<FileVersion>.*</FileVersion>', "<FileVersion>$(AssemblySemVer)</FileVersion>"
-        $content = $content -replace '<InformationalVersion>.*</InformationalVersion>', "<InformationalVersion>$(InformationalVersion)</InformationalVersion>"
-        
-        # Add version properties if they don't exist
-        if (-not ($content -match '<AssemblyVersion>')) {
-          $content = $content -replace '(<Version>.*</Version>)', "`$1`n    <AssemblyVersion>$(AssemblySemVer)</AssemblyVersion>"
-        }
-        if (-not ($content -match '<FileVersion>')) {
-          $content = $content -replace '(<AssemblyVersion>.*</AssemblyVersion>)', "`$1`n    <FileVersion>$(AssemblySemVer)</FileVersion>"
-        }
-        if (-not ($content -match '<InformationalVersion>')) {
-          $content = $content -replace '(<FileVersion>.*</FileVersion>)', "`$1`n    <InformationalVersion>$(InformationalVersion)</InformationalVersion>"
-        }
-        
-        Set-Content $projectFile $content
-        Write-Host "Updated version in project file to $(Version)"
-      displayName: 'Update project version'
-
-    - pwsh: dotnet build RetroSharp.sln --configuration Release
-      displayName: 'Build with updated version'
-
-    - pwsh: dotnet pack src/RetroSharp.Cli/RetroSharp.Cli.csproj --configuration Release --no-build --output $(Build.ArtifactStagingDirectory)/packages
-      displayName: 'Package RetroSharp tool'
-
-    - pwsh: |
-        # Verify the package was created
-        $packages = Get-ChildItem "$(Build.ArtifactStagingDirectory)/packages" -Filter "*.nupkg"
-        foreach ($package in $packages) {
-          Write-Host "Created package: $($package.Name) ($($package.Length) bytes)"
-        }
-      displayName: 'Verify package creation'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish artifacts'
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)/packages'
-        ArtifactName: 'packages'
-
-    # Publish to NuGet only on main branch
-    - pwsh: dotnetdeployer nuget --api-key $env:NUGET_API_KEY --source "$(Build.ArtifactStagingDirectory)/packages"
-      displayName: 'Publish to NuGet (Production)'
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-      env:
-        NUGET_API_KEY: $(NuGetApiKey)
-
-    # Dry run for other branches
-    - pwsh: dotnetdeployer nuget --api-key $env:NUGET_API_KEY --source "$(Build.ArtifactStagingDirectory)/packages" --no-push
-      displayName: 'Publish to NuGet (Dry Run)'
-      condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/main'))
-      env:
-        NUGET_API_KEY: $(NuGetApiKey)
-
-    # Test the tool installation (optional verification step)
-    - pwsh: |
-        Write-Host "Testing tool installation..."
-        $package = Get-ChildItem "$(Build.ArtifactStagingDirectory)/packages" -Filter "RetroSharp.Tool.*.nupkg" | Select-Object -First 1
-        if ($package) {
-          Write-Host "Installing tool from package: $($package.Name)"
-          dotnet tool install --global --add-source "$(Build.ArtifactStagingDirectory)/packages" RetroSharp.Tool --version $(Version)
-          
-          # Create a test file
-          @"
-int main() {
-    return 42;
-}
-"@ | Out-File -FilePath "test.rs" -Encoding UTF8
-          
-          # Test the tool
-          Write-Host "Testing RetroSharp compiler..."
-          retrosharp test.rs
-          
-          Write-Host "Tool test completed successfully!"
-        } else {
-          Write-Error "Package not found!"
-          exit 1
-        }
-      displayName: 'Test tool installation'
-      condition: succeeded()
+- pwsh: dotnetdeployer nuget --api-key $env:NUGET_API_KEY --no-push
+  displayName: Publish NuGet packages (dry run)
+  condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
+  env:
+    NUGET_API_KEY: $(NuGetApiKey)
