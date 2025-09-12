@@ -5,7 +5,8 @@ using SomeCompiler.SemanticAnalysis;
 using SomeCompiler.Generation.Intermediate;  
 using SomeCompiler.Z80;                      
 using Sixty502DotNet;                        
-using Konamiman.Z80dotNet;                   
+using Konamiman.Z80dotNet;
+using Sixty502DotNet.Shared;
 
 var source = @"int fact(int n) {
     if (n == 0) {
