@@ -9,8 +9,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\libs\6502DotNet\Sixty502DotNet.Shared\Sixty502DotNet.Shared.csproj" />
-        <ProjectReference Include="..\SomeCompiler.Z80\SomeCompiler.Z80.csproj" />
-        <ProjectReference Include="..\SomeCompiler\SomeCompiler.csproj" />
+        <ProjectReference Include="..\RetroSharp.Z80\RetroSharp.Z80.csproj" />
+        <ProjectReference Include="..\RetroSharp\RetroSharp.csproj" />
         <ProjectReference Include="..\..\libs\Z80DotNet\Main\Main.csproj" />
     </ItemGroup>
 

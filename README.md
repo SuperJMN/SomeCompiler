@@ -1,19 +1,32 @@
-# Welcome!
+# RetroSharp
 
-This is "SomeCompiler", a little C-like compiler created for "The Joy of Learning®".
+RetroSharp is a modern C#-like language that compiles to 8-bit architectures, created for "The Joy of Learning®".
 
-I'm making this in my free time to learn about compilers and some old-school topics. It's supposed to make me happier, but more often that not, it's making me get bald faster 🤣
+I'm making this in my free time to learn about compilers and some old-school topics. It combines the familiar syntax of C# with the nostalgic charm of retro computing. It's supposed to make me happier, but more often that not, it's making me get bald faster 🤣
 
 ## How does it work?
 
-Currently, it's able to compile very simple programs into a sort of **intermediate language** (IL for short) that is nothing more than 3-Address Code. The benefit of this IL, is that it's so generic that it can virtually be translated to any platform.
+RetroSharp uses a multi-stage compilation pipeline:
 
-Then, the IL is targeted to a specific platform with a **code generator**. It basically converts IL into the actual binary format (or aseembly code).
+1. **Parser**: Uses ANTLR4 to parse RetroSharp source code into an AST
+2. **Semantic Analysis**: Validates types, scopes, and semantics
+3. **Intermediate Code Generation**: Produces platform-agnostic 3-address code (IL)
+4. **Backend**: Translates IL to target architecture (currently Zilog Z80)
 
-What can it do?
+The benefit of this architecture is that the IL is generic enough to target virtually any platform by just writing a new backend.
 
-Right now, it can compile a few simple programs like this:
-```
+## What can it do?
+
+Right now, RetroSharp can compile simple programs with:
+- Basic arithmetic and logic operations
+- Variables and assignments
+- Function calls
+- Control flow (if/else, loops)
+- Multiple data types (int, char, byte, u8, i8, u16, i16, bool)
+- Pointers with `ptr<T>` syntax
+
+Example program:
+```csharp
 int main() 
 { 
     return 2 * 3 * 4; 
@@ -22,4 +35,26 @@ int main()
 
 ## Which platforms does it compile for?
 
-It can compile for the Zilog Z80 processor only. I'm using it as a real platform to test the compiler 😊 But truth is that I almost know nothing about it apart from it being one of the most widely used processors of all time and part of systems like Nintendo Gameboy, Apple II, Commodor 64 and many others.
+Currently, RetroSharp targets the **Zilog Z80** processor - one of the most iconic 8-bit CPUs of all time! The Z80 powered legendary systems like:
+
+- Nintendo Game Boy
+- Amstrad CPC
+- MSX computers
+- TRS-80
+- And many arcade machines
+
+The modular design makes it relatively straightforward to add support for other 8-bit processors like the 6502, 8080, or even modern microcontrollers.
+
+## Installation
+
+RetroSharp is distributed as a .NET tool:
+
+```bash
+dotnet tool install --global RetroSharp
+```
+
+Then use it to compile your programs:
+
+```bash
+retroSharp myprogram.rs
+```

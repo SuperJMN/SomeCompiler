@@ -366,9 +366,19 @@ FodyWeavers.xsd
 .idea/
 *.iml
 # Specific nested workspace file
-.idea/.idea.SomeCompiler/.idea/workspace.xml
+.idea/.idea.RetroSharp/.idea/workspace.xml
 
 # Additional JetBrains Rider/IDE user-specific files
 *.sln.DotSettings.user
 *.ipr
 *.iws
+
+# RetroSharp specific
+packages/
+test.rs
+*.rs~
+
+# Pipeline artifacts
+TestResults/
+*.trx
+*.coverage

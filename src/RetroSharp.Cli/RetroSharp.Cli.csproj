@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <!-- Configuración como dotnet tool -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>retrosharp</ToolCommandName>
+    <PackageId>RetroSharp.Tool</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>SuperJMN</Authors>
+    <Description>A modern C#-like language that compiles to 8-bit architectures (Z80)</Description>
+    <PackageTags>compiler;8bit;z80;retro;csharp;language</PackageTags>
+    <RepositoryUrl>https://github.com/SuperJMN/RetroSharp</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/SuperJMN/RetroSharp</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\RetroSharp.Parser.Antlr4.v2\RetroSharp.Parser.csproj" />
+    <ProjectReference Include="..\RetroSharp.SemanticAnalysis\RetroSharp.SemanticAnalysis.csproj" />
+    <ProjectReference Include="..\RetroSharp.Generation.Intermediate\RetroSharp.Generation.Intermediate.csproj" />
+    <ProjectReference Include="..\RetroSharp.Z80\RetroSharp.Z80.csproj" />
+    <ProjectReference Include="..\..\libs\Z80DotNet\Main\Main.csproj" />
+    <ProjectReference Include="..\..\libs\6502DotNet\Sixty502DotNet.Shared\Sixty502DotNet.Shared.csproj" />
+  </ItemGroup>
+</Project>

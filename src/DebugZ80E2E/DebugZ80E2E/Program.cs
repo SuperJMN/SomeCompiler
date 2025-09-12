@@ -1,4 +1,4 @@
-using SomeCompiler.Z80.Tests.Support;
+using RetroSharp.Z80.Tests.Support;
 using Sixty502DotNet;
 using Konamiman.Z80dotNet;
 using Sixty502DotNet.Shared;
@@ -12,11 +12,11 @@ Console.WriteLine($"Entry PC: {entryPc:X4}");
 
 // Let's debug the BuildBinaryAndEntryPc method by recreating it here
 Console.WriteLine("\n=== DEBUG ENTRY PC DETECTION ===");
-var parseResult = new SomeCompiler.Parser.SomeParser().Parse(source);
-var analyzed = new SomeCompiler.SemanticAnalysis.SemanticAnalyzer().Analyze(parseResult.Value);
-var programNode = (SomeCompiler.SemanticAnalysis.ProgramNode)analyzed.Node;
-var ir = new SomeCompiler.Generation.Intermediate.V2IntermediateCodeGenerator().Generate(programNode);
-var asmResult = new SomeCompiler.Z80.Z80Generator().Generate(ir);
+var parseResult = new RetroSharp.Parser.SomeParser().Parse(source);
+var analyzed = new RetroSharp.SemanticAnalysis.SemanticAnalyzer().Analyze(parseResult.Value);
+var programNode = (RetroSharp.SemanticAnalysis.ProgramNode)analyzed.Node;
+var ir = new RetroSharp.Generation.Intermediate.V2IntermediateCodeGenerator().Generate(programNode);
+var asmResult = new RetroSharp.Z80.Z80Generator().Generate(ir);
 var asm = asmResult.Value.Assembly;
 
 var assembler = new Z80Assembler();
