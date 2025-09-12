@@ -1,4 +1,6 @@
-﻿void PrintSection(string header, string body)
+﻿using Sixty502DotNet.Shared;
+
+void PrintSection(string header, string body)
 {
     Console.WriteLine(header);
     Console.WriteLine(body);
@@ -65,7 +67,7 @@ Result<SomeCompiler.Z80.Core.GeneratedProgram> GenerateAsm(SomeCompiler.Generati
 Result<int> RunAsm(SomeCompiler.Z80.Core.GeneratedProgram asm)
 {
     // Assemble with Sixty502DotNet Z80Assembler and run on Konamiman.Z80dotNet
-    var assembler = new Sixty502DotNet.Z80Assembler();
+    var assembler = new Z80Assembler();
     var assembled = assembler.Assemble(asm.Assembly);
     if (assembled.IsFailure) return Result.Failure<int>(assembled.Error);
 

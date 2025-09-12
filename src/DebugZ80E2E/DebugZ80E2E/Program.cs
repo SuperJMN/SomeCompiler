@@ -1,6 +1,7 @@
 using SomeCompiler.Z80.Tests.Support;
 using Sixty502DotNet;
 using Konamiman.Z80dotNet;
+using Sixty502DotNet.Shared;
 
 // Let's debug the exact memory addresses
 var source = "int main() { return 7; }";
@@ -18,7 +19,7 @@ var ir = new SomeCompiler.Generation.Intermediate.V2IntermediateCodeGenerator().
 var asmResult = new SomeCompiler.Z80.Z80Generator().Generate(ir);
 var asm = asmResult.Value.Assembly;
 
-var assembler = new Sixty502DotNet.Z80Assembler();
+var assembler = new Z80Assembler();
 var assembled = assembler.Assemble(asm);
 var debugInfo = assembled.Value.DebugInfo;
 
