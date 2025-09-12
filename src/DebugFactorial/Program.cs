@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using SomeCompiler.Parser;                    
-using SomeCompiler.SemanticAnalysis;         
-using SomeCompiler.Generation.Intermediate;  
-using SomeCompiler.Z80;                      
+using RetroSharp.Parser;                    
+using RetroSharp.SemanticAnalysis;         
+using RetroSharp.Generation.Intermediate;  
+using RetroSharp.Z80;                      
 using Sixty502DotNet;                        
 using Konamiman.Z80dotNet;
 using Sixty502DotNet.Shared;

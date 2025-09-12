@@ -1,0 +1,26 @@
+# DotnetDeployer configuration for RetroSharp
+# https://github.com/SuperJMN/DotnetDeployer
+
+solution: RetroSharp.sln
+
+packages:
+  - name: RetroSharp.Tool
+    project: src/RetroSharp.Cli/RetroSharp.Cli.csproj
+    type: tool
+    description: "A modern C#-like language that compiles to 8-bit architectures (Z80)"
+    
+output:
+  directory: packages/
+  
+nuget:
+  source: https://api.nuget.org/v3/index.json
+  
+versioning:
+  strategy: gitversion
+  
+build:
+  configuration: Release
+  
+# Solo empaquetar el CLI como tool, otros proyectos son librerías internas
+projects-to-pack:
+  - src/RetroSharp.Cli/RetroSharp.Cli.csproj

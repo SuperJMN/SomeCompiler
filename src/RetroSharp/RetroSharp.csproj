@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="Generation\**" />
+      <EmbeddedResource Remove="Generation\**" />
+      <None Remove="Generation\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CSharpFunctionalExtensions" />
+        <PackageReference Include="Zafiro.Core" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RetroSharp.Parser.Antlr4.v2\RetroSharp.Parser.csproj" />
+    </ItemGroup>
+
+</Project>

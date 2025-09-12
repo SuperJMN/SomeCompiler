@@ -1,0 +1,33 @@
+﻿<!-- Template generated code from Antlr4BuildTasks.Template v 8.17 -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputType>Exe</OutputType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Antlr4 Include="RetroSharp.g4">
+			<Package>RetroSharp.Parser</Package>
+		</Antlr4>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Antlr4.Runtime.Standard" />
+		<PackageReference Include="Antlr4BuildTasks" PrivateAssets="all" />
+		<PackageReference Include="CSharpFunctionalExtensions" />
+		<PackageReference Include="Zafiro.Core" />
+		<PackageReference Include="System.Drawing.Common" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\RetroSharp.Core\RetroSharp.Core.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>3021;1701;1702</NoWarn>
+	</PropertyGroup>
+
+</Project>
