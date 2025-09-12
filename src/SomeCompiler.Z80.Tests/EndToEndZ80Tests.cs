@@ -7,6 +7,7 @@ using Sixty502DotNet;
 using Konamiman.Z80dotNet;
 using Xunit;
 using CSharpFunctionalExtensions;
+using Sixty502DotNet.Shared;
 
 namespace SomeCompiler.Z80.Tests;
 

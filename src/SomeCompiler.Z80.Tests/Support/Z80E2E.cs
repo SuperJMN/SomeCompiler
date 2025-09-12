@@ -5,7 +5,8 @@ using SomeCompiler.SemanticAnalysis;         // SemanticAnalyzer, ProgramNode
 using SomeCompiler.Generation.Intermediate;  // V2IntermediateCodeGenerator
 using SomeCompiler.Z80;                      // Z80Generator
 using Sixty502DotNet;                        // Z80Assembler
-using Konamiman.Z80dotNet;                   // Z80Processor
+using Konamiman.Z80dotNet;
+using Sixty502DotNet.Shared; // Z80Processor
 
 namespace SomeCompiler.Z80.Tests.Support;
 

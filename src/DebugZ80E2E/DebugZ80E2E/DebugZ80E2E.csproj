@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../SomeCompiler.Z80.Tests/SomeCompiler.Z80.Tests.csproj" />
+    <ProjectReference Include="../../../libs/6502DotNet/Sixty502DotNet.Shared/Sixty502DotNet.Shared.csproj" />
   </ItemGroup>
 
 </Project>
